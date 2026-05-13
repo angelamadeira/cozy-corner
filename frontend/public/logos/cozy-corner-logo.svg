@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 140" role="img" aria-labelledby="cc-title">
-  <title id="cc-title">Cozy Corner · recipes by Gigi</title>
+  <title id="cc-title">Cozy Corner — by Gigi</title>
   <text x="240" y="80"
         font-family="Caveat, cursive"
         font-size="68"
@@ -11,5 +11,5 @@
         font-size="13"
         text-anchor="middle"
         fill="currentColor"
-        opacity="0.55">recipes by Gigi</text>
+        opacity="0.55">— by Gigi</text>
 </svg>

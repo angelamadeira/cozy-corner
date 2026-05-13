@@ -1,134 +1,124 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-// 6 variações pra comparar: 3 geométricas + 3 orgânicas
-const variants = [
-  { id: 'v1', name: 'V1 · Inter outline', vibe: 'tipográfico, sans clean em outline fino', org: false },
-  { id: 'v2', name: 'V2 · Inter outline + traço terracota', vibe: 'mesma base, assinatura sutil', org: false },
-  { id: 'v3', name: 'V3 · Cutive Mono outline lowercase', vibe: 'typewriter delicado, "carta digitada"', org: false },
-  { id: 'v4', name: 'V4 · Fraunces italic', vibe: 'serif variável italic — editorial, curvas orgânicas', org: true },
-  { id: 'v5', name: 'V5 · Caveat handwritten', vibe: 'caligrafia neat — "manuscrito numa receita"', org: true },
-  { id: 'v6', name: 'V6 · Homemade Apple', vibe: 'caligrafia mais autêntica, intimista', org: true },
+// "Cozy Corner" fixo em Caveat. Variando só o subtítulo "recipes by Gigi".
+const subtitleVariants = [
+  {
+    id: 'a',
+    name: 'A · Cutive Mono (atual)',
+    desc: 'Typewriter delicado contrastando com o handwritten — mistura warm com nostálgico.',
+    sub: 'recipes by Gigi',
+    fontFamily: "'Cutive Mono', monospace",
+    fontSize: 13,
+    italic: false,
+    weight: 400,
+    opacity: 0.55,
+  },
+  {
+    id: 'b',
+    name: 'B · Caveat menor',
+    desc: 'Mesma família handwritten — identidade unificada, mais suave.',
+    sub: 'recipes by Gigi',
+    fontFamily: 'Caveat, cursive',
+    fontSize: 22,
+    italic: false,
+    weight: 500,
+    opacity: 0.7,
+  },
+  {
+    id: 'c',
+    name: 'C · Inter italic light',
+    desc: 'Minimalist sans em itálico leve — contraste editorial mas discreto.',
+    sub: 'recipes by Gigi',
+    fontFamily: 'Inter, sans-serif',
+    fontSize: 13,
+    italic: true,
+    weight: 300,
+    opacity: 0.7,
+  },
+  {
+    id: 'd',
+    name: 'D · Fraunces italic',
+    desc: 'Serif italic refinada — sensação de capa de revista, autoral.',
+    sub: 'recipes by Gigi',
+    fontFamily: 'Fraunces, serif',
+    fontSize: 16,
+    italic: true,
+    weight: 400,
+    opacity: 0.65,
+  },
+  {
+    id: 'e',
+    name: 'E · Sacramento (script romântico)',
+    desc: 'Script mais fluido e romântico — combina com o Caveat mas mais cursivo.',
+    sub: 'recipes by Gigi',
+    fontFamily: 'Sacramento, cursive',
+    fontSize: 22,
+    italic: false,
+    weight: 400,
+    opacity: 0.7,
+  },
+  {
+    id: 'f',
+    name: 'F · Só "by Gigi" — assinatura curta',
+    desc: 'Remove "recipes", deixa só "by Gigi" como assinatura — mais limpo.',
+    sub: '— by Gigi',
+    fontFamily: "'Cutive Mono', monospace",
+    fontSize: 13,
+    italic: false,
+    weight: 400,
+    opacity: 0.55,
+  },
 ];
+
+function renderLogo(v: typeof subtitleVariants[number], height = 0) {
+  const heightAttr = height > 0 ? `height="${height}"` : `width="320"`;
+  const fontStyle = v.italic ? 'italic' : 'normal';
+  return `
+    <svg viewBox="0 0 480 160" ${heightAttr} xmlns="http://www.w3.org/2000/svg">
+      <text x="240" y="86" font-family="Caveat, cursive" font-size="68" font-weight="600" text-anchor="middle" fill="currentColor">Cozy Corner</text>
+      <text x="240" y="124" font-family="${v.fontFamily}" font-size="${v.fontSize}" font-style="${fontStyle}" font-weight="${v.weight}" text-anchor="middle" fill="currentColor" opacity="${v.opacity}">${v.sub}</text>
+    </svg>
+  `;
+}
 ---
 
-<BaseLayout title="Logo Variations" description="Variações tipográficas line-art do logo Cozy Corner">
-  <!-- Carrega Fraunces, Caveat e Homemade Apple só nessa página -->
+<BaseLayout title="Logo · subtitle iteration" description="Variações de subtítulo pro logo Cozy Corner">
   <style is:global>
-    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Homemade+Apple&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Sacramento&display=swap');
   </style>
 
   <div class="logos-shell">
     <header class="logos-header">
-      <p class="t-meta">/logos</p>
-      <h1 class="logos-title">6 variações tipográficas</h1>
+      <p class="t-meta">/logos · subtítulo</p>
+      <h1 class="logos-title">Iteração no subtítulo</h1>
       <p class="t-body" style="color: var(--ink-soft); margin-top: 8px; max-width: 600px;">
-        3 geométricas (Inter / Cutive Mono em outline) e 3 orgânicas (serif italic, handwritten). Cada uma em fundo claro, escuro e tamanho de header.
+        "Cozy Corner" em Caveat fixo. Variando só o "recipes by Gigi" — 6 tratamentos pra você comparar.
       </p>
       <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">toggle dark</button>
     </header>
 
-    {variants.map((v) => (
+    {subtitleVariants.map((v) => (
       <section class="variant">
         <div class="variant-meta">
-          <h2 class="variant-title">{v.name}{v.org && <span class="org-badge">orgânico</span>}</h2>
-          <p class="t-small" style="color: var(--ink-soft);">{v.vibe}</p>
+          <h2 class="variant-title">{v.name}</h2>
+          <p class="t-small" style="color: var(--ink-soft);">{v.desc}</p>
+          <p class="t-meta" style="color: var(--ink-mute); margin-top: 4px;">
+            {v.fontFamily.split(',')[0]} · {v.fontSize}px · {v.italic ? 'italic' : 'normal'} · weight {v.weight}
+          </p>
         </div>
         <div class="variant-previews">
-          <div class={`preview preview-light ${v.id}`}>
+          <div class="preview preview-light">
             <span class="preview-label">creme</span>
-            <div class="logo-render">
-              {v.id === 'v1' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="70" font-family="Inter, sans-serif" font-size="56" font-weight="500" letter-spacing="-1.5" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.6">Cozy Corner</text>
-                  <text x="240" y="108" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v2' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="70" font-family="Inter, sans-serif" font-size="56" font-weight="500" letter-spacing="-1.5" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.6">Cozy Corner</text>
-                  <line x1="180" y1="84" x2="300" y2="84" stroke="#C56B4A" stroke-width="0.8" stroke-linecap="round" />
-                  <text x="240" y="116" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v3' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="68" font-family="Cutive Mono, monospace" font-size="42" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.5">cozy corner</text>
-                  <text x="240" y="106" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by gigi</text>
-                </svg>
-              )}
-              {v.id === 'v4' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="76" font-family="Fraunces, serif" font-size="60" font-style="italic" font-weight="400" text-anchor="middle" fill="currentColor">Cozy Corner</text>
-                  <text x="240" y="112" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v5' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="80" font-family="Caveat, cursive" font-size="68" font-weight="500" text-anchor="middle" fill="currentColor">Cozy Corner</text>
-                  <text x="240" y="114" font-family="Cutive Mono, monospace" font-size="13" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v6' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="74" font-family="'Homemade Apple', cursive" font-size="38" text-anchor="middle" fill="currentColor">Cozy Corner</text>
-                  <text x="240" y="110" font-family="Cutive Mono, monospace" font-size="13" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-            </div>
+            <div class="logo-render" set:html={renderLogo(v)} />
           </div>
           <div class="preview preview-dark">
             <span class="preview-label">dark</span>
-            <div class="logo-render dark">
-              {v.id === 'v1' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="70" font-family="Inter, sans-serif" font-size="56" font-weight="500" letter-spacing="-1.5" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.6">Cozy Corner</text>
-                  <text x="240" y="108" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v2' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="70" font-family="Inter, sans-serif" font-size="56" font-weight="500" letter-spacing="-1.5" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.6">Cozy Corner</text>
-                  <line x1="180" y1="84" x2="300" y2="84" stroke="#D58860" stroke-width="0.8" stroke-linecap="round" />
-                  <text x="240" y="116" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v3' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="68" font-family="Cutive Mono, monospace" font-size="42" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.5">cozy corner</text>
-                  <text x="240" y="106" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by gigi</text>
-                </svg>
-              )}
-              {v.id === 'v4' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="76" font-family="Fraunces, serif" font-size="60" font-style="italic" font-weight="400" text-anchor="middle" fill="currentColor">Cozy Corner</text>
-                  <text x="240" y="112" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v5' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="80" font-family="Caveat, cursive" font-size="68" font-weight="500" text-anchor="middle" fill="currentColor">Cozy Corner</text>
-                  <text x="240" y="114" font-family="Cutive Mono, monospace" font-size="13" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-              {v.id === 'v6' && (
-                <svg viewBox="0 0 480 140" width="320">
-                  <text x="240" y="74" font-family="'Homemade Apple', cursive" font-size="38" text-anchor="middle" fill="currentColor">Cozy Corner</text>
-                  <text x="240" y="110" font-family="Cutive Mono, monospace" font-size="13" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text>
-                </svg>
-              )}
-            </div>
+            <div class="logo-render" set:html={renderLogo(v)} />
           </div>
           <div class="preview preview-small">
             <span class="preview-label">tamanho header (~32px)</span>
-            <div class="logo-render">
-              {v.id === 'v1' && <svg viewBox="0 0 480 140" height="32"><text x="240" y="70" font-family="Inter, sans-serif" font-size="56" font-weight="500" letter-spacing="-1.5" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.6">Cozy Corner</text><text x="240" y="108" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text></svg>}
-              {v.id === 'v2' && <svg viewBox="0 0 480 140" height="32"><text x="240" y="70" font-family="Inter, sans-serif" font-size="56" font-weight="500" letter-spacing="-1.5" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.6">Cozy Corner</text><line x1="180" y1="84" x2="300" y2="84" stroke="#C56B4A" stroke-width="0.8" stroke-linecap="round" /><text x="240" y="116" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text></svg>}
-              {v.id === 'v3' && <svg viewBox="0 0 480 140" height="32"><text x="240" y="68" font-family="Cutive Mono, monospace" font-size="42" text-anchor="middle" fill="none" stroke="currentColor" stroke-width="0.5">cozy corner</text><text x="240" y="106" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by gigi</text></svg>}
-              {v.id === 'v4' && <svg viewBox="0 0 480 140" height="32"><text x="240" y="76" font-family="Fraunces, serif" font-size="60" font-style="italic" font-weight="400" text-anchor="middle" fill="currentColor">Cozy Corner</text><text x="240" y="112" font-family="Cutive Mono, monospace" font-size="14" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text></svg>}
-              {v.id === 'v5' && <svg viewBox="0 0 480 140" height="32"><text x="240" y="80" font-family="Caveat, cursive" font-size="68" font-weight="500" text-anchor="middle" fill="currentColor">Cozy Corner</text><text x="240" y="114" font-family="Cutive Mono, monospace" font-size="13" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text></svg>}
-              {v.id === 'v6' && <svg viewBox="0 0 480 140" height="32"><text x="240" y="74" font-family="'Homemade Apple', cursive" font-size="38" text-anchor="middle" fill="currentColor">Cozy Corner</text><text x="240" y="110" font-family="Cutive Mono, monospace" font-size="13" text-anchor="middle" fill="currentColor" opacity="0.55">recipes by Gigi</text></svg>}
-            </div>
+            <div class="logo-render" set:html={renderLogo(v, 32)} />
           </div>
         </div>
       </section>
@@ -155,19 +145,9 @@ const variants = [
     }
     .variant { padding: 40px 0; border-top: 1px solid var(--line); }
     .variant-meta { margin-bottom: 24px; }
-    .variant-title { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .org-badge {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 2px 8px;
-      background: var(--terracota);
-      color: white;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+    .variant-title { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin-bottom: 4px; }
     .variant-previews { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .preview { position: relative; padding: 40px 24px; border-radius: 8px; min-height: 180px; display: flex; align-items: center; justify-content: center; }
+    .preview { position: relative; padding: 40px 24px; border-radius: 8px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
     .preview-label { position: absolute; top: 12px; left: 16px; font-family: var(--font-mono); font-size: 10px; color: var(--ink-mute); text-transform: lowercase; }
     .preview-light { background: #FAF6EE; color: #1A1A1A; }
     .preview-dark { background: #0F1A2A; color: #F5F0E5; }
