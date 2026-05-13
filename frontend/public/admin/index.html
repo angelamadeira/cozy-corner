@@ -10,23 +10,42 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Cutive+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    /* ============ AUTH (LOGIN) — customização ============ */
-    /* Decap renderiza a tela de login direto no body antes da app montar.
-       Esses overrides usam selectors estáveis (atributos e tags) pra
-       sobreviver às mudanças de class-names auto-geradas. */
+    /* ===================================================================
+       Cozy Corner — Decap admin
+       Aplica o DS do site no admin via overrides. Decap usa styled-
+       components (class names auto-gerados); selectors estáveis usam
+       [class*=...], tags HTML e atributos de role/aria.
+       =================================================================== */
 
-    body {
-      background: #FAF6EE !important;
-      font-family: 'Cutive Mono', ui-monospace, monospace;
-      color: #1A1A1A;
+    :root {
+      --bg:        #FAF6EE;
+      --surface:   #F4EFE2;
+      --ink:       #1A1A1A;
+      --ink-soft:  #6B5F4F;
+      --ink-mute:  #A89F8E;
+      --line:      #E5DFD3;
+      --line-soft: #F0EBE0;
+      --terracota: #C56B4A;
+      --accent:    #D7F5FF;
+      --font-brand:   'Caveat', cursive;
+      --font-display: 'Inter', system-ui, sans-serif;
+      --font-mono:    'Cutive Mono', ui-monospace, monospace;
+      --r-sm: 4px;
+      --r-md: 8px;
+      --r-pill: 999px;
     }
 
-    /* Container da auth-page (Decap usa este className previsível) */
+    /* ============ BASE ============ */
+    html, body { background: var(--bg) !important; }
+    body, html, body * {
+      font-family: var(--font-mono);
+      color: var(--ink);
+    }
+
+    /* ============ AUTH (LOGIN) ============ */
     [class*="AuthenticationPage"], [class*="AuthPage"] {
-      background: #FAF6EE !important;
+      background: var(--bg) !important;
     }
-
-    /* Logo grande do topo */
     [class*="AuthenticationPage"] img,
     [class*="AuthPage"] img {
       max-width: 320px !important;
@@ -35,16 +54,14 @@
       margin: 0 auto 32px !important;
       opacity: 1 !important;
     }
-
-    /* Botão "Login" — pinta com a paleta da casa */
     [class*="AuthenticationPage"] button[type="button"],
     [class*="AuthPage"] button[type="button"] {
-      background: #1A1A1A !important;
-      color: #FAF6EE !important;
+      background: var(--ink) !important;
+      color: var(--bg) !important;
       border: none !important;
-      border-radius: 4px !important;
+      border-radius: var(--r-sm) !important;
       padding: 14px 32px !important;
-      font-family: 'Cutive Mono', monospace !important;
+      font-family: var(--font-mono) !important;
       font-size: 14px !important;
       font-weight: 400 !important;
       letter-spacing: 0.02em !important;
@@ -53,16 +70,212 @@
     }
     [class*="AuthenticationPage"] button[type="button"]:hover,
     [class*="AuthPage"] button[type="button"]:hover {
-      background: #C56B4A !important;
+      background: var(--terracota) !important;
       transform: translateY(-1px);
     }
 
-    /* Mensagem "Use Local Backend" / textos auxiliares */
-    [class*="AuthenticationPage"] p,
-    [class*="AuthPage"] p {
-      font-family: 'Cutive Mono', monospace !important;
-      color: #6B5F4F !important;
+    /* ============ APP HEADER (top nav) ============ */
+    [class*="AppHeader"],
+    [class*="Header__StyledAppHeader"],
+    nav[role="navigation"] {
+      background: var(--bg) !important;
+      border-bottom: 1px solid var(--line) !important;
+      box-shadow: none !important;
+    }
+    [class*="AppHeader"] a,
+    nav[role="navigation"] a {
+      color: var(--ink-soft) !important;
+      font-family: var(--font-mono) !important;
       font-size: 13px !important;
+      text-decoration: none !important;
+    }
+    [class*="AppHeader"] a:hover,
+    nav[role="navigation"] a:hover { color: var(--terracota) !important; }
+
+    /* Botão "Quick add" (Adicionar receita rápido) */
+    [class*="QuickPostButton"], [class*="ActionsContainer"] button {
+      background: var(--ink) !important;
+      color: var(--bg) !important;
+      border-radius: var(--r-sm) !important;
+      font-family: var(--font-mono) !important;
+    }
+
+    /* ============ SIDEBAR (collections list) ============ */
+    [class*="Sidebar"],
+    [class*="SidebarContainer"] {
+      background: var(--surface) !important;
+      border-right: 1px solid var(--line-soft) !important;
+    }
+    [class*="Sidebar"] h1, [class*="Sidebar"] h2 {
+      font-family: var(--font-display) !important;
+      font-weight: 500 !important;
+      color: var(--ink) !important;
+    }
+    [class*="Sidebar"] a {
+      color: var(--ink-soft) !important;
+      font-family: var(--font-mono) !important;
+      font-size: 13px !important;
+      padding: 8px 12px !important;
+      border-radius: var(--r-sm) !important;
+    }
+    [class*="Sidebar"] a:hover {
+      background: var(--bg) !important;
+      color: var(--ink) !important;
+    }
+    [class*="Sidebar"] a[class*="Active"],
+    [class*="Sidebar"] a[aria-current] {
+      background: var(--ink) !important;
+      color: var(--bg) !important;
+    }
+
+    /* ============ MAIN AREA ============ */
+    main, [class*="Workflow"], [class*="CollectionContainer"] {
+      background: var(--bg) !important;
+    }
+
+    /* ============ CARDS / ENTRY LIST ============ */
+    [class*="ListCard"], [class*="EntriesCollection"] > a,
+    [class*="Card"] {
+      background: var(--surface) !important;
+      border: 1px solid var(--line-soft) !important;
+      border-radius: var(--r-md) !important;
+      box-shadow: 0 1px 2px rgba(26,26,26,0.04) !important;
+      transition: border-color 200ms, transform 200ms !important;
+    }
+    [class*="ListCard"]:hover,
+    [class*="EntriesCollection"] > a:hover {
+      border-color: var(--terracota) !important;
+      transform: translateY(-2px) !important;
+    }
+    [class*="ListCard"] h2, [class*="ListCard"] h3 {
+      font-family: var(--font-display) !important;
+      font-weight: 600 !important;
+      color: var(--ink) !important;
+    }
+
+    /* ============ HEADINGS no editor ============ */
+    h1, h2, h3 {
+      font-family: var(--font-display) !important;
+      color: var(--ink) !important;
+    }
+
+    /* ============ FORMS ============ */
+    input[type="text"], input[type="email"], input[type="password"],
+    input[type="number"], input[type="date"], input[type="datetime-local"],
+    input[type="time"], select, textarea {
+      background: var(--bg) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: var(--r-sm) !important;
+      padding: 10px 14px !important;
+      font-family: var(--font-mono) !important;
+      font-size: 14px !important;
+      color: var(--ink) !important;
+      transition: border-color 200ms !important;
+    }
+    input[type="text"]:focus, input[type="email"]:focus,
+    input[type="password"]:focus, input[type="number"]:focus,
+    input[type="date"]:focus, input[type="datetime-local"]:focus,
+    input[type="time"]:focus, select:focus, textarea:focus {
+      outline: none !important;
+      border-color: var(--terracota) !important;
+    }
+    label {
+      font-family: var(--font-mono) !important;
+      font-size: 12px !important;
+      color: var(--ink-soft) !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+    }
+
+    /* ============ BUTTONS — primary, secondary, danger ============ */
+    button {
+      font-family: var(--font-mono) !important;
+      font-size: 13px !important;
+      border-radius: var(--r-sm) !important;
+      transition: background 200ms, color 200ms !important;
+    }
+    /* Botão de ação primária (Save, Publish) */
+    button[class*="primary"], [class*="Save"] button, [class*="Publish"] button {
+      background: var(--terracota) !important;
+      color: var(--bg) !important;
+      border: none !important;
+    }
+    button[class*="primary"]:hover {
+      background: var(--ink) !important;
+    }
+    /* Botão secundário */
+    button[class*="Tertiary"], [class*="Toolbar"] button {
+      background: transparent !important;
+      color: var(--ink) !important;
+      border: 1px solid var(--line) !important;
+    }
+    button[class*="Tertiary"]:hover, [class*="Toolbar"] button:hover {
+      background: var(--surface) !important;
+      border-color: var(--terracota) !important;
+    }
+
+    /* ============ TOOLBAR (no editor) ============ */
+    [class*="EditorToolbar"],
+    [class*="Toolbar__Top"] {
+      background: var(--bg) !important;
+      border-bottom: 1px solid var(--line) !important;
+    }
+
+    /* ============ LIST WIDGET (ingredientes, passos, etc) ============ */
+    [class*="ListItemTopBar"], [class*="ItemTopBar"] {
+      background: var(--surface) !important;
+      border-bottom: 1px solid var(--line-soft) !important;
+    }
+    [class*="ObjectControl"], [class*="ListControl"] {
+      background: transparent !important;
+      border: 1px solid var(--line-soft) !important;
+      border-radius: var(--r-sm) !important;
+    }
+
+    /* ============ MODALS / DIALOGS ============ */
+    [class*="Modal"], [role="dialog"] {
+      background: var(--bg) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: var(--r-md) !important;
+      box-shadow: 0 12px 32px rgba(26,26,26,0.10) !important;
+    }
+
+    /* ============ WORKFLOW BOARD (Drafts/Review/Ready) ============ */
+    [class*="WorkflowList__StyledColumn"],
+    [class*="WorkflowList__Column"] {
+      background: var(--surface) !important;
+      border-radius: var(--r-md) !important;
+      padding: 16px !important;
+    }
+    [class*="WorkflowCard"] {
+      background: var(--bg) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: var(--r-sm) !important;
+    }
+
+    /* ============ MARKDOWN EDITOR ============ */
+    [class*="Markdown"] {
+      font-family: var(--font-mono) !important;
+    }
+    [class*="MarkdownControl"] textarea {
+      font-family: var(--font-mono) !important;
+      line-height: 1.6 !important;
+    }
+
+    /* ============ DROP ZONES / MEDIA UPLOAD ============ */
+    [class*="DropArea"], [class*="MediaLibrary"] {
+      background: var(--surface) !important;
+      border: 1px dashed var(--line) !important;
+      border-radius: var(--r-md) !important;
+    }
+
+    /* ============ NOTIFICATIONS / SNACKS ============ */
+    [class*="Snackbar"], [class*="Notification"] {
+      background: var(--ink) !important;
+      color: var(--bg) !important;
+      font-family: var(--font-mono) !important;
+      border-radius: var(--r-pill) !important;
+      box-shadow: 0 4px 12px rgba(26,26,26,0.10) !important;
     }
   </style>
 </head>
