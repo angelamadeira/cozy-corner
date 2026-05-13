@@ -244,6 +244,17 @@ const categoryLabels: Record<string, string> = {
     .hint :global(svg) { fill: none; stroke: currentColor; }
 
     /* ============ CENA ============ */
+    .page {
+      transition: transform 0.45s var(--ease-out);
+    }
+    /* Quando qualquer drawer abre, o conteúdo principal desloca pra esquerda
+       pra manter a cozinha centralizada no espaço livre (viewport - drawer). */
+    @media (min-width: 960px) {
+      body.drawer-open .page {
+        transform: translateX(-240px);
+      }
+    }
+
     .kitchen {
       position: relative;
       width: 100%;
@@ -525,6 +536,7 @@ const categoryLabels: Record<string, string> = {
       drawer.classList.add('open');
       drawer.setAttribute('aria-hidden', 'false');
       backdrop.classList.add('open');
+      document.body.classList.add('drawer-open');
       document.body.style.overflow = 'hidden';
     }
     function closeAllDrawers() {
@@ -533,6 +545,7 @@ const categoryLabels: Record<string, string> = {
         d.setAttribute('aria-hidden', 'true');
       });
       backdrop.classList.remove('open');
+      document.body.classList.remove('drawer-open');
       document.body.style.overflow = '';
     }
     backdrop.addEventListener('click', closeAllDrawers);
