@@ -360,28 +360,27 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     margin-bottom: var(--s-6);
   }
   .cm-restart {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: transparent;
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
-    font: inherit;
     font-family: var(--font-mono);
     font-size: var(--fs-small);
+    line-height: 1;
     color: var(--ink);
     cursor: pointer;
     transition: all var(--dur-fast);
   }
   .cm-restart:hover { background: var(--surface); border-color: var(--terracota); color: var(--terracota); }
   .cm-restart :global(svg) {
-    display: block;
-    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-top: -2px; /* compensa peso visual do path concentrado embaixo */
     fill: none;
     stroke: currentColor;
   }
-  .cm-restart :global(span) { line-height: 1; }
 
   /* ============ NAV ============ */
   .cm-nav {
