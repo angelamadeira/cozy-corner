@@ -33,9 +33,10 @@
   --danger:  #B8503A;
 
   /* ====== TIPOGRAFIA ====== */
-  --font-display: 'Fraunces', Georgia, serif;           /* hero, títulos com alma */
-  --font-sans:    'Inter', system-ui, sans-serif;       /* body, UI */
-  --font-mono:    'Courier Prime', ui-monospace, monospace; /* intro typewriter + meta */
+  /* Cutive Mono em tudo — identidade unificada de "carta digitada", delicada */
+  --font-display: 'Cutive Mono', ui-monospace, monospace;
+  --font-sans:    'Cutive Mono', ui-monospace, monospace;
+  --font-mono:    'Cutive Mono', ui-monospace, monospace;
 
   /* Type scale */
   --fs-display:   clamp(48px, 9vw, 96px);
