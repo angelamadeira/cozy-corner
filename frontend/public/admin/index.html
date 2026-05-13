@@ -36,31 +36,49 @@
       opacity: 1 !important;
     }
 
-    /* Botão "Login" — primary do DS escalado pra tela cheia */
-    [class*="AuthenticationPage"] button[type="button"],
-    [class*="AuthPage"] button[type="button"] {
+    /* Botão "Login" — primary do DS escalado pra tela cheia.
+       Decap v3 usa class names auto-gerados; selectors amplos pegam
+       qualquer <button> dentro do container de auth. */
+    [class*="Authentication"] button,
+    [class*="AuthPage"] button,
+    [class*="auth"] button[type="button"] {
       display: inline-flex !important;
       align-items: center !important;
       gap: 8px !important;
-      background: #C56B4A !important;            /* --terracota */
+      background: #C56B4A !important;
       color: #FFFFFF !important;
       border: 1px solid #C56B4A !important;
-      border-radius: 4px !important;              /* --r-sm */
+      border-radius: 4px !important;
       padding: 18px 40px !important;
       min-width: 240px !important;
       justify-content: center !important;
       font-family: 'Cutive Mono', monospace !important;
-      font-size: 16px !important;                 /* --fs-body */
+      font-size: 16px !important;
       font-weight: 400 !important;
       letter-spacing: 0.04em !important;
       box-shadow: none !important;
       cursor: pointer !important;
       transition: opacity 150ms, transform 150ms, background 300ms !important;
     }
-    [class*="AuthenticationPage"] button[type="button"]:hover,
-    [class*="AuthPage"] button[type="button"]:hover {
+    [class*="Authentication"] button:hover,
+    [class*="AuthPage"] button:hover,
+    [class*="auth"] button[type="button"]:hover {
       opacity: 0.92 !important;
       transform: translateY(-1px) !important;
+    }
+
+    /* "Go back to site" link */
+    [class*="Authentication"] a,
+    [class*="AuthPage"] a {
+      color: #6B5F4F !important;
+      font-family: 'Cutive Mono', monospace !important;
+      font-size: 13px !important;
+      text-decoration: none !important;
+      margin-top: 24px !important;
+    }
+    [class*="Authentication"] a:hover,
+    [class*="AuthPage"] a:hover {
+      color: #C56B4A !important;
     }
 
     /* Textos auxiliares (ex: "Use Local Backend") */
