@@ -1,0 +1,522 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { getCollection } from 'astro:content';
+import { CATEGORY_META } from '../lib/categories';
+
+const allRecipes = await getCollection('recipes', ({ data }) => data.published);
+
+// Index pré-computado — só os campos que a busca precisa, serializado pro client
+const index = allRecipes.map((r) => ({
+  id: r.id,
+  title: r.data.title,
+  description: r.data.description ?? '',
+  category: r.data.category,
+  categoryLabel: CATEGORY_META[r.data.category]?.label ?? r.data.category,
+  time: r.data.time,
+  servings: r.data.servings,
+  difficulty: r.data.difficulty,
+  tags: r.data.tags,
+  ingredients: r.data.ingredients,
+}));
+
+// Tags populares — pra mostrar sugestões quando o input está vazio
+const tagCount = new Map<string, number>();
+for (const r of allRecipes) {
+  for (const t of r.data.tags) tagCount.set(t, (tagCount.get(t) ?? 0) + 1);
+}
+const popularTags = [...tagCount.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 8)
+  .map(([tag]) => tag);
+---
+
+<BaseLayout title="Buscar receitas" description="Procure por título, ingrediente ou tag em todas as receitas.">
+  <header class="site-header">
+    <a href="/" class="logo-link" aria-label="Cozy Corner">
+      <span class="logo-name">Cozy Corner</span>
+      <span class="logo-by">— by Gigi</span>
+    </a>
+    <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">
+      <Icon name="ph:lightbulb-thin" class="icon-light" width={20} height={20} />
+      <Icon name="ph:moon-thin" class="icon-dark" width={20} height={20} />
+    </button>
+  </header>
+
+  <main class="search-page">
+    <a href="/" class="back-link">
+      <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+    </a>
+
+    <h1 class="page-title">buscar</h1>
+
+    <div class="search-bar">
+      <Icon name="ph:magnifying-glass-thin" width={20} height={20} />
+      <input
+        class="search-input"
+        type="search"
+        id="search"
+        placeholder="título, ingrediente ou tag..."
+        autocomplete="off"
+        autofocus
+      />
+      <button class="clear-btn" id="clear-btn" type="button" hidden aria-label="limpar busca">
+        <Icon name="ph:x-thin" width={16} height={16} />
+      </button>
+    </div>
+
+    <p class="result-count" id="result-count" hidden></p>
+
+    <div class="suggestions" id="suggestions">
+      <div class="sug-block">
+        <h2 class="sug-title">categorias</h2>
+        <div class="chips">
+          {Object.entries(CATEGORY_META).map(([slug, meta]) => (
+            <a href={`/categorias/${slug}/`} class="chip chip-link">
+              <Icon name={meta.icon} width={14} height={14} />
+              {meta.label.toLowerCase()}
+            </a>
+          ))}
+        </div>
+      </div>
+      {popularTags.length > 0 && (
+        <div class="sug-block">
+          <h2 class="sug-title">tags populares</h2>
+          <div class="chips">
+            {popularTags.map((tag) => (
+              <button class="chip chip-suggest" type="button" data-suggest={tag}>
+                #{tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <ul class="results" id="results" hidden></ul>
+
+    <div class="no-results" id="no-results" hidden>
+      <Icon name="ph:magnifying-glass-thin" width={48} height={48} />
+      <p>não achei nada por aqui.</p>
+      <p class="hint">tenta com menos palavras, ou explore por <a href="/">categoria</a>.</p>
+    </div>
+  </main>
+
+  <script define:vars={{ index }}>
+    const searchInput = document.getElementById('search');
+    const resultsEl = document.getElementById('results');
+    const noResultsEl = document.getElementById('no-results');
+    const suggestionsEl = document.getElementById('suggestions');
+    const resultCountEl = document.getElementById('result-count');
+    const clearBtn = document.getElementById('clear-btn');
+
+    // Normaliza pra busca case-insensitive e sem acento
+    const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+    // Pré-computa campos normalizados — feito uma vez no load
+    const docs = index.map((r) => ({
+      ...r,
+      _title: norm(r.title),
+      _description: norm(r.description),
+      _tags: r.tags.map(norm),
+      _ingredients: r.ingredients.map(norm),
+    }));
+
+    function highlight(text, q) {
+      if (!q) return text;
+      const nq = norm(q);
+      const ntext = norm(text);
+      const i = ntext.indexOf(nq);
+      if (i < 0) return text;
+      return text.slice(0, i) + '<mark>' + text.slice(i, i + q.length) + '</mark>' + text.slice(i + q.length);
+    }
+
+    function search(q) {
+      const nq = norm(q.trim());
+      if (!nq) return [];
+
+      const scored = [];
+      for (const d of docs) {
+        let score = 0;
+        const matchedIn = [];
+
+        if (d._title.includes(nq)) { score += 10; matchedIn.push('title'); }
+        if (d._description.includes(nq)) { score += 3; matchedIn.push('description'); }
+        const tagMatch = d._tags.find((t) => t.includes(nq));
+        if (tagMatch) { score += 6; matchedIn.push('tag:' + tagMatch); }
+        const ingMatch = d._ingredients.find((i) => i.includes(nq));
+        if (ingMatch) { score += 4; matchedIn.push('ingredient'); }
+
+        if (score > 0) scored.push({ doc: d, score, matchedIn });
+      }
+
+      scored.sort((a, b) => b.score - a.score);
+      return scored;
+    }
+
+    function renderResults(results, q) {
+      resultsEl.innerHTML = '';
+      if (results.length === 0) {
+        resultsEl.setAttribute('hidden', '');
+        noResultsEl.removeAttribute('hidden');
+        resultCountEl.setAttribute('hidden', '');
+        return;
+      }
+
+      noResultsEl.setAttribute('hidden', '');
+      resultsEl.removeAttribute('hidden');
+      resultCountEl.removeAttribute('hidden');
+      resultCountEl.textContent =
+        results.length + ' ' + (results.length === 1 ? 'resultado' : 'resultados');
+
+      const frag = document.createDocumentFragment();
+      for (const { doc, matchedIn } of results) {
+        const li = document.createElement('li');
+        li.className = 'result-item';
+
+        // Identifica por onde casou — pra mostrar contexto extra
+        const titleMatched = matchedIn.includes('title');
+        const ingredientMatched = matchedIn.includes('ingredient');
+        const tagMatchedKey = matchedIn.find((m) => m.startsWith('tag:'));
+        const tagMatched = tagMatchedKey ? tagMatchedKey.slice(4) : null;
+
+        // Encontra o ingrediente que casou pra mostrar contexto
+        let matchContext = '';
+        if (!titleMatched && ingredientMatched) {
+          const ing = doc.ingredients.find((i) => norm(i).includes(norm(q)));
+          if (ing) matchContext = '<span class="match-ctx">em <em>' + highlight(ing, q) + '</em></span>';
+        } else if (!titleMatched && tagMatched) {
+          const realTag = doc.tags.find((t) => norm(t) === tagMatched);
+          if (realTag) matchContext = '<span class="match-ctx">tag <em>#' + realTag + '</em></span>';
+        }
+
+        li.innerHTML =
+          '<a href="/receitas/' + doc.id + '/">' +
+            '<div class="thumb">foto</div>' +
+            '<div class="info">' +
+              '<h3 class="recipe-name">' + highlight(doc.title, q) + '</h3>' +
+              '<p class="recipe-meta">' +
+                '<span class="cat-pill">' + doc.categoryLabel + '</span>' +
+                '<span class="sep">·</span>' +
+                doc.time + ' min' +
+                '<span class="sep">·</span>' +
+                doc.difficulty +
+              '</p>' +
+              (matchContext ? '<p class="match-line">' + matchContext + '</p>' : '') +
+            '</div>' +
+            '<svg class="row-arrow" width="20" height="20" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="8"><polyline points="96,48 176,128 96,208"/></svg>' +
+          '</a>';
+        frag.appendChild(li);
+      }
+      resultsEl.appendChild(frag);
+    }
+
+    function update(q) {
+      if (!q.trim()) {
+        resultsEl.setAttribute('hidden', '');
+        noResultsEl.setAttribute('hidden', '');
+        resultCountEl.setAttribute('hidden', '');
+        suggestionsEl.removeAttribute('hidden');
+        clearBtn.setAttribute('hidden', '');
+        return;
+      }
+      suggestionsEl.setAttribute('hidden', '');
+      clearBtn.removeAttribute('hidden');
+      renderResults(search(q), q);
+    }
+
+    searchInput?.addEventListener('input', (e) => {
+      const v = e.target.value;
+      update(v);
+      // Mantém o URL em sincronia pra permitir compartilhar busca
+      const url = new URL(window.location.href);
+      if (v.trim()) url.searchParams.set('q', v);
+      else url.searchParams.delete('q');
+      window.history.replaceState({}, '', url);
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      searchInput.value = '';
+      update('');
+      searchInput.focus();
+      const url = new URL(window.location.href);
+      url.searchParams.delete('q');
+      window.history.replaceState({}, '', url);
+    });
+
+    // Sugestões — clique numa tag preenche o campo
+    document.querySelectorAll('[data-suggest]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-suggest') ?? '';
+        searchInput.value = tag;
+        update(tag);
+        searchInput.focus();
+      });
+    });
+
+    // Init com query string (?q=foo)
+    const initQ = new URL(window.location.href).searchParams.get('q');
+    if (initQ) {
+      searchInput.value = initQ;
+      update(initQ);
+    }
+
+    // Dark mode
+    document.getElementById('dark-toggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      try {
+        localStorage.setItem('cozy-dark-mode',
+          document.body.classList.contains('dark-mode') ? 'true' : 'false');
+      } catch (e) {}
+    });
+  </script>
+
+  <style>
+    .site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      padding: 0 var(--s-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      background: rgba(250, 246, 238, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    body.dark-mode .site-header { background: rgba(15, 26, 42, 0.85); }
+    .logo-link {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.1;
+    }
+    .logo-name { font-family: var(--font-brand); font-weight: 600; font-size: 22px; line-height: 1; }
+    .logo-by { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
+    .dark-toggle {
+      width: 36px; height: 36px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-dark { display: none; }
+    body.dark-mode .icon-light { display: none; }
+    body.dark-mode .icon-dark { display: inline-block; }
+    svg { fill: none; stroke: currentColor; }
+
+    .search-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: calc(var(--header-h) + var(--s-7)) var(--s-6) var(--s-9);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-soft);
+      text-decoration: none;
+      margin-bottom: var(--s-5);
+    }
+    .back-link:hover { color: var(--terracota); }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h1);
+      letter-spacing: -0.02em;
+      line-height: var(--lh-tight);
+      margin-bottom: var(--s-5);
+    }
+
+    /* ============ SEARCH BAR ============ */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      padding: 14px 18px;
+      border: 1.5px solid var(--ink);
+      border-radius: var(--r-sm);
+      background: var(--bg);
+      margin-bottom: var(--s-4);
+      color: var(--ink);
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      font: inherit;
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      outline: none;
+      color: var(--ink);
+    }
+    .search-input::placeholder { color: var(--ink-mute); }
+    .clear-btn {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      width: 24px; height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--ink-soft);
+      flex-shrink: 0;
+    }
+    .clear-btn:hover { color: var(--terracota); border-color: var(--terracota); }
+
+    .result-count {
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+      margin-bottom: var(--s-4);
+    }
+
+    /* ============ SUGGESTIONS ============ */
+    .suggestions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-5);
+      margin-top: var(--s-4);
+    }
+    .sug-title {
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-mute);
+      margin-bottom: var(--s-3);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--ink-soft);
+      transition: all var(--dur-fast);
+      user-select: none;
+      text-decoration: none;
+    }
+    .chip:hover { border-color: var(--terracota); color: var(--ink); }
+    .chip-suggest { font: inherit; font-family: var(--font-mono); font-size: var(--fs-caption); }
+
+    /* ============ RESULTS ============ */
+    .results { list-style: none; }
+    .result-item { border-bottom: 1px solid var(--line-soft); }
+    .results :global(a) {
+      display: grid;
+      grid-template-columns: 80px 1fr 24px;
+      gap: var(--s-4);
+      padding: var(--s-4) 0;
+      text-decoration: none;
+      color: inherit;
+      align-items: center;
+      transition: background var(--dur-fast);
+    }
+    .results :global(a:hover) {
+      background: var(--surface);
+      padding-left: var(--s-3);
+      padding-right: var(--s-3);
+      margin: 0 calc(-1 * var(--s-3));
+      border-radius: var(--r-sm);
+    }
+    .results :global(a:hover .recipe-name) { color: var(--terracota); }
+    .results :global(a:hover .row-arrow) { transform: translateX(4px); }
+    .results :global(.thumb) {
+      aspect-ratio: 1;
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-mute);
+    }
+    .results :global(.recipe-name) {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--fs-h3);
+      margin-bottom: 4px;
+      transition: color var(--dur-fast);
+    }
+    .results :global(.recipe-meta) {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+    }
+    .results :global(.cat-pill) {
+      background: var(--surface);
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      color: var(--ink-soft);
+      font-size: 11px;
+    }
+    .results :global(.sep) { opacity: 0.4; }
+    .results :global(.match-line) {
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-mute);
+      margin-top: 4px;
+    }
+    .results :global(.match-ctx em) { color: var(--ink-soft); font-style: italic; }
+    .results :global(.row-arrow) {
+      color: var(--ink-mute);
+      transition: transform var(--dur-fast);
+    }
+    .results :global(mark) {
+      background: var(--accent-blue);
+      color: var(--ink);
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+    body.dark-mode .results :global(mark) { background: var(--terracota); color: var(--bg); }
+
+    /* ============ NO RESULTS ============ */
+    .no-results {
+      text-align: center;
+      padding: var(--s-8) var(--s-5);
+      color: var(--ink-mute);
+    }
+    .no-results svg {
+      margin: 0 auto var(--s-4);
+      color: var(--ink-mute);
+    }
+    .no-results p {
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      margin-bottom: var(--s-2);
+    }
+    .no-results .hint { font-size: var(--fs-meta); color: var(--ink-mute); }
+    .no-results a { color: var(--terracota); }
+
+    @media (max-width: 640px) {
+      .results :global(a) { grid-template-columns: 64px 1fr 20px; }
+      .page-title { font-size: 32px; }
+    }
+  </style>
+</BaseLayout>
