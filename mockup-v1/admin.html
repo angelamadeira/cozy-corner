@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cozy Corner recipes by Gigi — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1A1A1A;
+      --ink-soft: #525252;
+      --ink-mute: #A3A3A3;
+      --line: #D4D4D4;
+      --line-soft: #E5E5E5;
+      --surface: #FAFAFA;
+      --white: #FFFFFF;
+      --accent: #2D6CDF;
+      --accent-soft: #EBF2FF;
+      --danger: #DC2626;
+      --success: #16A34A;
+      --radius: 4px;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: var(--surface);
+      font-size: 14px;
+    }
+
+    /* ============ MOCKUP NAV ============ */
+    .mockup-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 48px;
+      background: var(--ink); color: var(--white);
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 16px;
+      font-family: var(--font-mono); font-size: 11px;
+      z-index: 1000;
+    }
+    .mockup-nav .label { color: var(--ink-mute); margin-right: 8px; }
+    .mockup-nav button {
+      background: transparent; color: var(--white);
+      border: 1px solid #444; padding: 6px 10px;
+      border-radius: var(--radius); cursor: pointer;
+      font: inherit;
+    }
+    .mockup-nav button.active { background: var(--white); color: var(--ink); border-color: var(--white); }
+    .mockup-nav button:hover { background: #2a2a2a; }
+    .mockup-nav button.active:hover { background: var(--white); color: var(--ink); }
+    .mockup-nav .spacer { flex: 1; }
+    .mockup-nav a {
+      color: #888; text-decoration: none;
+      border: 1px solid #444; padding: 6px 10px;
+      border-radius: var(--radius);
+    }
+    .mockup-nav a:hover { color: var(--white); }
+
+    /* ============ APP SHELL ============ */
+    .admin-shell {
+      padding-top: 48px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: var(--white);
+      border-right: 1px solid var(--line);
+      padding: 24px 0;
+    }
+    .sidebar .brand {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--line-soft);
+      margin-bottom: 16px;
+    }
+    .sidebar .brand .logo { font-weight: 600; font-size: 15px; }
+    .sidebar .brand .sub { font-size: 11px; color: var(--ink-mute); font-family: var(--font-mono); margin-top: 4px; }
+    .sidebar h4 {
+      padding: 8px 20px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-mute);
+    }
+    .sidebar ul { list-style: none; margin-bottom: 16px; }
+    .sidebar li {
+      padding: 8px 20px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar li:hover { background: var(--surface); }
+    .sidebar li.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-left: 3px solid var(--accent);
+      padding-left: 17px;
+      font-weight: 500;
+    }
+    .sidebar li .count { font-size: 11px; color: var(--ink-mute); font-family: var(--font-mono); }
+    .sidebar .user {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--line-soft);
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    /* ============ MAIN ============ */
+    .main {
+      padding: 24px 32px 64px;
+      max-width: 100%;
+    }
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .page-head h1 { font-size: 24px; font-weight: 500; }
+    .page-head .actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      border-color: var(--accent);
+    }
+    .btn-danger { color: var(--danger); border-color: var(--line); }
+    .btn:hover { background: var(--surface); }
+    .btn-primary:hover { opacity: 0.92; background: var(--accent); }
+
+    /* ============ VIEWS ============ */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ====== LOGIN VIEW ====== */
+    #view-login {
+      grid-column: 1 / -1;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 24px;
+    }
+    #view-login.active { display: flex; }
+    #view-login .box {
+      background: var(--white);
+      border: 1px solid var(--line);
+      padding: 40px;
+      border-radius: 8px;
+      width: 380px;
+      text-align: center;
+    }
+    #view-login h2 { font-size: 22px; margin-bottom: 8px; font-weight: 500; }
+    #view-login p { color: var(--ink-soft); margin-bottom: 24px; font-size: 13px; }
+    #view-login .gh-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--ink);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+    }
+    #view-login .gh-btn:hover { opacity: 0.9; }
+    #view-login .note {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--ink-mute);
+      font-family: var(--font-mono);
+    }
+
+    /* ====== LIST VIEW ====== */
+    .list-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .list-controls input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 13px;
+    }
+    .list-controls select {
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 13px;
+      background: var(--white);
+    }
+    .recipe-table {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .recipe-table .row {
+      display: grid;
+      grid-template-columns: 56px 2fr 1fr 1fr 1fr 80px 100px;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line-soft);
+      gap: 16px;
+    }
+    .recipe-table .row:last-child { border-bottom: none; }
+    .recipe-table .row:hover { background: var(--surface); }
+    .recipe-table .row.head {
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-mute);
+    }
+    .recipe-table .thumb {
+      width: 40px; height: 40px;
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      color: var(--ink-mute);
+      font-family: var(--font-mono);
+    }
+    .recipe-table .title { font-weight: 500; }
+    .recipe-table .meta { font-size: 12px; color: var(--ink-soft); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+    .badge.pt { background: #DBEAFE; color: #1E40AF; }
+    .badge.en { background: #DCFCE7; color: #166534; }
+    .badge.both { background: #F3E8FF; color: #6B21A8; }
+    .badge.draft { background: #FEF3C7; color: #92400E; }
+    .badge.published { background: #DCFCE7; color: #166534; }
+
+    /* ====== EDITOR VIEW ====== */
+    .editor {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+    }
+    .editor-form {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .editor-aside {
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-section {
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .form-section h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-mute);
+      margin-bottom: 16px;
+    }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .field input[type=text],
+    .field input[type=number],
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 14px;
+    }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+    .field .lang-tabs span {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      background: var(--line-soft);
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+      cursor: pointer;
+    }
+    .field .lang-tabs span.active {
+      background: var(--ink);
+      color: var(--white);
+    }
+    .field .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .repeater {
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: var(--surface);
+    }
+    .repeater-item {
+      display: grid;
+      grid-template-columns: 24px 1fr 24px;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .repeater-item:last-child { border-bottom: none; }
+    .repeater-item input { width: 100%; padding: 6px 8px; border: 1px solid transparent; background: transparent; border-radius: var(--radius); font: inherit; font-size: 13px; }
+    .repeater-item input:focus { border-color: var(--line); background: var(--white); outline: none; }
+    .repeater-item .drag { color: var(--ink-mute); cursor: grab; text-align: center; font-size: 14px; }
+    .repeater-item .del { color: var(--ink-mute); cursor: pointer; text-align: center; font-size: 16px; }
+    .repeater-add {
+      margin-top: 8px;
+      padding: 8px;
+      width: 100%;
+      background: var(--white);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+    .image-upload {
+      border: 2px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      color: var(--ink-mute);
+      cursor: pointer;
+      background: var(--surface);
+    }
+    .image-upload:hover { background: var(--accent-soft); }
+
+    /* Lista de mídias (fotos + vídeos) */
+    .media-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .media-item {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .media-item.is-cover { border-color: var(--accent); }
+    .media-preview {
+      width: 56px;
+      height: 56px;
+      background: var(--white);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .media-info { min-width: 0; }
+    .media-name {
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .media-meta {
+      font-size: 11px;
+      color: var(--ink-mute);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+    .media-actions {
+      display: flex;
+      gap: 8px;
+      color: var(--ink-mute);
+      font-size: 14px;
+    }
+    .media-actions .drag { cursor: grab; }
+    .media-actions .del { cursor: pointer; }
+    .media-actions .del:hover { color: var(--danger); }
+
+    /* aside */
+    .aside-block {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .aside-block h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-mute);
+      margin-bottom: 12px;
+    }
+    .save-actions { display: flex; flex-direction: column; gap: 8px; }
+    .save-actions button { width: 100%; }
+    .status-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--ink-soft);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .status-line:last-child { border-bottom: none; }
+
+    /* ====== PAGE EDITOR ====== */
+    .page-editor-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .page-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+    }
+    .page-card:hover { border-color: var(--accent); }
+    .page-card h3 { font-size: 15px; margin-bottom: 4px; }
+    .page-card .desc { font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; }
+    .page-card .fields { font-size: 11px; color: var(--ink-mute); font-family: var(--font-mono); }
+
+    /* ====== HELP TEXT ====== */
+    .hint {
+      font-size: 11px;
+      color: var(--ink-mute);
+      margin-top: 4px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="mockup-nav">
+    <span class="label">ADMIN MOCKUP ›</span>
+    <button data-view="login">1. Login</button>
+    <button data-view="list" class="active">2. Lista de receitas</button>
+    <button data-view="editor">3. Editor de receita</button>
+    <button data-view="pages">4. Editar páginas</button>
+    <span class="spacer"></span>
+    <a href="index.html">← Voltar pro mockup público</a>
+  </nav>
+
+  <div class="admin-shell">
+
+    <!-- ===== LOGIN VIEW (não tem sidebar) ===== -->
+    <section id="view-login" class="view">
+      <div class="box">
+        <h2>Entrar no admin</h2>
+        <p>Acesso restrito. Só o usuário autorizado consegue editar receitas.</p>
+        <button class="gh-btn">Continuar com GitHub →</button>
+        <div class="note">Decap CMS · OAuth restrito a 1 usuário</div>
+      </div>
+    </section>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <span style="font-weight:500;font-size:14px;letter-spacing:-0.01em">Cozy Corner</span>
+          <span style="font-size:10px;opacity:0.55;display:block;margin-top:1px">recipes by Gigi</span>
+        </div>
+        <div class="sub" style="margin-top:8px">admin · Decap CMS</div>
+      </div>
+
+      <h4>Coleções</h4>
+      <ul>
+        <li class="active">🍝 Receitas <span class="count">28</span></li>
+        <li>📄 Páginas <span class="count">5</span></li>
+        <li>💌 Recados recebidos <span class="count">3</span></li>
+        <li>🏷 Tags <span class="count">12</span></li>
+      </ul>
+
+      <h4>Configuração</h4>
+      <ul>
+        <li>🖼 Mídia</li>
+        <li>🌐 Idiomas</li>
+        <li>⚙️ Site</li>
+      </ul>
+
+      <div class="user">
+        👤 angelmadeira@gmail.com<br/>
+        <span style="font-size:10px;color:var(--ink-mute)">sair ↗</span>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN AREA ===== -->
+    <main class="main">
+
+      <!-- ===== LIST VIEW ===== -->
+      <section id="view-list" class="view active">
+        <div class="page-head">
+          <h1>Receitas <span style="color:var(--ink-mute);font-size:16px;font-weight:400">(28)</span></h1>
+          <div class="actions">
+            <button class="btn">Exportar</button>
+            <button class="btn btn-primary">+ Nova receita</button>
+          </div>
+        </div>
+
+        <div class="list-controls">
+          <input type="search" placeholder="🔍 buscar receita por nome, ingrediente, tag..." />
+          <select>
+            <option>Todas categorias</option>
+            <option>Pratos Principais</option>
+            <option>Sobremesas</option>
+            <option>Datas Comemorativas</option>
+            <option>Vegetarianas</option>
+            <option>Para Congelar</option>
+            <option>Receitas Rápidas</option>
+          </select>
+          <select>
+            <option>Todos status</option>
+            <option>Publicadas</option>
+            <option>Rascunhos</option>
+          </select>
+        </div>
+
+        <div class="recipe-table">
+          <div class="row head">
+            <div></div>
+            <div>Título</div>
+            <div>Categoria</div>
+            <div>Idiomas</div>
+            <div>Status</div>
+            <div>Atualizada</div>
+            <div></div>
+          </div>
+
+          <div class="row">
+            <div class="thumb">img</div>
+            <div class="title">Risoto de cogumelos</div>
+            <div class="meta">Pratos Principais</div>
+            <div><span class="badge both">PT + EN</span></div>
+            <div><span class="badge published">publicada</span></div>
+            <div class="meta">há 2 dias</div>
+            <div><button class="btn">editar</button></div>
+          </div>
+
+          <div class="row">
+            <div class="thumb">img</div>
+            <div class="title">Bolo de cenoura</div>
+            <div class="meta">Sobremesas</div>
+            <div><span class="badge pt">PT</span></div>
+            <div><span class="badge published">publicada</span></div>
+            <div class="meta">há 1 semana</div>
+            <div><button class="btn">editar</button></div>
+          </div>
+
+          <div class="row">
+            <div class="thumb">img</div>
+            <div class="title">Panetone caseiro</div>
+            <div class="meta">Datas Comemorativas</div>
+            <div><span class="badge both">PT + EN</span></div>
+            <div><span class="badge draft">rascunho</span></div>
+            <div class="meta">há 3h</div>
+            <div><button class="btn">editar</button></div>
+          </div>
+
+          <div class="row">
+            <div class="thumb">img</div>
+            <div class="title">Estrogonofe vegetariano</div>
+            <div class="meta">Vegetarianas</div>
+            <div><span class="badge pt">PT</span></div>
+            <div><span class="badge published">publicada</span></div>
+            <div class="meta">há 2 semanas</div>
+            <div><button class="btn">editar</button></div>
+          </div>
+
+          <div class="row">
+            <div class="thumb">img</div>
+            <div class="title">Molho bolonhesa pra congelar</div>
+            <div class="meta">Para Congelar</div>
+            <div><span class="badge both">PT + EN</span></div>
+            <div><span class="badge published">publicada</span></div>
+            <div class="meta">há 1 mês</div>
+            <div><button class="btn">editar</button></div>
+          </div>
+
+          <div class="row">
+            <div class="thumb">img</div>
+            <div class="title">Omelete cremosa em 10 min</div>
+            <div class="meta">Receitas Rápidas</div>
+            <div><span class="badge pt">PT</span></div>
+            <div><span class="badge published">publicada</span></div>
+            <div class="meta">há 5 dias</div>
+            <div><button class="btn">editar</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== EDITOR VIEW ===== -->
+      <section id="view-editor" class="view">
+        <div class="page-head">
+          <h1>Editar receita</h1>
+          <div class="actions">
+            <button class="btn btn-danger">Excluir</button>
+            <button class="btn">Pré-visualizar</button>
+            <button class="btn">Salvar rascunho</button>
+            <button class="btn btn-primary">Publicar</button>
+          </div>
+        </div>
+
+        <div class="editor">
+          <!-- formulário principal -->
+          <div class="editor-form">
+
+            <!-- básico -->
+            <div class="form-section">
+              <h3>Identificação</h3>
+
+              <div class="field">
+                <div class="lang-tabs">
+                  <span class="active">PT</span>
+                  <span>EN</span>
+                </div>
+                <label>Título</label>
+                <input type="text" value="Risoto de cogumelos" />
+                <div class="hint">o título aparece na listagem e na página da receita.</div>
+              </div>
+
+              <div class="field">
+                <label>Descrição curta (opcional)</label>
+                <textarea>Um clássico italiano cremoso, com cogumelos paris dourados e parmesão.</textarea>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label>Categoria</label>
+                  <select>
+                    <option>Pratos Principais</option>
+                    <option>Sobremesas</option>
+                    <option>Datas Comemorativas</option>
+                    <option>Vegetarianas</option>
+                    <option>Para Congelar</option>
+                    <option>Receitas Rápidas</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Slug (URL)</label>
+                  <input type="text" value="risoto-de-cogumelos" />
+                </div>
+              </div>
+            </div>
+
+            <!-- mídia: fotos + vídeos -->
+            <div class="form-section">
+              <h3>Mídia (fotos e vídeos)</h3>
+              <div class="media-list">
+                <div class="media-item is-cover">
+                  <div class="media-preview">📷</div>
+                  <div class="media-info">
+                    <div class="media-name">risoto-hero.jpg</div>
+                    <div class="media-meta">capa · 1600×900 · 142 KB</div>
+                  </div>
+                  <div class="media-actions">
+                    <span class="drag">⋮⋮</span>
+                    <span class="del">✕</span>
+                  </div>
+                </div>
+                <div class="media-item">
+                  <div class="media-preview">📷</div>
+                  <div class="media-info">
+                    <div class="media-name">risoto-detail.jpg</div>
+                    <div class="media-meta">1200×800 · 98 KB</div>
+                  </div>
+                  <div class="media-actions">
+                    <span class="drag">⋮⋮</span>
+                    <span class="del">✕</span>
+                  </div>
+                </div>
+                <div class="media-item">
+                  <div class="media-preview">🎬</div>
+                  <div class="media-info">
+                    <div class="media-name">como-mexer.mp4</div>
+                    <div class="media-meta">vídeo · 0:18 · 2.4 MB</div>
+                  </div>
+                  <div class="media-actions">
+                    <span class="drag">⋮⋮</span>
+                    <span class="del">✕</span>
+                  </div>
+                </div>
+                <div class="media-item">
+                  <div class="media-preview">📷</div>
+                  <div class="media-info">
+                    <div class="media-name">prato-finalizado.jpg</div>
+                    <div class="media-meta">1600×1067 · 156 KB</div>
+                  </div>
+                  <div class="media-actions">
+                    <span class="drag">⋮⋮</span>
+                    <span class="del">✕</span>
+                  </div>
+                </div>
+              </div>
+              <div class="image-upload">
+                📷 🎬 arraste fotos ou vídeos aqui (ou clique pra escolher)<br/>
+                <span style="font-size:11px">JPG, WebP, MP4 · primeira mídia vira a capa · arraste pra reordenar</span>
+              </div>
+            </div>
+
+            <!-- meta -->
+            <div class="form-section">
+              <h3>Detalhes</h3>
+              <div class="field row2">
+                <div>
+                  <label>Tempo (minutos)</label>
+                  <input type="number" value="40" />
+                </div>
+                <div>
+                  <label>Porções</label>
+                  <input type="number" value="4" />
+                </div>
+              </div>
+              <div class="field row2">
+                <div>
+                  <label>Dificuldade</label>
+                  <select>
+                    <option>fácil</option>
+                    <option selected>médio</option>
+                    <option>difícil</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Tags (filtros)</label>
+                  <input type="text" value="vegetariana, italiana, comfort food" />
+                </div>
+              </div>
+              <div class="field row2">
+                <div>
+                  <label>Sistema de unidades</label>
+                  <select>
+                    <option selected>métrico (g, ml, L, °C)</option>
+                    <option>imperial (oz, cup, tbsp, °F)</option>
+                  </select>
+                  <div class="hint">o sistema oposto é convertido automaticamente na receita pública.</div>
+                </div>
+                <div>
+                  <label>Modo cozinha (mantém tela acesa)</label>
+                  <select>
+                    <option selected>habilitado</option>
+                    <option>desabilitado</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- ingredientes -->
+            <div class="form-section">
+              <h3>Ingredientes</h3>
+              <div class="repeater">
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="200g arroz arbóreo" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="500g cogumelos paris" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="1 cebola média" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="2 dentes de alho" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="100ml vinho branco" />
+                  <span class="del">✕</span>
+                </div>
+              </div>
+              <button class="repeater-add">+ adicionar ingrediente</button>
+            </div>
+
+            <!-- materiais / utensílios -->
+            <div class="form-section">
+              <h3>Materiais (utensílios necessários)</h3>
+              <div class="repeater">
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="panela média de fundo grosso" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="colher de pau" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="frigideira antiaderente" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="concha" />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">⋮⋮</span>
+                  <input type="text" value="ralador (parmesão)" />
+                  <span class="del">✕</span>
+                </div>
+              </div>
+              <button class="repeater-add">+ adicionar material</button>
+            </div>
+
+            <!-- passos -->
+            <div class="form-section">
+              <h3>Modo de preparo</h3>
+              <div class="repeater">
+                <div class="repeater-item">
+                  <span class="drag">1</span>
+                  <input type="text" value="Aqueça o caldo de legumes e refogue a cebola..." />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">2</span>
+                  <input type="text" value="Adicione o alho e os cogumelos fatiados..." />
+                  <span class="del">✕</span>
+                </div>
+                <div class="repeater-item">
+                  <span class="drag">3</span>
+                  <input type="text" value="Acrescente o arroz e mexa por 1 minuto..." />
+                  <span class="del">✕</span>
+                </div>
+              </div>
+              <button class="repeater-add">+ adicionar passo</button>
+            </div>
+
+            <!-- observações -->
+            <div class="form-section">
+              <h3>Observações (opcional)</h3>
+              <div class="field">
+                <label>Dicas, variações, história da receita</label>
+                <textarea>Pode trocar cogumelos paris por shitake ou portobello. Receita da minha avó, que aprendeu na Itália...</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- aside -->
+          <aside class="editor-aside">
+            <div class="aside-block">
+              <h4>Publicação</h4>
+              <div class="save-actions">
+                <button class="btn btn-primary">Publicar agora</button>
+                <button class="btn">Salvar rascunho</button>
+              </div>
+              <div style="margin-top:16px">
+                <div class="status-line">
+                  <span>status</span>
+                  <span><span class="badge published">publicada</span></span>
+                </div>
+                <div class="status-line">
+                  <span>idiomas</span>
+                  <span><span class="badge both">PT + EN</span></span>
+                </div>
+                <div class="status-line">
+                  <span>última edição</span>
+                  <span style="color:var(--ink-mute);font-family:var(--font-mono);font-size:11px">há 2h</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="aside-block">
+              <h4>Versão em inglês</h4>
+              <div style="font-size:13px;color:var(--ink-soft);margin-bottom:12px">
+                Esta receita já tem versão em inglês.
+              </div>
+              <button class="btn" style="width:100%">Editar versão EN →</button>
+              <div class="hint" style="margin-top:8px">
+                receitas podem ser publicadas em só um idioma; você pode traduzir depois.
+              </div>
+            </div>
+
+            <div class="aside-block">
+              <h4>SEO</h4>
+              <div class="field">
+                <label>Meta título</label>
+                <input type="text" value="Risoto de cogumelos cremoso · 40min" />
+              </div>
+              <div class="field">
+                <label>Meta descrição</label>
+                <textarea>Receita de risoto de cogumelos paris, fácil e cremoso. Pronto em 40 minutos.</textarea>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== PAGES VIEW ===== -->
+      <section id="view-pages" class="view">
+        <div class="page-head">
+          <h1>Editar páginas</h1>
+          <div class="actions">
+            <button class="btn btn-primary">Salvar tudo</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:24px;font-size:13px;color:var(--ink-soft);max-width:640px">
+          Estas são as páginas e textos do site. Você edita aqui sem precisar mexer no código.
+          A ilustração da cozinha fica fora do CMS — é editada direto no Figma e atualizada pelo seu desenvolvedor.
+        </div>
+
+        <div class="page-editor-list">
+          <div class="page-card">
+            <h3>🟦 Intro</h3>
+            <div class="desc">As 2 frases do typewriter que aparecem no fundo escuro antes do logo ser revelado.</div>
+            <div class="fields">frase_1 · frase_2 · cor_fundo_escuro</div>
+          </div>
+
+          <div class="page-card">
+            <h3>🍳 Cozinha</h3>
+            <div class="desc">Labels que aparecem em hover sobre os 8 hotspots da ilustração.</div>
+            <div class="fields">label_vaso · label_livros · label_relogio · label_freezer · label_calendario · label_postit · label_prato · label_doce</div>
+          </div>
+
+          <div class="page-card">
+            <h3>💌 Recado (post-it)</h3>
+            <div class="desc">Texto do modal de contato e configuração do WhatsApp.</div>
+            <div class="fields">titulo · subtitulo · whatsapp_numero · whatsapp_mensagem_template · email_fallback</div>
+          </div>
+
+          <div class="page-card">
+            <h3>⚙️ Configuração geral</h3>
+            <div class="desc">Cores do site, fontes, links sociais, identidade.</div>
+            <div class="fields">cor_intro · cor_acento · fonte_titulo · instagram · email</div>
+          </div>
+
+          <div class="page-card">
+            <h3>🚫 404 / Empty states</h3>
+            <div class="desc">Mensagens quando uma categoria está vazia ou página não existe.</div>
+            <div class="fields">empty_categoria · empty_busca · texto_404</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Switcher de telas
+    const buttons = document.querySelectorAll('.mockup-nav button[data-view]');
+    const views = document.querySelectorAll('.view');
+    const sidebar = document.getElementById('sidebar');
+    function show(name) {
+      views.forEach(v => v.classList.remove('active'));
+      const target = document.getElementById('view-' + name);
+      if (target) target.classList.add('active');
+      buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+      // Esconde sidebar na tela de login
+      sidebar.style.display = name === 'login' ? 'none' : 'block';
+      document.querySelector('.admin-shell').style.gridTemplateColumns = name === 'login' ? '1fr' : '240px 1fr';
+    }
+    buttons.forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
+  </script>
+</body>
+</html>

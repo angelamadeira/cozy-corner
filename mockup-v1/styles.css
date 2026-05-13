@@ -1,0 +1,986 @@
+/* ========================================================
+   Mockup estrutural — Site de Receitas
+   Placeholders e wireframes. Sem ilustrações finais.
+   ======================================================== */
+
+:root {
+  --intro-blue: #D7F5FF;
+  --ink: #1A1A1A;
+  --ink-soft: #525252;
+  --ink-mute: #A3A3A3;
+  --line: #D4D4D4;
+  --line-soft: #E5E5E5;
+  --surface: #FAFAFA;
+  --white: #FFFFFF;
+  --accent: #1A1A1A;
+  --placeholder-bg: #F5F5F5;
+  --placeholder-stroke: #BBB;
+  --kitchen-wall: #F5FAFD;
+  --kitchen-counter: #EEF2F5;
+  --kitchen-fridge: #F0F4F7;
+  --kitchen-fridge-border: #E3EAEF;
+  --radius: 4px;
+  --radius-lg: 8px;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --font-display: 'Inter', system-ui, sans-serif;
+}
+
+/* Dark mode — acionado pelo interruptor da cozinha */
+body.dark-mode {
+  --ink: #F5F5F5;
+  --ink-soft: #C5C5C5;
+  --ink-mute: #888;
+  --line: #3A3A3A;
+  --line-soft: #2A2A2A;
+  --surface: #1A1A1A;
+  --white: #0F0F0F;
+  --placeholder-bg: #2A2A2A;
+  --placeholder-stroke: #555;
+  --kitchen-wall: #1E2433;
+  --kitchen-counter: #18202A;
+  --kitchen-fridge: #1A1F26;
+  --kitchen-fridge-border: #2A2F36;
+}
+
+body, .kitchen-canvas, #cozinha .ph-wall, #cozinha .ph-counter, #cozinha .ph-fridge,
+.cat-drawer, .recado-modal, .ph, .hotspot {
+  transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--white);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Screen Switcher Top Bar (mockup-only) ---------- */
+.mockup-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  background: var(--ink);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  z-index: 1000;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.mockup-nav .label {
+  color: var(--ink-mute);
+  margin-right: 8px;
+}
+.mockup-nav button {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid #444;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  transition: background 0.15s;
+}
+.mockup-nav button:hover { background: #2a2a2a; }
+.mockup-nav button.active { background: var(--white); color: var(--ink); border-color: var(--white); }
+.mockup-nav .spacer { flex: 1; }
+.mockup-nav a {
+  color: #888;
+  text-decoration: none;
+  border: 1px solid #444;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+}
+.mockup-nav a:hover { color: var(--white); }
+
+/* ---------- Screen base ---------- */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding-top: 48px;
+}
+.screen.active { display: block; }
+
+/* Site chrome (header shown in actual screens, not the mockup nav) */
+.site-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+.site-header .logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.site-header .logo .name {
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+.site-header .logo .by {
+  font-size: 10px;
+  opacity: 0.55;
+  margin-top: 1px;
+}
+.site-header .right { display: flex; gap: 16px; align-items: center; }
+.site-header .lang { display: flex; gap: 4px; }
+.site-header .lang button {
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-soft); font-family: inherit; font-size: inherit;
+  padding: 4px 6px;
+}
+.site-header .lang button.active { color: var(--ink); font-weight: 600; }
+.site-header .skip { color: var(--ink-soft); font-size: 12px; cursor: pointer; }
+
+/* ---------- Placeholder primitives ---------- */
+.ph {
+  background: var(--placeholder-bg);
+  border: 1px dashed var(--placeholder-stroke);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-mute);
+  text-align: center;
+  padding: 8px;
+}
+.ph.img { aspect-ratio: 4/3; }
+.ph.square { aspect-ratio: 1; }
+.ph.tall { aspect-ratio: 3/4; }
+.ph.wide { aspect-ratio: 16/9; }
+
+.hotspot {
+  position: absolute;
+  border: 1.5px dashed #5fa8d3;
+  background: rgba(95, 168, 211, 0.08);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #2d6a90;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  text-align: center;
+  padding: 4px;
+}
+.hotspot:hover { background: rgba(95, 168, 211, 0.18); transform: scale(1.02); }
+.hotspot small { display: block; opacity: 0.7; font-size: 9px; }
+
+/* ==========================================================
+   SCREEN 1: INTRO
+   ========================================================== */
+#intro {
+  background: var(--intro-blue);
+}
+#intro .intro-scroll {
+  height: 300vh;
+  position: relative;
+}
+#intro .intro-sticky {
+  position: sticky;
+  top: 48px;
+  height: calc(100vh - 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+}
+#intro .phrase {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 800px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: absolute;
+}
+#intro .phrase.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#intro .scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  opacity: 0.6;
+  animation: bob 1.8s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ==========================================================
+   SCREEN 2: COZINHA
+   ========================================================== */
+#cozinha .kitchen-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px auto;
+  aspect-ratio: 16/10;
+  background: #FBFCFD;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+#cozinha .layer-label {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  top: 8px; left: 12px;
+}
+#cozinha .ph-wall {
+  position: absolute;
+  inset: 24px 24px 35% 24px;
+  background: var(--kitchen-wall);
+  border-radius: var(--radius);
+}
+#cozinha .ph-counter {
+  position: absolute;
+  bottom: 24px; left: 24px; right: 24px;
+  height: 30%;
+  background: var(--kitchen-counter);
+  border-radius: var(--radius);
+}
+#cozinha .ph-fridge {
+  position: absolute;
+  top: 26%; right: 6%;
+  width: 22%; height: 60%;
+  background: var(--kitchen-fridge);
+  border: 1px solid var(--kitchen-fridge-border);
+  border-radius: var(--radius);
+}
+/* 8 hotspots + 1 interruptor de dark mode */
+.hs-vaso       { top: 50%; left: 6%;   width: 11%; height: 28%; }
+.hs-livros     { top: 58%; left: 22%;  width: 9%;  height: 10%; }
+.hs-prato      { top: 60%; left: 36%;  width: 12%; height: 8%;  }
+.hs-doce       { top: 58%; left: 52%;  width: 10%; height: 10%; }
+.hs-relogio    { top: 10%; right: 13%; width: 9%;  height: 14%; }
+.hs-freezer    { top: 28%; right: 7%;  width: 20%; height: 14%; }
+.hs-calendario { top: 44%; right: 16%; width: 11%; height: 12%; }
+.hs-postit     { top: 46%; right: 7%;  width: 8%;  height: 10%; }
+.hs-switch     { top: 32%; left: 35%;  width: 3%;  height: 6%;  }
+
+#cozinha .nav-arrow {
+  position: absolute;
+  right: 16px; top: 50%; transform: translateY(-50%);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+#cozinha .nav-arrow small {
+  position: absolute;
+  top: 100%; left: 50%; transform: translateX(-50%);
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-mute);
+}
+#cozinha .meta {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-mute);
+}
+
+/* ==========================================================
+   SCREEN 3: CATEGORIA (drawer over kitchen)
+   ========================================================== */
+#categoria {
+  position: relative;
+}
+#categoria .split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 48px);
+}
+#categoria .split-kitchen {
+  background: #FBFCFD;
+  opacity: 0.4;
+  position: relative;
+  padding: 32px;
+  border-right: 1px dashed var(--line);
+}
+#categoria .split-kitchen .ph {
+  height: 100%;
+}
+#categoria .split-list {
+  padding: 32px 40px;
+  background: var(--white);
+  overflow-y: auto;
+}
+#categoria .crumb {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+#categoria h1 {
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+#categoria .count {
+  color: var(--ink-mute);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+#categoria .search {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+#categoria .filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+#categoria .chip {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--white);
+}
+#categoria .chip.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+#categoria .recipe-card {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-soft);
+  cursor: pointer;
+  align-items: center;
+}
+#categoria .recipe-card:hover { background: var(--surface); }
+#categoria .recipe-card .ph { aspect-ratio: 1; }
+#categoria .recipe-card h3 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+#categoria .recipe-card .meta {
+  font-size: 12px; color: var(--ink-mute); font-family: var(--font-mono);
+}
+
+/* ==========================================================
+   SCREEN 4: RECEITA INDIVIDUAL
+   ========================================================== */
+#receita { background: var(--white); }
+#receita .receita-back {
+  padding: 24px 32px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+#receita .hero {
+  max-width: 1000px;
+  margin: 24px auto;
+  padding: 0 32px;
+}
+/* Carousel */
+#receita .carousel {
+  position: relative;
+}
+#receita .carousel .carousel-slide {
+  aspect-ratio: 16/9;
+}
+#receita .carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#receita .carousel-arrow:hover {
+  transform: translateY(-50%) scale(1.06);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+#receita .carousel-arrow.prev { left: 12px; }
+#receita .carousel-arrow.next { right: 12px; }
+#receita .carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+#receita .carousel-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+  cursor: pointer;
+  transition: width 0.2s, background 0.2s;
+}
+#receita .carousel-dots .dot.active {
+  background: var(--ink);
+  width: 24px;
+  border-radius: 4px;
+}
+#receita .carousel-dots .dot.video {
+  background: var(--ink-mute);
+  border: 1px solid var(--ink-soft);
+}
+
+/* Toggle de unidades — centralizado abaixo do título */
+#receita .unit-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px;
+  margin: 0 auto 20px;
+  width: fit-content;
+}
+#receita .unit-toggle button {
+  background: transparent;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ink-soft);
+  padding: 4px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+#receita .unit-toggle button.active {
+  background: var(--ink);
+  color: var(--white);
+}
+#receita .titlebar {
+  max-width: 1000px;
+  margin: 0 auto 32px;
+  padding: 0 32px;
+}
+#receita .titlebar h1 {
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+#receita .titlebar .meta {
+  display: flex; gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+#receita .body {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 32px 64px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+}
+#receita .ingredients {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+}
+#receita .ingredients h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+#receita .ingredients ul { list-style: none; margin-bottom: 20px; }
+#receita .ingredients li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 14px;
+}
+#receita .portion-slider {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+#receita .portion-slider input { width: 100%; margin-top: 8px; }
+#receita .ingredients-subtitle {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 24px 0 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+#receita .materials {
+  list-style: none;
+  margin-bottom: 20px;
+}
+#receita .materials li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+#receita .materials li::before {
+  content: '🔧';
+  margin-right: 8px;
+  opacity: 0.6;
+  font-size: 11px;
+}
+#receita .steps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+#receita .steps-header h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0;
+}
+#receita .btn-cook {
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+}
+#receita .btn-cook:hover { opacity: 0.92; }
+#receita .step {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-soft);
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 16px;
+}
+#receita .step:last-child,
+#receita .step:has(+ .share) { border-bottom: none; }
+#receita .step .num {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 16px;
+}
+#receita .share {
+  margin-top: 0;
+  padding-top: 32px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line-soft);
+}
+#receita .share button {
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   SCREEN 5: MODO COZINHA (cooking mode)
+   ========================================================== */
+#modo-cozinha {
+  background: #0F0F0F;
+  color: var(--white);
+}
+#modo-cozinha .mc-top {
+  padding: 16px 32px;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #888;
+}
+#modo-cozinha .mc-body {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 32px;
+  text-align: center;
+}
+#modo-cozinha .step-of {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 24px;
+}
+#modo-cozinha h2 {
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.3;
+  margin-bottom: 48px;
+}
+#modo-cozinha .nav {
+  display: flex; gap: 12px; justify-content: center;
+}
+#modo-cozinha .nav button {
+  padding: 16px 32px;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid #333;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+#modo-cozinha .nav button.primary { background: var(--white); color: #000; border-color: var(--white); }
+#modo-cozinha .ingredients-collapse {
+  margin-top: 64px;
+  padding: 16px;
+  background: #1A1A1A;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #888;
+}
+
+/* ==========================================================
+   SCREEN 6: BUSCA GLOBAL
+   ========================================================== */
+#busca {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+#busca .search-bar {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+#busca .section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-mute);
+  margin: 24px 0 12px;
+}
+#busca .result {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-soft);
+  cursor: pointer;
+}
+#busca .result:hover { background: var(--surface); }
+#busca .result h4 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+#busca .result .meta { font-size: 12px; color: var(--ink-mute); font-family: var(--font-mono); }
+
+/* ==========================================================
+   SCREEN 7: 404 / EMPTY STATE
+   ========================================================== */
+#empty {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 96px 32px;
+  min-height: 100vh;
+}
+#empty.active { display: flex; }
+#empty .ph { width: 200px; aspect-ratio: 1; margin-bottom: 32px; }
+#empty h1 { font-size: 32px; font-weight: 400; margin-bottom: 8px; letter-spacing: -0.02em; }
+#empty p { color: var(--ink-soft); margin-bottom: 24px; }
+#empty button {
+  padding: 12px 24px;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* ==========================================================
+   Responsive (mobile)
+   ========================================================== */
+@media (max-width: 768px) {
+  .site-header { padding: 0 16px; }
+  #cozinha .kitchen-canvas {
+    aspect-ratio: 3/4;
+    margin: 16px;
+  }
+  /* Mobile hotspot layout — vertical stack approximation (versão do switcher) */
+  .hs-vaso       { top: 10%; left: 8%;  width: 22%; height: 12%; }
+  .hs-livros     { top: 10%; right: 8%; width: 22%; height: 12%; }
+  .hs-relogio    { top: 26%; left: 38%; width: 24%; height: 8%; }
+  .hs-prato      { top: 40%; left: 16%; width: 28%; height: 8%; }
+  .hs-doce       { top: 40%; right: 16%; width: 28%; height: 8%; }
+  .hs-freezer    { top: 56%; left: 25%; width: 50%; height: 10%; }
+  .hs-calendario { top: 70%; left: 18%; width: 28%; height: 10%; }
+  .hs-postit     { top: 70%; right: 18%; width: 28%; height: 10%; }
+  .hs-switch     { top: 18%; right: 8%;  width: 8%;  height: 6%;  }
+
+  #categoria .split { grid-template-columns: 1fr; }
+  #categoria .split-kitchen { display: none; }
+  #categoria .split-list { padding: 24px 20px; }
+  #receita .body { grid-template-columns: 1fr; gap: 24px; }
+  #receita .ingredients { position: static; }
+  #receita .hero, #receita .titlebar, #receita .body, #receita .share { padding-left: 20px; padding-right: 20px; }
+  #receita .titlebar h1 { font-size: 28px; }
+  #cozinha .nav-arrow { width: 44px; height: 44px; font-size: 18px; }
+}
+
+/* ==========================================================
+   Frame label helper (for mockup readability)
+   ========================================================== */
+.frame-label {
+  position: fixed;
+  top: 56px; right: 16px;
+  z-index: 999;
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ==========================================================
+   SCREEN 1: INTRO COVER (mock — fundo escuro com typewriter)
+   ========================================================== */
+#intro .intro-cover-mock {
+  background: #1A2840;
+  color: var(--white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  padding: 0 24px;
+}
+#intro .cover-skip-mock {
+  position: absolute;
+  top: 20px; right: 32px;
+  color: var(--white);
+  opacity: 0.55;
+  font-size: 12px;
+  cursor: pointer;
+}
+#intro .cover-phrase {
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 820px;
+}
+#intro .cover-phrase .caret {
+  display: inline-block;
+  margin-left: 4px;
+  font-weight: 300;
+  opacity: 0.6;
+  animation: cover-caret 0.9s steps(2) infinite;
+}
+@keyframes cover-caret {
+  0%, 50% { opacity: 0.6; }
+  51%, 100% { opacity: 0; }
+}
+#intro .cover-meta {
+  position: absolute;
+  bottom: 24px; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================
+   SCREEN 2: HERO (mock — logo revelado pós-wipe, fundo azul claro)
+   ========================================================== */
+#hero .hero-mock {
+  background: var(--intro-blue);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  position: relative;
+}
+#hero .hero-mock-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+#hero .hero-mock-logo .name {
+  font-size: clamp(48px, 9vw, 96px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--ink);
+}
+#hero .hero-mock-logo .by {
+  font-size: clamp(13px, 1.8vw, 18px);
+  opacity: 0.55;
+  color: var(--ink);
+}
+#hero .hero-mock-meta {
+  position: absolute;
+  bottom: 24px; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================
+   SCREEN 7: RECADO (mock — modal post-it estilo)
+   ========================================================== */
+#recado .recado-mock-shell {
+  background: #FBFCFD;
+  min-height: calc(100vh - 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  position: relative;
+}
+#recado .recado-mock {
+  position: relative;
+  width: 440px;
+  max-width: 100%;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  padding: 40px 32px 32px;
+}
+#recado .recado-mock::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 90px; height: 16px;
+  background: #FBE9A6;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+#recado .recado-mock .recado-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: none; border: none;
+  font-size: 20px; cursor: pointer;
+  color: var(--ink-soft);
+}
+#recado .recado-mock h2 {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+#recado .recado-mock .sub {
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+#recado .recado-mock label {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+#recado .recado-mock input,
+#recado .recado-mock textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 14px;
+}
+#recado .recado-mock textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+#recado .recado-send {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  background: #25D366;
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+#recado .recado-alt {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-mute);
+  margin-top: 14px;
+}
+#recado .recado-alt a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+}

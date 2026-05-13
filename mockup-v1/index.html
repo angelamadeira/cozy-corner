@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cozy Corner recipes by Gigi — Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============================================
+       MOCKUP SCREEN SWITCHER (top bar)
+       Não aparece no site final — só pra navegar nas telas.
+       ============================================ -->
+  <nav class="mockup-nav" aria-label="screen switcher">
+    <span class="label">MOCKUP ›</span>
+    <button data-screen="intro" class="active">1. Intro (cover escura)</button>
+    <button data-screen="hero">2. Hero (logo revelado)</button>
+    <button data-screen="cozinha">3. Cozinha</button>
+    <button data-screen="categoria">4. Categoria</button>
+    <button data-screen="receita">5. Receita</button>
+    <button data-screen="modo-cozinha">6. Modo Cozinha</button>
+    <button data-screen="recado">7. Recado (modal)</button>
+    <button data-screen="busca">8. Busca</button>
+    <button data-screen="empty">9. Vazio/404</button>
+    <span class="spacer"></span>
+    <a href="flow.html">▶ Ver flow (scroll)</a>
+    <a href="admin.html">Admin →</a>
+  </nav>
+  <div class="frame-label" id="frame-label">Intro</div>
+
+  <!-- =================================================
+       SCREEN 1 — INTRO (cover azul escura, fundo #1A2840)
+       2 frases auto-play com typewriter. Skip-intro top-right.
+       ================================================= -->
+  <section id="intro" class="screen active">
+    <div class="intro-cover-mock">
+      <span class="cover-skip-mock">pular intro ✕</span>
+      <p class="cover-phrase">que bom te ver por aqui :)<span class="caret">|</span></p>
+      <div class="cover-meta">
+        <span>[ INTRO COVER ]</span>
+        <span>fundo #1A2840 · typewriter ~70ms/char</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 2 — HERO (logo grande revelado após o wipe)
+       Estado intermediário: fundo azul claro, logo centralizado.
+       ================================================= -->
+  <section id="hero" class="screen">
+    <div class="hero-mock">
+      <div class="hero-mock-logo">
+        <span class="name">Cozy Corner</span>
+        <span class="by">recipes by Gigi</span>
+      </div>
+      <div class="cover-meta hero-mock-meta">
+        <span>[ HERO — pós-wipe ]</span>
+        <span>fundo #D7F5FF · logo encolhe ao rolar e morpha pro header</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 3 — COZINHA (hub, 8 hotspots)
+       Ilustração com placeholders.
+       ================================================= -->
+  <section id="cozinha" class="screen">
+    <header class="site-header">
+      <div class="logo">
+        <span class="name">Cozy Corner</span>
+        <span class="by">recipes by Gigi</span>
+      </div>
+    </header>
+
+    <div class="meta">
+      <span>[ COZINHA — hub principal ]</span>
+      <span>SVG layers: bg-parede / bg-piso / moveis / objetos</span>
+    </div>
+
+    <div class="kitchen-canvas">
+      <span class="layer-label">canvas 1440 × 900 — ilustração da cozinha vai aqui</span>
+
+      <!-- placeholder layers -->
+      <div class="ph-wall"></div>
+      <div class="ph-counter"></div>
+      <div class="ph-fridge"></div>
+
+      <!-- 8 hotspots: 6 categorias + 1 atalho + 1 recado -->
+      <div class="hotspot hs-vaso" data-action="cat" data-key="vegetarianas">
+        vaso<br/><small>→ Vegetarianas</small>
+      </div>
+      <div class="hotspot hs-livros" data-action="cat" data-key="todas">
+        livros<br/><small>→ Todas as receitas</small>
+      </div>
+      <div class="hotspot hs-prato" data-action="cat" data-key="principais">
+        prato<br/><small>→ Pratos principais</small>
+      </div>
+      <div class="hotspot hs-doce" data-action="cat" data-key="sobremesas">
+        doce<br/><small>→ Sobremesas</small>
+      </div>
+      <div class="hotspot hs-relogio" data-action="cat" data-key="rapidas">
+        relógio<br/><small>→ Receitas rápidas</small>
+      </div>
+      <div class="hotspot hs-freezer" data-action="cat" data-key="congelar">
+        freezer<br/><small>→ Para congelar</small>
+      </div>
+      <div class="hotspot hs-calendario" data-action="cat" data-key="datas">
+        calendário<br/><small>→ Datas comemorativas</small>
+      </div>
+      <div class="hotspot hs-postit" data-action="recado">
+        post-it<br/><small>→ Deixe seu recado</small>
+      </div>
+      <div class="hotspot hs-switch" data-action="dark-mode" title="liga/desliga a luz">
+        💡<br/><small>→ dark mode</small>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>8 hotspots na cozinha (ver flow.html pra versão atualizada)</span>
+      <span>hover: label + glow + scale 1.05</span>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 4 — CATEGORIA (drawer over kitchen)
+       Lista de receitas da categoria selecionada.
+       ================================================= -->
+  <section id="categoria" class="screen">
+    <header class="site-header">
+      <div class="logo">
+        <span class="name">Cozy Corner</span>
+        <span class="by">recipes by Gigi</span>
+      </div>
+    </header>
+
+    <div class="split">
+      <!-- esquerda: cozinha esmaecida -->
+      <div class="split-kitchen">
+        <div class="ph">cozinha (esmaecida)<br/><small>objeto selecionado continua aceso</small></div>
+      </div>
+
+      <!-- direita: listagem -->
+      <div class="split-list">
+        <div class="crumb">← voltar pra cozinha</div>
+        <h1>Pratos Principais</h1>
+        <div class="count">12 receitas</div>
+
+        <input class="search" type="search" placeholder="🔍 buscar nesta categoria..." />
+
+        <div class="filters">
+          <span class="chip active">todas</span>
+          <span class="chip">⏱ até 30 min</span>
+          <span class="chip">🌱 vegetariana</span>
+          <span class="chip">⭐ favoritas</span>
+          <span class="chip">sem glúten</span>
+        </div>
+
+        <article class="recipe-card">
+          <div class="ph">foto</div>
+          <div>
+            <h3>Risoto de cogumelos</h3>
+            <div class="meta">40 min · 4 porções · médio</div>
+          </div>
+        </article>
+        <article class="recipe-card">
+          <div class="ph">foto</div>
+          <div>
+            <h3>Lasanha à bolonhesa</h3>
+            <div class="meta">1h30 · 6 porções · médio</div>
+          </div>
+        </article>
+        <article class="recipe-card">
+          <div class="ph">foto</div>
+          <div>
+            <h3>Frango ao curry</h3>
+            <div class="meta">35 min · 4 porções · fácil</div>
+          </div>
+        </article>
+        <article class="recipe-card">
+          <div class="ph">foto</div>
+          <div>
+            <h3>Macarrão alho e óleo</h3>
+            <div class="meta">15 min · 2 porções · fácil</div>
+          </div>
+        </article>
+        <article class="recipe-card">
+          <div class="ph">foto</div>
+          <div>
+            <h3>Estrogonofe vegetariano</h3>
+            <div class="meta">45 min · 4 porções · médio</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 5 — RECEITA INDIVIDUAL
+       ================================================= -->
+  <section id="receita" class="screen">
+    <header class="site-header">
+      <div class="logo">
+        <span class="name">Cozy Corner</span>
+        <span class="by">recipes by Gigi</span>
+      </div>
+    </header>
+
+    <div class="receita-back">← Pratos Principais</div>
+
+    <div class="hero">
+      <div class="carousel">
+        <button class="carousel-arrow prev" aria-label="anterior">‹</button>
+        <div class="ph carousel-slide">foto 1 · capa</div>
+        <button class="carousel-arrow next" aria-label="próximo">›</button>
+      </div>
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot video"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <div class="titlebar">
+      <h1>Risoto de cogumelos</h1>
+      <div class="meta">
+        <span>⏱ 40 min</span>
+        <span>🍽 4 porções</span>
+        <span>📊 médio</span>
+        <span>🌱 vegetariana</span>
+      </div>
+    </div>
+
+    <div class="body">
+      <aside class="ingredients">
+        <h3>Ingredientes</h3>
+        <div class="unit-toggle">
+          <button class="active">métrico</button>
+          <button>imperial</button>
+        </div>
+        <ul>
+          <li>200g arroz arbóreo</li>
+          <li>500g cogumelos paris</li>
+          <li>1 cebola média</li>
+          <li>2 dentes de alho</li>
+          <li>100ml vinho branco</li>
+          <li>50g parmesão</li>
+          <li>1L caldo de legumes</li>
+          <li>azeite, sal, pimenta</li>
+        </ul>
+
+        <div class="portion-slider">
+          ajustar porções: 4
+          <input type="range" min="1" max="12" value="4" />
+        </div>
+
+        <h3 class="ingredients-subtitle">Materiais</h3>
+        <ul class="materials">
+          <li>panela média de fundo grosso</li>
+          <li>colher de pau</li>
+          <li>frigideira antiaderente</li>
+          <li>concha</li>
+          <li>ralador (parmesão)</li>
+        </ul>
+      </aside>
+
+      <div class="steps">
+        <div class="steps-header">
+          <h3>Modo de preparo</h3>
+          <button class="btn-cook">🍳 Modo cozinha</button>
+        </div>
+        <div class="step">
+          <span class="num">1</span>
+          <p>Aqueça o caldo de legumes e mantenha em fogo baixo. Refogue a cebola picada no azeite até ficar translúcida.</p>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <p>Adicione o alho amassado e os cogumelos fatiados. Refogue por 5 minutos até dourar.</p>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <p>Acrescente o arroz e mexa por 1 minuto. Despeje o vinho branco e mexa até evaporar.</p>
+        </div>
+        <div class="step">
+          <span class="num">4</span>
+          <p>Vá adicionando o caldo quente, uma concha por vez, mexendo até absorver antes da próxima.</p>
+        </div>
+        <div class="step">
+          <span class="num">5</span>
+          <p>Quando o arroz estiver al dente (cerca de 18-20 minutos), desligue o fogo, adicione o parmesão e finalize com pimenta-do-reino.</p>
+        </div>
+
+        <div class="share">
+          <button>📱 Mandar pro WhatsApp</button>
+          <button>📋 Copiar link</button>
+          <button>🖨 Imprimir</button>
+          <button>⭐ Favoritar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 6 — MODO COZINHA
+       Tela cheia, mantém acesa, fonte grande.
+       ================================================= -->
+  <section id="modo-cozinha" class="screen">
+    <div class="mc-top">
+      <span>Risoto de cogumelos</span>
+      <span>✕ sair do modo cozinha</span>
+    </div>
+    <div class="mc-body">
+      <div class="step-of">passo 3 de 5</div>
+      <h2>Acrescente o arroz e mexa por 1 minuto. Despeje o vinho branco e mexa até evaporar.</h2>
+      <div class="nav">
+        <button>← anterior</button>
+        <button class="primary">próximo →</button>
+      </div>
+      <div class="ingredients-collapse">
+        ▾ ver ingredientes desta etapa
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 7 — RECADO (modal "deixe seu recado" estilo post-it)
+       Aberto ao clicar no post-it da geladeira na cozinha.
+       ================================================= -->
+  <section id="recado" class="screen">
+    <div class="recado-mock-shell">
+      <div class="recado-mock">
+        <button class="recado-close">✕</button>
+        <h2>Deixe seu recado</h2>
+        <p class="sub">manda um oi, dúvida ou sugestão de receita 💌</p>
+        <label>seu nome</label>
+        <input type="text" placeholder="" />
+        <label>mensagem</label>
+        <textarea placeholder="oi Gigi!"></textarea>
+        <button class="recado-send">📱 enviar pelo WhatsApp</button>
+        <div class="recado-alt">ou me escreve em <a href="#">angelmadeira@gmail.com</a></div>
+      </div>
+    </div>
+    <div class="meta">
+      <span>[ RECADO — modal post-it ]</span>
+      <span>Aciona ao clicar no post-it · envia via wa.me com texto pré-formatado</span>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 8 — BUSCA GLOBAL
+       Acessada via topo, busca em todo o site.
+       ================================================= -->
+  <section id="busca" class="screen">
+    <header class="site-header">
+      <div class="logo">
+        <span class="name">Cozy Corner</span>
+        <span class="by">recipes by Gigi</span>
+      </div>
+    </header>
+
+    <input class="search-bar" type="search" placeholder="🔍 buscar receitas, ingredientes ou categorias..." value="bolo" />
+
+    <div class="section-title">RECEITAS (3)</div>
+    <div class="result">
+      <h4>Bolo de cenoura com cobertura</h4>
+      <div class="meta">Sobremesas · 1h · fácil</div>
+    </div>
+    <div class="result">
+      <h4>Bolo de fubá da vovó</h4>
+      <div class="meta">Sobremesas · 50 min · fácil</div>
+    </div>
+    <div class="result">
+      <h4>Bolo de chocolate sem farinha</h4>
+      <div class="meta">Sobremesas · 1h20 · médio</div>
+    </div>
+
+    <div class="section-title">CATEGORIAS (1)</div>
+    <div class="result">
+      <h4>Sobremesas</h4>
+      <div class="meta">18 receitas</div>
+    </div>
+
+    <div class="section-title">INGREDIENTES (1)</div>
+    <div class="result">
+      <h4>"farinha de trigo" aparece em 24 receitas</h4>
+      <div class="meta">ver tudo →</div>
+    </div>
+  </section>
+
+  <!-- =================================================
+       SCREEN 9 — EMPTY STATE / 404
+       ================================================= -->
+  <section id="empty" class="screen">
+    <div class="ph">desenho de prato vazio</div>
+    <h1>ainda sem receitas por aqui...</h1>
+    <p>essa categoria está em construção. volte em breve, ou bisbilhote outras gavetas da cozinha.</p>
+    <button>← voltar pra cozinha</button>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

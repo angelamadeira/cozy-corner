@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cozy Corner recipes by Gigi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ============ FLOW OVERRIDES ============ */
+    html, body { background: var(--white); overflow-x: hidden; }
+    .mockup-nav { display: none !important; }
+    .screen { display: block !important; padding-top: 0; min-height: auto; }
+
+    /* ============ HEADER ============ */
+    .flow-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      padding: 0 32px;
+      z-index: 100;
+    }
+    .flow-header .logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .flow-header .logo {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .flow-header .logo .name {
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+    }
+    .flow-header .logo .by {
+      font-size: 10px;
+      opacity: 0.55;
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    /* ============ INTRO COVER (azul escuro, fixed full-screen) ============ */
+    body.intro-active { overflow: hidden; }
+
+    .intro-cover {
+      position: fixed;
+      inset: 0;
+      background: #1A2840;
+      color: white;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px;
+      text-align: center;
+      clip-path: inset(0 0 0 0);
+      transition: clip-path 1.4s cubic-bezier(0.7, 0, 0.2, 1);
+    }
+    .intro-cover.wiped {
+      clip-path: inset(100% 0 0 0);
+      pointer-events: none;
+    }
+    .intro-cover .cover-skip {
+      position: absolute;
+      top: 20px;
+      right: 32px;
+      color: white;
+      opacity: 0.55;
+      font-size: 12px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      z-index: 5;
+      font-family: inherit;
+    }
+    .intro-cover .cover-skip:hover { opacity: 1; }
+    .intro-cover .phrase {
+      position: absolute;
+      font-size: clamp(28px, 5vw, 56px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      max-width: 820px;
+      color: white;
+      opacity: 0;
+      padding: 0 24px;
+      will-change: opacity;
+    }
+
+    /* ============ INTRO — cenas após o wipe ============ */
+    #scene-intro {
+      min-height: 100vh;
+      background: var(--intro-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px;
+      text-align: center;
+      position: relative;
+    }
+    /* Hero logo — fixed no centro, morpha pra header conforme scroll */
+    .hero-logo {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      z-index: 80;
+      pointer-events: none;
+      will-change: transform, opacity;
+      transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s;
+    }
+    .hero-logo.visible { opacity: 1; }
+    .hero-logo .name {
+      font-size: clamp(48px, 9vw, 96px);
+      font-weight: 500;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .hero-logo .by {
+      font-size: clamp(13px, 1.8vw, 18px);
+      opacity: 0.55;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    /* Header logo — fica invisível até o morph passar 70% */
+    .flow-header .logo {
+      opacity: 0;
+    }
+
+    /* Cursor de typewriter — pisca enquanto digita */
+    .phrase.typewriter::after {
+      content: '|';
+      display: inline-block;
+      margin-left: 4px;
+      font-weight: 300;
+      color: currentColor;
+      opacity: 0.6;
+      animation: caret 0.9s steps(2) infinite;
+    }
+    .phrase.typewriter.done::after { content: ''; }
+    @keyframes caret {
+      0%, 50% { opacity: 0.6; }
+      51%, 100% { opacity: 0; }
+    }
+
+
+    /* Hint de scroll */
+    .scroll-hint {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      opacity: 0;
+      animation: bob 1.8s ease-in-out infinite;
+      z-index: 90;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .scroll-hint.show { opacity: 0.65; }
+    .scroll-hint.hidden { opacity: 0; }
+    @keyframes bob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ============ TRANSIÇÃO BG ============ */
+    #flow-transition {
+      height: 50vh;
+      background: linear-gradient(to bottom, var(--intro-blue), var(--white));
+    }
+
+    /* ============ COZINHA ============ */
+    #flow-kitchen {
+      background: var(--white);
+      padding: 64px 32px 96px;
+    }
+    .kitchen-title {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .kitchen-canvas {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      aspect-ratio: 16/10;
+      background: #FBFCFD;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-lg);
+    }
+
+    /* Placeholders dos elementos do cenário */
+    .kitchen-canvas .ph-wall {
+      position: absolute;
+      inset: 24px 24px 38% 24px;
+      background: var(--kitchen-wall);
+      border-radius: var(--radius);
+    }
+    .kitchen-canvas .ph-counter {
+      position: absolute;
+      bottom: 24px; left: 24px; right: 24px;
+      height: 33%;
+      background: var(--kitchen-counter);
+      border-radius: var(--radius);
+    }
+    .kitchen-canvas .ph-fridge {
+      position: absolute;
+      top: 26%; right: 6%;
+      width: 22%; height: 60%;
+      background: var(--kitchen-fridge);
+      border: 1px solid var(--kitchen-fridge-border);
+      border-radius: var(--radius);
+    }
+
+    /* Hotspots — sempre visíveis e clicáveis */
+    .kitchen-canvas .hotspot {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 5;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .kitchen-canvas .hotspot:hover {
+      background: rgba(95, 168, 211, 0.22);
+      transform: scale(1.04);
+      box-shadow: 0 0 0 3px rgba(95, 168, 211, 0.15);
+    }
+    .kitchen-canvas .hotspot::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: var(--radius);
+      border: 1.5px solid rgba(95, 168, 211, 0.3);
+      animation: pulse 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    /* Stagger nos pulses */
+    .kitchen-canvas .hotspot:nth-child(2)::before { animation-delay: 0.3s; }
+    .kitchen-canvas .hotspot:nth-child(3)::before { animation-delay: 0.6s; }
+    .kitchen-canvas .hotspot:nth-child(4)::before { animation-delay: 0.9s; }
+    .kitchen-canvas .hotspot:nth-child(5)::before { animation-delay: 1.2s; }
+    .kitchen-canvas .hotspot:nth-child(6)::before { animation-delay: 1.5s; }
+    .kitchen-canvas .hotspot:nth-child(7)::before { animation-delay: 1.8s; }
+    .kitchen-canvas .hotspot:nth-child(8)::before { animation-delay: 2.1s; }
+
+    /* Posições dos 8 hotspots — placeholders, ajustar com ilustração final */
+    .hs-vaso        { top: 50%;  left: 6%;  width: 11%; height: 28%; }
+    .hs-livros      { top: 58%;  left: 22%; width: 9%;  height: 10%; }
+    .hs-prato       { top: 60%;  left: 36%; width: 12%; height: 8%;  }
+    .hs-doce        { top: 58%;  left: 52%; width: 10%; height: 10%; }
+    .hs-relogio     { top: 10%;  right: 13%; width: 9%; height: 14%; }
+    .hs-freezer     { top: 28%;  right: 7%;  width: 20%; height: 14%; }
+    .hs-calendario  { top: 44%;  right: 16%; width: 11%; height: 12%; }
+    .hs-postit      { top: 46%;  right: 7%;  width: 8%;  height: 10%; }
+    .hs-switch      { top: 32%;  left: 35%;  width: 3%;  height: 6%;  }
+
+    /* ============ DRAWER (RECEITAS / TODAS) ============ */
+    .drawer-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.18);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.4s, visibility 0.4s;
+      z-index: 150;
+    }
+    .drawer-backdrop.open { opacity: 1; visibility: visible; }
+
+    .cat-drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 520px;
+      max-width: 100vw;
+      background: var(--white);
+      border-left: 1px solid var(--line);
+      box-shadow: -20px 0 40px rgba(0,0,0,0.08);
+      transform: translateX(100%);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 200;
+      overflow-y: auto;
+      padding: 48px 32px;
+    }
+    .cat-drawer.open { transform: translateX(0); }
+    .drawer-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: none; border: none;
+      font-size: 20px; cursor: pointer;
+      color: var(--ink-soft);
+    }
+    .cat-drawer .crumb {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+    .cat-drawer h1 {
+      font-size: 36px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .cat-drawer .count {
+      color: var(--ink-mute);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    .cat-drawer .search {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .cat-drawer .filters {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .cat-drawer .chip {
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--white);
+    }
+    .cat-drawer .chip.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+    .cat-drawer .recipe {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line-soft);
+      cursor: pointer;
+      align-items: center;
+    }
+    .cat-drawer .recipe:hover { background: var(--surface); }
+    .cat-drawer .recipe .ph { aspect-ratio: 1; }
+    .cat-drawer .recipe h3 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .cat-drawer .recipe .meta { font-size: 12px; color: var(--ink-mute); font-family: var(--font-mono); }
+
+    /* ============ MODAL "DEIXE SEU RECADO" ============ */
+    .recado-modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.96);
+      width: 440px;
+      max-width: calc(100vw - 32px);
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      padding: 40px 32px 32px;
+      z-index: 220;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+    }
+    .recado-modal.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .recado-modal::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 90px; height: 16px;
+      background: #FBE9A6;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .recado-modal h2 {
+      font-size: 24px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .recado-modal .sub {
+      color: var(--ink-soft);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    .recado-modal label {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+    .recado-modal input,
+    .recado-modal textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 14px;
+    }
+    .recado-modal textarea { min-height: 90px; resize: vertical; }
+    .recado-modal .wa-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      background: #25D366;
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .recado-modal .alt {
+      text-align: center;
+      font-size: 12px;
+      color: var(--ink-mute);
+      margin-top: 14px;
+    }
+    .recado-modal .alt a { color: var(--ink-soft); text-decoration: underline; }
+
+    /* ============ DEBUG / NAVEGAÇÃO MOCKUP ============ */
+    .back-to-mockup {
+      position: fixed;
+      bottom: 16px; left: 16px;
+      background: var(--ink);
+      color: var(--white);
+      padding: 8px 14px;
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-decoration: none;
+      z-index: 99;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .back-to-mockup:hover { opacity: 1; }
+
+    /* ============ MOBILE ============ */
+    @media (max-width: 768px) {
+      #flow-kitchen { padding: 56px 16px 64px; }
+      .kitchen-canvas { aspect-ratio: 3/4; }
+      /* Posições mobile — provisórias, redesenhar com ilustração vertical */
+      .hs-vaso        { top: 10%; left: 8%;  width: 22%; height: 12%; }
+      .hs-livros      { top: 10%; right: 8%; width: 22%; height: 12%; }
+      .hs-relogio     { top: 26%; left: 38%; width: 24%; height: 8%; }
+      .hs-prato       { top: 40%; left: 16%; width: 28%; height: 8%; }
+      .hs-doce        { top: 40%; right: 16%; width: 28%; height: 8%; }
+      .hs-freezer     { top: 56%; left: 25%; width: 50%; height: 10%; }
+      .hs-calendario  { top: 70%; left: 18%; width: 28%; height: 10%; }
+      .hs-postit      { top: 70%; right: 18%; width: 28%; height: 10%; }
+      .hs-switch      { top: 18%; right: 8%;  width: 8%;  height: 6%;  }
+      .cat-drawer { width: 100%; }
+      .recado-modal { padding: 32px 20px 24px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===================== INTRO COVER (fundo escuro, typewriter) ===================== -->
+  <div class="intro-cover" id="intro-cover">
+    <span class="cover-skip" id="cover-skip">pular intro ✕</span>
+    <p class="phrase typewriter" id="ph1"></p>
+    <p class="phrase typewriter" id="ph2"></p>
+  </div>
+
+  <header class="flow-header">
+    <div class="logo" id="header-logo">
+      <span class="name">Cozy Corner</span>
+      <span class="by">recipes by Gigi</span>
+    </div>
+  </header>
+
+  <div class="scroll-hint" id="scroll-hint">↓ role pra continuar</div>
+
+  <!-- ===================== INTRO — cena 1 (hero logo revelado) ===================== -->
+  <section id="scene-intro">
+    <div class="hero-logo" id="hero-logo">
+      <span class="name">Cozy Corner</span>
+      <span class="by">recipes by Gigi</span>
+    </div>
+  </section>
+
+
+  <!-- ===================== TRANSIÇÃO ===================== -->
+  <section id="flow-transition" aria-hidden="true"></section>
+
+  <!-- ===================== COZINHA ===================== -->
+  <section id="flow-kitchen">
+    <div class="kitchen-title">cozinha · clique em qualquer elemento</div>
+    <div class="kitchen-canvas">
+      <div class="ph-wall"></div>
+      <div class="ph-counter"></div>
+      <div class="ph-fridge"></div>
+
+      <div class="hotspot hs-vaso"        data-action="cat" data-key="vegetarianas">vaso<br><small>Vegetarianas</small></div>
+      <div class="hotspot hs-livros"      data-action="cat" data-key="todas">livros<br><small>Todas as receitas</small></div>
+      <div class="hotspot hs-prato"       data-action="cat" data-key="principais">prato<br><small>Pratos principais</small></div>
+      <div class="hotspot hs-doce"        data-action="cat" data-key="sobremesas">doce<br><small>Sobremesas</small></div>
+      <div class="hotspot hs-relogio"     data-action="cat" data-key="rapidas">relógio<br><small>Receitas rápidas</small></div>
+      <div class="hotspot hs-freezer"     data-action="cat" data-key="congelar">freezer<br><small>Para congelar</small></div>
+      <div class="hotspot hs-calendario"  data-action="cat" data-key="datas">calendário<br><small>Datas comemorativas</small></div>
+      <div class="hotspot hs-postit"      data-action="recado">post-it<br><small>Deixe seu recado</small></div>
+      <div class="hotspot hs-switch"      data-action="dark-mode" title="liga/desliga a luz">💡<br><small>dark mode</small></div>
+    </div>
+  </section>
+
+  <!-- ===================== DRAWERS / MODAIS ===================== -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <aside class="cat-drawer" id="cat-drawer" aria-hidden="true">
+    <button class="drawer-close" data-close>✕</button>
+    <div class="crumb" data-close>← voltar pra cozinha</div>
+    <h1 id="cat-title">Pratos principais</h1>
+    <div class="count" id="cat-count">12 receitas</div>
+    <input class="search" type="search" placeholder="🔍 buscar..." />
+    <div class="filters">
+      <span class="chip active">todas</span>
+      <span class="chip">⏱ até 30 min</span>
+      <span class="chip">🌱 vegetariana</span>
+      <span class="chip">⭐ favoritas</span>
+    </div>
+    <div id="cat-results">
+      <article class="recipe">
+        <div class="ph">foto</div>
+        <div>
+          <h3>Risoto de cogumelos</h3>
+          <div class="meta">40 min · 4 porções · médio</div>
+        </div>
+      </article>
+      <article class="recipe">
+        <div class="ph">foto</div>
+        <div>
+          <h3>Lasanha à bolonhesa</h3>
+          <div class="meta">1h30 · 6 porções · médio</div>
+        </div>
+      </article>
+      <article class="recipe">
+        <div class="ph">foto</div>
+        <div>
+          <h3>Frango ao curry</h3>
+          <div class="meta">35 min · 4 porções · fácil</div>
+        </div>
+      </article>
+      <article class="recipe">
+        <div class="ph">foto</div>
+        <div>
+          <h3>Macarrão alho e óleo</h3>
+          <div class="meta">15 min · 2 porções · fácil</div>
+        </div>
+      </article>
+      <article class="recipe">
+        <div class="ph">foto</div>
+        <div>
+          <h3>Estrogonofe vegetariano</h3>
+          <div class="meta">45 min · 4 porções · médio</div>
+        </div>
+      </article>
+    </div>
+  </aside>
+
+  <!-- Modal "Deixe seu recado" — visual de post-it -->
+  <div class="recado-modal" id="recado-modal" aria-hidden="true">
+    <button class="drawer-close" data-close>✕</button>
+    <h2>Deixe seu recado</h2>
+    <p class="sub">manda um oi, dúvida ou sugestão de receita 💌</p>
+    <label for="r-name">seu nome</label>
+    <input id="r-name" type="text" placeholder="" />
+    <label for="r-msg">mensagem</label>
+    <textarea id="r-msg" placeholder="oi Gigi!"></textarea>
+    <button class="wa-btn" id="r-send">📱 enviar pelo WhatsApp</button>
+    <div class="alt">ou me escreve em <a href="mailto:angelmadeira@gmail.com">angelmadeira@gmail.com</a></div>
+  </div>
+
+  <a class="back-to-mockup" href="index.html">← switcher de telas</a>
+
+  <script>
+    // =============================================
+    // INTRO — typewriter auto (ph1 → ph2) na cover azul escura
+    // =============================================
+    const sceneIntro = document.getElementById('scene-intro');
+    const ph1 = document.getElementById('ph1');
+    const ph2 = document.getElementById('ph2');
+    const scrollHint = document.getElementById('scroll-hint');
+
+    let userScrolled = false;
+    let typewriterDone = false;
+
+    const TEXT_1 = 'olá!';
+    const TEXT_2 = 'que bom te ver por aqui :)';
+    const TYPE_SPEED = 70;       // ms por caractere
+    const DELAY_BEFORE_1 = 500;  // espera inicial
+    const PAUSE_AFTER_1 = 700;   // pausa após a 1ª frase
+    const PAUSE_AFTER_2 = 900;   // pausa após a 2ª frase, antes da 3ª
+    const FADE_DUR = 350;        // crossfade entre frases
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function typeInto(el, text, speed = TYPE_SPEED) {
+      el.textContent = '';
+      el.style.opacity = 1;
+      for (let i = 0; i <= text.length; i++) {
+        el.textContent = text.slice(0, i);
+        await sleep(speed);
+      }
+      el.classList.add('done');
+    }
+
+    const introCover = document.getElementById('intro-cover');
+    const heroLogo = document.getElementById('hero-logo');
+    const headerLogo = document.getElementById('header-logo');
+
+    document.body.classList.add('intro-active');
+
+    async function revealAfterTypewriter() {
+      // Pausa antes do wipe
+      await sleep(800);
+      // Wipe da cover + revela hero logo simultaneamente
+      introCover.classList.add('wiped');
+      heroLogo.classList.add('visible');
+      // Espera o wipe (1.4s) e libera scroll
+      await sleep(1400);
+      document.body.classList.remove('intro-active');
+      // Header logo é controlado pelo morph (JS) conforme rola
+      if (!userScrolled) scrollHint.classList.add('show');
+    }
+
+    // =============================================
+    // MORPH — hero logo encolhe e vai pra header conforme rola
+    // =============================================
+    let firstMorphCall = true;
+    function updateMorph() {
+      if (firstMorphCall) {
+        // Desliga a transition de opacity pro scroll ser direto
+        heroLogo.style.transition = 'none';
+        firstMorphCall = false;
+      }
+
+      const scrollY = window.scrollY;
+      const morphRange = window.innerHeight * 0.55; // 55vh de scroll pra morph completar
+      const progress = Math.min(1, Math.max(0, scrollY / morphRange));
+
+      // Hero encolhe e sobe pro CENTRO do header
+      const scale = 1 - progress * 0.78; // 1 → 0.22
+      const endX = window.innerWidth / 2; // centro horizontal (header centro)
+      const endY = 28;                    // px do topo (header altura 56 / 2)
+      const startX = window.innerWidth / 2;
+      const startY = window.innerHeight / 2;
+      const tx = (endX - startX) * progress; // = 0 (sem deslocamento horizontal)
+      const ty = (endY - startY) * progress;
+
+      // Hero opacity — sai ANTES do header entrar (sem sobreposição)
+      let heroOp = 1;
+      if (progress > 0.78) heroOp = Math.max(0, 1 - (progress - 0.78) / 0.08);
+
+      heroLogo.style.transform =
+        `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scale})`;
+      heroLogo.style.opacity = heroOp;
+
+      // Header logo só entra DEPOIS do hero ter saído completamente
+      let headerOp = 0;
+      if (progress > 0.88) headerOp = Math.min(1, (progress - 0.88) / 0.08);
+      headerLogo.style.opacity = headerOp;
+    }
+    window.addEventListener('scroll', updateMorph, { passive: true });
+    window.addEventListener('resize', updateMorph);
+
+    async function runIntroSequence() {
+      await sleep(DELAY_BEFORE_1);
+      if (userScrolled) return;
+      await typeInto(ph1, TEXT_1);
+      if (userScrolled) return;
+      await sleep(PAUSE_AFTER_1);
+      if (userScrolled) return;
+
+      // fade out ph1
+      ph1.style.transition = `opacity ${FADE_DUR}ms ease`;
+      ph1.style.opacity = 0;
+      await sleep(FADE_DUR);
+      if (userScrolled) return;
+
+      await typeInto(ph2, TEXT_2);
+      typewriterDone = true;
+
+      // fade out ph2
+      await sleep(700);
+      ph2.style.transition = `opacity ${FADE_DUR}ms ease`;
+      ph2.style.opacity = 0;
+      await sleep(FADE_DUR);
+
+      // wipe + reveal do logo no fundo claro
+      await revealAfterTypewriter();
+    }
+
+    runIntroSequence();
+
+    // =============================================
+    // SCROLL — phrase 2 fade-out + phrase 3 reveal
+    // =============================================
+    // Detecta scroll real (esconde hint, marca interação)
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 30 && !userScrolled) {
+        userScrolled = true;
+        scrollHint.classList.add('hidden');
+      }
+    }, { passive: true });
+
+    // =============================================
+    // SKIP INTRO — pula direto pra cozinha (botão na cover azul escura)
+    // Some naturalmente junto com a cover quando o wipe acontece.
+    // =============================================
+    document.getElementById('cover-skip').addEventListener('click', () => {
+      // Wipe instantâneo + scroll pra cozinha
+      introCover.style.transition = 'none';
+      introCover.classList.add('wiped');
+      // eslint-disable-next-line no-unused-expressions
+      introCover.offsetHeight;  // força reflow
+      document.body.classList.remove('intro-active');
+      userScrolled = true;
+      const kitchen = document.getElementById('flow-kitchen');
+      kitchen.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // =============================================
+    // DRAWERS / MODAL
+    // =============================================
+    const catDrawer = document.getElementById('cat-drawer');
+    const recadoModal = document.getElementById('recado-modal');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const catTitle = document.getElementById('cat-title');
+    const catCount = document.getElementById('cat-count');
+
+    const catData = {
+      vegetarianas: { name: 'Vegetarianas',         count: '14 receitas' },
+      todas:        { name: 'Todas as receitas',    count: '74 receitas' },
+      principais:   { name: 'Pratos principais',    count: '12 receitas' },
+      sobremesas:   { name: 'Sobremesas',           count: '18 receitas' },
+      rapidas:      { name: 'Receitas rápidas',     count: '23 receitas' },
+      congelar:     { name: 'Para congelar',        count: '8 receitas'  },
+      datas:        { name: 'Datas comemorativas',  count: '6 receitas'  },
+    };
+
+    document.querySelectorAll('.kitchen-canvas .hotspot').forEach(h => {
+      h.addEventListener('click', e => {
+        e.stopPropagation();
+        const action = h.dataset.action;
+        if (action === 'cat') {
+          const cat = catData[h.dataset.key];
+          if (cat) {
+            catTitle.textContent = cat.name;
+            catCount.textContent = cat.count;
+          }
+          openDrawer(catDrawer);
+        } else if (action === 'recado') {
+          openModal(recadoModal);
+        } else if (action === 'dark-mode') {
+          // Interruptor da parede — liga/desliga dark mode
+          document.body.classList.toggle('dark-mode');
+        }
+      });
+    });
+
+    function openDrawer(d) {
+      d.classList.add('open');
+      backdrop.classList.add('open');
+    }
+    function openModal(m) {
+      m.classList.add('open');
+      backdrop.classList.add('open');
+    }
+    function closeAll() {
+      catDrawer.classList.remove('open');
+      recadoModal.classList.remove('open');
+      backdrop.classList.remove('open');
+    }
+    backdrop.addEventListener('click', closeAll);
+    document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeAll));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+    // =============================================
+    // RECADO → WhatsApp
+    // =============================================
+    document.getElementById('r-send').addEventListener('click', () => {
+      const nome = document.getElementById('r-name').value.trim();
+      const msg = document.getElementById('r-msg').value.trim();
+      const texto = encodeURIComponent(
+        (nome ? `Oi Gigi, sou ${nome}.\n\n` : 'Oi Gigi!\n\n') +
+        (msg || 'vim do seu Cantinho de Receitas!')
+      );
+      // placeholder do número — trocar no projeto real
+      window.open(`https://wa.me/55SEUNUMERO?text=${texto}`, '_blank');
+    });
+  </script>
+</body>
+</html>
