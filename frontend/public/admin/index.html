@@ -40,11 +40,26 @@
       filter: invert(1) hue-rotate(180deg) !important;
     }
 
-    /* Garante que wrappers internos do Decap também centralizem */
+    /* Força TODOS os wrappers internos do Decap a serem flex column centered.
+       Sem isso, divs nested mantêm align-items default (stretch/start) e o
+       botão acaba na esquerda. */
     [class*="Authentication"] > *,
     [class*="AuthPage"] > * {
       margin-left: auto !important;
       margin-right: auto !important;
+    }
+    [class*="Authentication"] div,
+    [class*="AuthPage"] div {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+    /* text-align: center pega elementos inline também (fallback) */
+    [class*="Authentication"], [class*="AuthPage"] {
+      text-align: center !important;
     }
 
     /* Botão "Login" — primary do DS escalado pra tela cheia.
