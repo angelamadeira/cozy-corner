@@ -373,7 +373,13 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     transition: all var(--dur-fast);
   }
   .cm-restart:hover { background: var(--surface); border-color: var(--terracota); color: var(--terracota); }
-  .cm-restart :global(svg) { fill: none; stroke: currentColor; }
+  .cm-restart :global(svg) {
+    display: block;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+  }
+  .cm-restart :global(span) { line-height: 1; }
 
   /* ============ NAV ============ */
   .cm-nav {
