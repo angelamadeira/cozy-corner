@@ -449,13 +449,14 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       border-radius: var(--r-md);
     }
     .unit-toggle {
-      display: inline-flex;
+      display: flex;
+      width: fit-content;
       gap: 2px;
       background: var(--bg);
       border: 1px solid var(--line);
       border-radius: var(--r-pill);
       padding: 2px;
-      margin-bottom: var(--s-4);
+      margin: 0 auto var(--s-4);
     }
     .unit-btn {
       background: transparent;
