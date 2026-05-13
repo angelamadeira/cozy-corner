@@ -5,6 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
   <title>Cozy Corner · Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Cutive+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ============ AUTH (LOGIN) — customização ============ */
+    /* Decap renderiza a tela de login direto no body antes da app montar.
+       Esses overrides usam selectors estáveis (atributos e tags) pra
+       sobreviver às mudanças de class-names auto-geradas. */
+
+    body {
+      background: #FAF6EE !important;
+      font-family: 'Cutive Mono', ui-monospace, monospace;
+      color: #1A1A1A;
+    }
+
+    /* Container da auth-page (Decap usa este className previsível) */
+    [class*="AuthenticationPage"], [class*="AuthPage"] {
+      background: #FAF6EE !important;
+    }
+
+    /* Logo grande do topo */
+    [class*="AuthenticationPage"] img,
+    [class*="AuthPage"] img {
+      max-width: 320px !important;
+      width: 80% !important;
+      height: auto !important;
+      margin: 0 auto 32px !important;
+      opacity: 1 !important;
+    }
+
+    /* Botão "Login" — pinta com a paleta da casa */
+    [class*="AuthenticationPage"] button[type="button"],
+    [class*="AuthPage"] button[type="button"] {
+      background: #1A1A1A !important;
+      color: #FAF6EE !important;
+      border: none !important;
+      border-radius: 4px !important;
+      padding: 14px 32px !important;
+      font-family: 'Cutive Mono', monospace !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      letter-spacing: 0.02em !important;
+      box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08) !important;
+      transition: background 200ms ease, transform 200ms ease !important;
+    }
+    [class*="AuthenticationPage"] button[type="button"]:hover,
+    [class*="AuthPage"] button[type="button"]:hover {
+      background: #C56B4A !important;
+      transform: translateY(-1px);
+    }
+
+    /* Mensagem "Use Local Backend" / textos auxiliares */
+    [class*="AuthenticationPage"] p,
+    [class*="AuthPage"] p {
+      font-family: 'Cutive Mono', monospace !important;
+      color: #6B5F4F !important;
+      font-size: 13px !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Decap CMS injeta a UI aqui -->
