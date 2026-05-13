@@ -738,7 +738,25 @@ const countByCategory = Object.fromEntries(
     let userScrolled = false;
     let typewriterDone = false;
 
-    document.body.classList.add('intro-active');
+    // Intro só roda na PRIMEIRA visita. Próximas vão direto pro hero.
+    const INTRO_SEEN_KEY = 'cozy-intro-seen';
+    const introSeen = (() => {
+      try { return localStorage.getItem(INTRO_SEEN_KEY) === 'true'; } catch (e) { return false; }
+    })();
+    function markIntroSeen() {
+      try { localStorage.setItem(INTRO_SEEN_KEY, 'true'); } catch (e) {}
+    }
+
+    if (introSeen) {
+      // Skip intro: já viu antes, vai direto pro estado pós-wipe
+      introCover.style.transition = 'none';
+      introCover.classList.add('wiped');
+      document.body.classList.remove('intro-active');
+      heroLogo.classList.add('visible');
+      userScrolled = true;
+    } else {
+      document.body.classList.add('intro-active');
+    }
 
     // =============================================
     // TYPEWRITER + WIPE
@@ -810,10 +828,15 @@ const countByCategory = Object.fromEntries(
       heroLogo.classList.add('visible');
       // Scroll suave pra cozinha — durante o scroll o morph acontece naturalmente
       document.getElementById('flow-kitchen')?.scrollIntoView({ behavior: 'smooth' });
+      markIntroSeen();
     });
 
-    // Roda a sequência do typewriter + reveal automático
-    runIntroSequence().then(() => revealAfterTypewriter());
+    // Roda a sequência do typewriter SÓ na primeira visita
+    if (!introSeen) {
+      runIntroSequence()
+        .then(() => revealAfterTypewriter())
+        .then(() => markIntroSeen());
+    }
 
     // =============================================
     // MORPH — hero diminui e morfa pro header conforme rola
