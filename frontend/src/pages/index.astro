@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
 import { CATEGORY_META } from '../lib/categories';
 
@@ -14,35 +15,45 @@ const countByCategory = recipes.reduce<Record<string, number>>((acc, r) => {
 
 <BaseLayout description="Receitas autorais da Gigi — narrativa, lenta, com carinho.">
   <main style="padding: 64px 32px; max-width: 720px; margin: 0 auto;">
-    <h1 style="font-size: 32px; margin-bottom: 8px; letter-spacing: -0.02em;">Cozy Corner</h1>
+    <h1 style="font-family: var(--font-display); font-size: 32px; margin-bottom: 8px; letter-spacing: -0.02em;">Cozy Corner</h1>
     <p style="color: var(--ink-soft); margin-bottom: 32px;">recipes by Gigi · scaffold inicial</p>
 
-    <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; margin: 32px 0 12px; color: var(--ink-mute);">Receitas ({recipes.length})</h2>
+    <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; margin: 32px 0 12px; color: var(--ink-mute);">
+      Receitas ({recipes.length})
+    </h2>
     <ul style="list-style: none; padding: 0;">
       {recipes.map((r) => (
-        <li style="padding: 12px 0; border-bottom: 1px solid var(--line-soft);">
-          <strong>{r.data.title}</strong>
-          <span style="color: var(--ink-mute); font-size: 13px; margin-left: 8px;">
-            · {CATEGORY_META[r.data.category].label} · {r.data.time} min
-          </span>
+        <li style="padding: 12px 0; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; gap: 12px;">
+          <Icon name={CATEGORY_META[r.data.category].icon} width={20} height={20} style="flex-shrink: 0;" />
+          <div>
+            <strong>{r.data.title}</strong>
+            <span style="color: var(--ink-mute); font-size: 13px; margin-left: 8px;">
+              · {CATEGORY_META[r.data.category].label} · {r.data.time} min
+            </span>
+          </div>
         </li>
       ))}
     </ul>
 
-    <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; margin: 48px 0 12px; color: var(--ink-mute);">Categorias</h2>
+    <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; margin: 48px 0 12px; color: var(--ink-mute);">
+      Categorias
+    </h2>
     <ul style="list-style: none; padding: 0;">
       {Object.entries(CATEGORY_META).map(([slug, meta]) => (
-        <li style="padding: 8px 0; font-size: 14px;">
-          {meta.emoji} <strong>{meta.label}</strong>
-          <span style="color: var(--ink-mute); font-size: 12px; margin-left: 6px;">
-            · hotspot: {meta.hotspot} · {countByCategory[slug] || 0} receitas
+        <li style="padding: 10px 0; display: flex; align-items: center; gap: 12px; font-size: 14px;">
+          <Icon name={meta.icon} width={22} height={22} style="flex-shrink: 0;" />
+          <span>
+            <strong>{meta.label}</strong>
+            <span style="color: var(--ink-mute); font-size: 12px; margin-left: 6px;">
+              · hotspot: {meta.hotspot} · {countByCategory[slug] || 0} receitas
+            </span>
           </span>
         </li>
       ))}
     </ul>
 
     <p style="margin-top: 48px; padding: 16px; background: var(--surface); border-radius: 4px; font-size: 13px; color: var(--ink-soft);">
-      📁 Próximos passos: importar o flow.html do mockup-v1, criar componentes (IntroCover, KitchenScene, RecipeCard), página individual de receita, drawer de categoria.
+      Próximos passos: portar a intro do mockup-v1, criar componentes (IntroCover, KitchenScene, RecipeCard), página individual de receita, drawer de categoria.
     </p>
   </main>
 </BaseLayout>

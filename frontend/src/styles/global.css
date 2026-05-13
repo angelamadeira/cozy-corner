@@ -33,10 +33,12 @@
   --danger:  #B8503A;
 
   /* ====== TIPOGRAFIA ====== */
-  /* Cutive Mono em tudo — identidade unificada de "carta digitada", delicada */
-  --font-display: 'Cutive Mono', ui-monospace, monospace;
-  --font-sans:    'Cutive Mono', ui-monospace, monospace;
-  --font-mono:    'Cutive Mono', ui-monospace, monospace;
+  /* Contraste inverso: títulos modernos, body em typewriter (nostalgia na leitura)
+     Inter = títulos (hero, h1, h2) — clean, presente
+     Cutive Mono = body, intro, meta (carta digitada, alma) */
+  --font-display: 'Inter', system-ui, sans-serif;          /* hero, h1, h2 */
+  --font-sans:    'Cutive Mono', ui-monospace, monospace;  /* body, ui */
+  --font-mono:    'Cutive Mono', ui-monospace, monospace;  /* intro + meta */
 
   /* Type scale */
   --fs-display:   clamp(48px, 9vw, 96px);

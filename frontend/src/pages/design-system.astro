@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
 
 const colors = [
   { name: 'intro-blue', hex: '#D7F5FF', role: 'Azul claro · sopro de manhã, assinatura' },
@@ -39,7 +40,10 @@ const types = [
           Tokens, tipografia e princípios do Cozy Corner. Toda decisão visual sai daqui.
         </p>
       </div>
-      <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">💡</button>
+      <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">
+        <Icon name="ph:lightbulb-thin" class="icon-light" width={22} height={22} />
+        <Icon name="ph:moon-thin" class="icon-dark" width={22} height={22} />
+      </button>
     </header>
 
     <!-- ============ MOMENTOS DA MARCA ============ -->
@@ -63,7 +67,15 @@ const types = [
       <div class="moment moment-recipe">
         <span class="moment-tag">página de receita</span>
         <h1 class="t-h1">Risoto de cogumelos</h1>
-        <p class="t-meta" style="margin-top: 8px; color: var(--ink-soft);">⏱ 40 min · 🍽 4 porções · 📊 médio · 🌱 vegetariana</p>
+        <p class="t-meta inline-icons" style="margin-top: 8px; color: var(--ink-soft);">
+          <Icon name="ph:clock-thin" /> 40 min
+          <span style="opacity: 0.5;">·</span>
+          <Icon name="ph:fork-knife-thin" /> 4 porções
+          <span style="opacity: 0.5;">·</span>
+          <Icon name="ph:gauge-thin" /> médio
+          <span style="opacity: 0.5;">·</span>
+          <Icon name="ph:plant-thin" /> vegetariana
+        </p>
         <p class="t-body" style="margin-top: 16px; color: var(--ink-soft); max-width: 540px;">
           Um clássico italiano cremoso, com cogumelos paris dourados e parmesão. Receita da minha avó.
         </p>
@@ -152,18 +164,22 @@ const types = [
     <section class="ds-section">
       <h2 class="ds-section-title">Botões (preview)</h2>
       <div class="btn-row">
-        <button class="btn btn-primary">📱 Mandar pro WhatsApp</button>
+        <button class="btn btn-primary">
+          <Icon name="ph:whatsapp-logo-thin" /> Mandar pro WhatsApp
+        </button>
         <button class="btn btn-secondary">Salvar rascunho</button>
         <button class="btn btn-ghost">Cancelar</button>
-        <button class="btn btn-icon" aria-label="favoritar">⭐</button>
+        <button class="btn btn-icon" aria-label="favoritar">
+          <Icon name="ph:star-thin" width={20} height={20} />
+        </button>
       </div>
 
       <h2 class="ds-section-title" style="margin-top: 48px;">Chips / filtros</h2>
       <div class="chip-row">
         <span class="chip chip-active">todas</span>
-        <span class="chip">⏱ até 30 min</span>
-        <span class="chip">🌱 vegetariana</span>
-        <span class="chip">⭐ favoritas</span>
+        <span class="chip"><Icon name="ph:clock-thin" /> até 30 min</span>
+        <span class="chip"><Icon name="ph:plant-thin" /> vegetariana</span>
+        <span class="chip"><Icon name="ph:star-thin" /> favoritas</span>
         <span class="chip">sem glúten</span>
       </div>
     </section>
@@ -177,6 +193,20 @@ const types = [
   </div>
 
   <style>
+    /* ============ ÍCONES (line art) ============ */
+    /* Todos os ícones herdam currentColor (adapta dark mode) */
+    [data-icon] svg, .astro-icon svg { fill: none; stroke: currentColor; }
+
+    /* Alinhamento inline: ícone + texto na mesma linha */
+    .inline-icons { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .inline-icons svg { display: inline-block; vertical-align: -0.15em; }
+    .chip svg, .btn svg { vertical-align: -0.15em; margin-right: 4px; }
+
+    /* Dark mode: alterna entre lâmpada e lua no toggle */
+    .icon-dark { display: none; }
+    body.dark-mode .icon-light { display: none; }
+    body.dark-mode .icon-dark { display: inline-block; }
+
     /* ============ TYPE CLASSES ============ */
     .t-display { font-family: var(--font-display); font-size: var(--fs-display); font-weight: 500; letter-spacing: -0.03em; line-height: var(--lh-tight); }
     .t-h1      { font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 500; letter-spacing: -0.02em; line-height: var(--lh-tight); }
@@ -406,8 +436,6 @@ const types = [
     const toggle = document.getElementById('dark-toggle');
     toggle?.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      toggle.textContent = isDark ? '🌙' : '💡';
     });
   </script>
 </BaseLayout>
