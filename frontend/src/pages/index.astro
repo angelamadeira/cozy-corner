@@ -749,12 +749,16 @@ const countByCategory = Object.fromEntries(
     }
 
     if (introSeen) {
-      // Skip intro: já viu antes, vai direto pro estado pós-wipe
+      // Skip intro: já viu antes, vai direto pra cozinha sem morph animado
       introCover.style.transition = 'none';
       introCover.classList.add('wiped');
       document.body.classList.remove('intro-active');
       heroLogo.classList.add('visible');
       userScrolled = true;
+      // Pula pro flow-kitchen instantaneamente — sem scroll suave, sem morph visível
+      requestAnimationFrame(() => {
+        document.getElementById('flow-kitchen')?.scrollIntoView({ behavior: 'auto', block: 'start' });
+      });
     } else {
       document.body.classList.add('intro-active');
     }
