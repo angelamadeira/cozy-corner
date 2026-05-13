@@ -1,22 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
-
-// Hotspots: bounding box (em % do SVG 998×801) + ação
-// Coordenadas extraídas direto do Group 8.svg da Gigi
-const hotspots = [
-  { id: 'vegetarianas', label: 'vegetarianas',         action: 'cat',    key: 'vegetarianas', x: 80.3, y: 0,    w: 16.2, h: 29.3 },
-  { id: 'rapidas',      label: 'receitas rápidas',     action: 'cat',    key: 'rapidas',      x: 47.0, y: 10.4, w: 11.8, h: 14.7 },
-  { id: 'sobre',        label: 'sobre mim',            action: 'sobre',  key: '',             x: 20.9, y: 41.1, w: 10.2, h: 14.2 },
-  { id: 'dark',         label: 'dark mode',            action: 'dark',   key: '',             x: 0.2,  y: 51.6, w: 5.3,  h: 8.4 },
-  { id: 'todas',        label: 'todas as receitas',    action: 'cat',    key: 'todas',        x: 37.5, y: 50.9, w: 10.9, h: 4.5 },
-  { id: 'congelar',     label: 'para congelar',        action: 'cat',    key: 'congelar',     x: 65.3, y: 29.3, w: 29.5, h: 18.0 },
-  { id: 'datas',        label: 'datas comemorativas',  action: 'cat',    key: 'datas',        x: 70.5, y: 54.5, w: 9.3,  h: 11.2 },
-  { id: 'recado',       label: 'deixe seu recado',     action: 'recado', key: '',             x: 84.0, y: 50.5, w: 10.0, h: 12.5 },
-  { id: 'akim',         label: 'akim',                 action: 'akim',   key: '',             x: 2.3,  y: 70.0, w: 15.8, h: 12.5 },
-  { id: 'principais',   label: 'pratos principais',    action: 'cat',    key: 'principais',   x: 26.4, y: 73.5, w: 15.5, h: 8.4 },
-  { id: 'sobremesas',   label: 'sobremesas',           action: 'cat',    key: 'sobremesas',   x: 48.5, y: 73.5, w: 9.6,  h: 8.4 },
-];
 ---
 
 <BaseLayout title="Cozinha (teste)" description="Teste da cena de cozinha em line-art.">
@@ -28,33 +12,100 @@ const hotspots = [
   </header>
 
   <main class="page">
-    <p class="meta">/cozinha-teste · SVG composto + hotspots</p>
+    <p class="meta">/cozinha-teste · SVG inline com hotspots no formato real</p>
     <h1 class="title">Cozinha — teste</h1>
 
     <label class="mock-toggle">
-      <input type="checkbox" id="hotspot-toggle" checked />
-      destacar áreas clicáveis
+      <input type="checkbox" id="hotspot-toggle" />
+      destacar áreas clicáveis (debug)
     </label>
 
-    <section class="kitchen" aria-label="Cena da cozinha com hotspots">
-      <img class="scene" src="/kitchen/cozinha.svg" alt="" />
+    <section class="kitchen" aria-label="Cena da cozinha">
+      <svg class="scene" viewBox="0 0 998 801" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cozinha com elementos clicáveis">
+        <!-- Bancada (não-clicável) -->
+        <rect x="63.5" y="656.868" width="932" height="240" stroke="currentColor" stroke-width="5"/>
+        <!-- Divisor da geladeira (não-clicável) -->
+        <path d="M650 382.368L949 382.368" stroke="currentColor" stroke-width="5"/>
+        <!-- Linha da bancada do meio (não-clicável) -->
+        <path d="M161 444.368H542" stroke="currentColor" stroke-width="5"/>
 
-      {hotspots.map((h) => (
-        <button
-          class={`hs hs-${h.id}`}
-          data-action={h.action}
-          data-key={h.key}
-          type="button"
-          style={`left:${h.x}%; top:${h.y}%; width:${h.w}%; height:${h.h}%`}
-          aria-label={h.label}
-        >
-          <span class="hs-label">{h.label}</span>
-        </button>
-      ))}
+        <!-- ============ HOTSPOTS ============ -->
+
+        <!-- Para congelar (fridge top) -->
+        <g class="hs" data-action="cat" data-key="congelar" role="button" aria-label="Para congelar" tabindex="0">
+          <rect x="652.5" y="235.868" width="294" height="144" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Geladeira (fridge lower) — interior, datas/recado vivem sobreposto -->
+        <g class="hs hs-fridge-lower" data-action="cat" data-key="todas" role="button" aria-label="Geladeira (todas as receitas)" tabindex="0">
+          <rect x="652.5" y="379.868" width="294" height="277" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Pratos principais -->
+        <g class="hs" data-action="cat" data-key="principais" role="button" aria-label="Pratos principais" tabindex="0">
+          <rect x="263.5" y="589.868" width="155" height="67" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Sobremesas -->
+        <g class="hs" data-action="cat" data-key="sobremesas" role="button" aria-label="Sobremesas" tabindex="0">
+          <rect x="484.5" y="589.868" width="96" height="67" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Receitas rápidas (relógio) -->
+        <g class="hs" data-action="cat" data-key="rapidas" role="button" aria-label="Receitas rápidas" tabindex="0">
+          <circle cx="528" cy="142.368" r="58.5" stroke="currentColor" stroke-width="5"/>
+          <path d="M528 103.368V143.893L550 165.368" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Vegetarianas (vaso com planta) -->
+        <g class="hs" data-action="cat" data-key="vegetarianas" role="button" aria-label="Vegetarianas" tabindex="0">
+          <rect x="816.5" y="168.868" width="95" height="67" stroke="currentColor" stroke-width="5"/>
+          <path d="M801.5 88.8679L840.5 167.868H874V155.868H963L884 120.868L909 65.8679L856.5 107.868L840.5 0.36792V107.868L801.5 88.8679Z" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Datas comemorativas (calendário) -->
+        <g class="hs" data-action="cat" data-key="datas" role="button" aria-label="Datas comemorativas" tabindex="0">
+          <rect x="704.5" y="437.868" width="93" height="90" stroke="currentColor" stroke-width="5"/>
+          <rect x="717.5" y="467.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="717.5" y="492.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="743.5" y="467.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="743.5" y="492.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="769.5" y="467.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="769.5" y="492.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Deixe seu recado (post-it rotacionado) -->
+        <g class="hs" data-action="recado" role="button" aria-label="Deixe seu recado" tabindex="0">
+          <rect x="869.943" y="423.873" width="54.5792" height="52.7554" transform="rotate(37.465 869.943 423.873)" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Sobre mim (quadro) -->
+        <g class="hs" data-action="sobre" role="button" aria-label="Sobre mim" tabindex="0">
+          <rect x="209.5" y="329.868" width="102" height="114" stroke="currentColor" stroke-width="5"/>
+          <rect x="218.5" y="339.868" width="84" height="94" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Todas as receitas (livros) -->
+        <g class="hs" data-action="cat" data-key="todas" role="button" aria-label="Todas as receitas" tabindex="0">
+          <rect x="375.5" y="426.868" width="109" height="17" stroke="currentColor" stroke-width="5"/>
+          <rect x="375.5" y="408.868" width="109" height="18" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Dark mode (interruptor) -->
+        <g class="hs" data-action="dark" role="button" aria-label="Dark mode (liga/desliga)" tabindex="0">
+          <rect x="2.5" y="413.868" width="53" height="67" stroke="currentColor" stroke-width="5"/>
+          <rect x="18.5" y="433.868" width="20" height="26" stroke="currentColor" stroke-width="5"/>
+        </g>
+
+        <!-- Akim (gato) -->
+        <g class="hs" data-action="akim" role="button" aria-label="Akim" tabindex="0">
+          <path d="M77.9648 582.471C84.1218 587.599 88 595.06 88 603.368C88 604.737 87.892 606.083 87.6885 607.4C96.97 604.841 107.857 603.368 119.5 603.368C153.466 603.368 181 615.904 181 631.368C181 646.832 153.466 659.368 119.5 659.368C85.5345 659.368 58 646.832 58 631.368C41.4315 631.368 28 618.832 28 603.368C28 600.619 28.4257 597.963 29.2168 595.453L28.6846 595.961L23.0684 572.739L43.6201 578.789C47.8898 576.608 52.7897 575.368 58 575.368C58.3399 575.368 58.6785 575.374 59.0156 575.385L72.4629 561.938L77.9648 582.471ZM119.5 608.368C106.969 608.368 95.483 610.139 86.1494 613.066C82.4813 622.337 73.7073 629.298 63.0107 630.976C63.0038 631.108 63 631.238 63 631.368C63 635.938 67.295 641.703 78.085 646.616C88.4264 651.324 103.064 654.368 119.5 654.368C135.936 654.368 150.574 651.324 160.915 646.616C171.705 641.703 176 635.938 176 631.368C176 626.798 171.705 621.032 160.915 616.12C150.574 611.412 135.936 608.368 119.5 608.368ZM58 580.368C43.8624 580.368 33 590.985 33 603.368C33 615.751 43.8624 626.368 58 626.368C58.3306 626.368 58.6594 626.36 58.9863 626.348C61.7696 619.348 70.2692 613.254 82.2051 609.103C82.7236 607.26 83 605.336 83 603.368C83 590.985 72.1376 580.368 58 580.368ZM79.1152 615.662C78.7672 615.813 78.4239 615.966 78.085 616.12C71.6432 619.053 67.5173 622.29 65.2373 625.395C71.0915 623.776 75.9634 620.244 79.1152 615.662ZM31.5088 586.368L36.2676 581.837L29.9639 579.982L31.5088 586.368ZM65.2725 576.198C66.3213 576.442 67.3487 576.735 68.3506 577.079L71.5762 577.944L69.875 571.597L65.2725 576.198Z" fill="currentColor"/>
+        </g>
+      </svg>
     </section>
 
     <p class="hint">
-      <Icon name="ph:info-thin" /> passa o mouse pra ver o nome de cada área.
+      <Icon name="ph:info-thin" /> hover destaca o elemento; clique segue pra categoria/modal.
     </p>
   </main>
 
@@ -114,75 +165,77 @@ const hotspots = [
       position: relative;
       width: 100%;
       aspect-ratio: 998 / 801;
-      background: var(--bg);
       color: var(--ink);
     }
     .scene {
-      position: absolute;
-      inset: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none;
+      display: block;
     }
-    body.dark-mode .scene { filter: invert(1); }
 
     /* ============ HOTSPOTS ============ */
-    .hs {
-      position: absolute;
-      background: transparent;
-      border: 1.5px dashed rgba(197, 107, 74, 0.45);
-      border-radius: 6px;
+    /* bounding-box: hit-test pelo bbox do grupo (não só pelo stroke) */
+    .scene :global(.hs) {
       cursor: pointer;
-      transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
-      z-index: 2;
-      padding: 0;
+      pointer-events: bounding-box;
+      transition: transform 200ms ease;
+      transform-box: fill-box;
+      transform-origin: center;
     }
-    body.hotspots-hidden .hs {
-      border-color: transparent;
+    /* Debug: ressalta as áreas clicáveis com fill semi-transparente */
+    body.hotspots-debug .scene :global(.hs > rect),
+    body.hotspots-debug .scene :global(.hs > circle),
+    body.hotspots-debug .scene :global(.hs > path) {
+      fill: rgba(197, 107, 74, 0.15);
     }
-    .hs:hover {
-      background: rgba(197, 107, 74, 0.12);
-      border-color: var(--terracota);
-      border-style: solid;
-      transform: scale(1.02);
+    /* Hover: stroke terracota nas linhas + leve scale */
+    .scene :global(.hs:hover) {
+      transform: scale(1.04);
     }
-    .hs-label {
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 6px);
-      transform: translate(-50%, 4px);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--bg);
-      background: var(--ink);
-      padding: 3px 8px;
-      border-radius: 4px;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity var(--dur-fast), transform var(--dur-fast);
-      pointer-events: none;
+    .scene :global(.hs:hover > rect),
+    .scene :global(.hs:hover > circle),
+    .scene :global(.hs:hover > path) {
+      stroke: var(--terracota);
     }
-    .hs:hover .hs-label {
-      opacity: 1;
-      transform: translate(-50%, 0);
+    /* Pra path com fill (cat), muda o fill no hover */
+    .scene :global(.hs:hover > path[fill="currentColor"]) {
+      fill: var(--terracota);
+    }
+    .scene :global(.hs:focus-visible) {
+      outline: 2px solid var(--terracota);
+      outline-offset: 4px;
     }
   </style>
 
   <script>
-    // Dark toggle pelo interruptor (hotspot 'dark')
-    document.querySelector('.hs-dark')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.body.classList.toggle('dark-mode');
-      try {
-        localStorage.setItem('cozy-dark-mode',
-          document.body.classList.contains('dark-mode') ? 'true' : 'false');
-      } catch (err) {}
+    // Handler centralizado pros hotspots
+    document.querySelectorAll<SVGGElement>('.hs').forEach((g) => {
+      const fire = () => {
+        const action = g.dataset.action;
+        const key = g.dataset.key;
+        if (action === 'dark') {
+          document.body.classList.toggle('dark-mode');
+          try {
+            localStorage.setItem('cozy-dark-mode',
+              document.body.classList.contains('dark-mode') ? 'true' : 'false');
+          } catch (err) {}
+        } else if (action === 'cat' && key) {
+          // No teste, só mostra um alert; na home real, abre drawer/categoria
+          console.log('→ categoria:', key);
+        } else if (action === 'sobre' || action === 'recado' || action === 'akim') {
+          console.log('→ modal:', action);
+        }
+      };
+      g.addEventListener('click', fire);
+      g.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(); }
+      });
     });
 
-    // Toggle visibilidade das bordas dos hotspots
+    // Toggle debug das áreas clicáveis
     document.getElementById('hotspot-toggle')?.addEventListener('change', (e) => {
       const target = e.target as HTMLInputElement;
-      document.body.classList.toggle('hotspots-hidden', !target.checked);
+      document.body.classList.toggle('hotspots-debug', target.checked);
     });
   </script>
 </BaseLayout>
