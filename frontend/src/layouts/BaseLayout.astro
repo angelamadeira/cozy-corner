@@ -23,8 +23,30 @@ const pageTitle = title ? `${title} · ${siteData.title}` : siteData.title;
     <link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
+    <!-- Aplica dark mode ANTES do body renderizar pra evitar flash -->
+    <script is:inline>
+      try {
+        if (localStorage.getItem('cozy-dark-mode') === 'true') {
+          document.documentElement.classList.add('pre-dark');
+        }
+      } catch (e) {}
+    </script>
+    <style>
+      /* pre-dark é aplicado no html pelo script inline acima.
+         Quando o body é criado, JS migra pra body.dark-mode.
+         Aqui só garantimos o bg correto enquanto isso acontece. */
+      html.pre-dark { background: #0F1A2A; }
+      html.pre-dark body { background: #0F1A2A; color: #F5F0E5; }
+    </style>
   </head>
   <body>
+    <script is:inline>
+      // Migra a flag do html pro body
+      if (document.documentElement.classList.contains('pre-dark')) {
+        document.body.classList.add('dark-mode');
+        document.documentElement.classList.remove('pre-dark');
+      }
+    </script>
     <slot />
   </body>
 </html>
