@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// 4 variantes de favicon — letras em Caveat (consistente com o logo)
+const variants = [
+  { id: 'c-lower',  letter: 'c',  size: 40, desc: 'lowercase "c" — primeiro de Cozy/Corner. Mais sutil.' },
+  { id: 'cc-lower', letter: 'cc', size: 32, desc: 'duplo "cc" — referência clara às iniciais. Mais distinto.' },
+  { id: 'C-upper',  letter: 'C',  size: 42, desc: 'maiúsculo "C" — mais formal, anchored.' },
+  { id: 'g-lower',  letter: 'g',  size: 38, desc: '"g" de Gigi — focado na autoria. Tem cauda descender, distintivo.' },
+];
+
+const previewSizes = [16, 32, 64, 128];
+---
+
+<BaseLayout title="Favicon" description="Variações de favicon pra Cozy Corner">
+  <div class="shell">
+    <header>
+      <p class="t-meta">/favicon</p>
+      <h1 class="t-title">4 variantes de favicon</h1>
+      <p class="t-body" style="color: var(--ink-soft); margin-top: 8px; max-width: 600px;">
+        Monogramas em Caveat (mesma fonte do logo). Cada um renderizado em 16/32/64/128px, em fundo cream e dark.
+      </p>
+      <button class="dark-toggle" id="dark-toggle" type="button">toggle dark</button>
+    </header>
+
+    {variants.map((v) => (
+      <section class="variant">
+        <div class="meta">
+          <h2 class="vname">{v.id}</h2>
+          <p class="t-small" style="color: var(--ink-soft);">{v.desc}</p>
+        </div>
+        <div class="previews">
+          <div class="row row-light">
+            <span class="row-label">creme</span>
+            {previewSizes.map((s) => (
+              <div class="size">
+                <span class="size-label">{s}px</span>
+                <div class="favicon-render" style={`width: ${s}px; height: ${s}px;`}>
+                  <svg viewBox="0 0 100 100" width={s} height={s}>
+                    <text x="50" y="68"
+                      font-family="Caveat, cursive"
+                      font-size={v.size + (v.letter.length > 1 ? -10 : 30)}
+                      font-weight="600"
+                      text-anchor="middle"
+                      fill="currentColor">{v.letter}</text>
+                  </svg>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="row row-dark">
+            <span class="row-label">dark</span>
+            {previewSizes.map((s) => (
+              <div class="size">
+                <span class="size-label">{s}px</span>
+                <div class="favicon-render" style={`width: ${s}px; height: ${s}px;`}>
+                  <svg viewBox="0 0 100 100" width={s} height={s}>
+                    <text x="50" y="68"
+                      font-family="Caveat, cursive"
+                      font-size={v.size + (v.letter.length > 1 ? -10 : 30)}
+                      font-weight="600"
+                      text-anchor="middle"
+                      fill="currentColor">{v.letter}</text>
+                  </svg>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="row row-tab">
+            <span class="row-label">aba do navegador</span>
+            <div class="tab-mock">
+              <div class="tab-favicon">
+                <svg viewBox="0 0 100 100" width="16" height="16">
+                  <text x="50" y="68"
+                    font-family="Caveat, cursive"
+                    font-size={v.size + (v.letter.length > 1 ? -10 : 30)}
+                    font-weight="600"
+                    text-anchor="middle"
+                    fill="currentColor">{v.letter}</text>
+                </svg>
+              </div>
+              <span class="tab-title">Cozy Corner — by Gigi</span>
+              <span class="tab-close">×</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <style>
+    .shell { max-width: 1200px; margin: 0 auto; padding: 48px 32px 96px; }
+    header { margin-bottom: 64px; position: relative; }
+    .t-meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
+    .t-title { font-family: var(--font-display); font-weight: 500; font-size: 36px; letter-spacing: -0.02em; margin-top: 8px; }
+    .t-body { font-family: var(--font-mono); }
+    .t-small { font-family: var(--font-mono); font-size: 13px; }
+    .dark-toggle {
+      position: absolute; top: 0; right: 0;
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font: inherit;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .variant { padding: 40px 0; border-top: 1px solid var(--line); }
+    .meta { margin-bottom: 24px; }
+    .vname { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin-bottom: 4px; font-family: var(--font-mono); }
+    .previews { display: flex; flex-direction: column; gap: 16px; }
+    .row { display: flex; align-items: center; gap: 24px; padding: 24px; border-radius: 8px; position: relative; min-height: 180px; }
+    .row-label { font-family: var(--font-mono); font-size: 10px; text-transform: lowercase; color: var(--ink-mute); position: absolute; top: 12px; left: 16px; }
+    .row-light { background: #FAF6EE; color: #1A1A1A; }
+    .row-dark { background: #0F1A2A; color: #F5F0E5; }
+    .row-dark .row-label { color: rgba(255,255,255,0.4); }
+    .row-tab { background: var(--surface); color: var(--ink); padding: 32px 24px; }
+    .size { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .size-label { font-family: var(--font-mono); font-size: 10px; color: currentColor; opacity: 0.5; }
+    .favicon-render { display: flex; align-items: center; justify-content: center; }
+    .tab-mock {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 8px 8px 0 0;
+      max-width: 320px;
+      border: 1px solid var(--line);
+      border-bottom: none;
+    }
+    .tab-favicon { flex-shrink: 0; display: flex; align-items: center; }
+    .tab-title {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .tab-close { color: var(--ink-mute); font-size: 14px; }
+  </style>
+
+  <script>
+    document.getElementById('dark-toggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      try { localStorage.setItem('cozy-dark-mode', document.body.classList.contains('dark-mode') ? 'true' : 'false'); } catch (e) {}
+    });
+  </script>
+</BaseLayout>
