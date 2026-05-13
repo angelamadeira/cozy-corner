@@ -650,10 +650,18 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         grid-template-columns: 1fr;
         display: block;
       }
+      .ingredients-col, .steps-col {
+        padding: 0;
+        margin: 0 0 16pt 0;
+      }
       .ingredients-col {
         position: static;
         margin-bottom: 24pt;
         page-break-inside: avoid;
+      }
+      .steps-header {
+        display: block;
+        margin-bottom: 0;
       }
       .recipe-title {
         font-size: 24pt;
