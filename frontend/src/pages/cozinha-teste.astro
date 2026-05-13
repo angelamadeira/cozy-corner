@@ -1,6 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
+
+// Hotspots: bounding box (em % do SVG 998×801) + ação
+// Coordenadas extraídas direto do Group 8.svg da Gigi
+const hotspots = [
+  { id: 'vegetarianas', label: 'vegetarianas',         action: 'cat',    key: 'vegetarianas', x: 80.3, y: 0,    w: 16.2, h: 29.3 },
+  { id: 'rapidas',      label: 'receitas rápidas',     action: 'cat',    key: 'rapidas',      x: 47.0, y: 10.4, w: 11.8, h: 14.7 },
+  { id: 'sobre',        label: 'sobre mim',            action: 'sobre',  key: '',             x: 20.9, y: 41.1, w: 10.2, h: 14.2 },
+  { id: 'dark',         label: 'dark mode',            action: 'dark',   key: '',             x: 0.2,  y: 51.6, w: 5.3,  h: 8.4 },
+  { id: 'todas',        label: 'todas as receitas',    action: 'cat',    key: 'todas',        x: 37.5, y: 50.9, w: 10.9, h: 4.5 },
+  { id: 'congelar',     label: 'para congelar',        action: 'cat',    key: 'congelar',     x: 65.3, y: 29.3, w: 29.5, h: 18.0 },
+  { id: 'datas',        label: 'datas comemorativas',  action: 'cat',    key: 'datas',        x: 70.5, y: 54.5, w: 9.3,  h: 11.2 },
+  { id: 'recado',       label: 'deixe seu recado',     action: 'recado', key: '',             x: 84.0, y: 50.5, w: 10.0, h: 12.5 },
+  { id: 'akim',         label: 'akim',                 action: 'akim',   key: '',             x: 2.3,  y: 70.0, w: 15.8, h: 12.5 },
+  { id: 'principais',   label: 'pratos principais',    action: 'cat',    key: 'principais',   x: 26.4, y: 73.5, w: 15.5, h: 8.4 },
+  { id: 'sobremesas',   label: 'sobremesas',           action: 'cat',    key: 'sobremesas',   x: 48.5, y: 73.5, w: 9.6,  h: 8.4 },
+];
 ---
 
 <BaseLayout title="Cozinha (teste)" description="Teste da cena de cozinha em line-art.">
@@ -12,96 +28,33 @@ import { Icon } from 'astro-icon/components';
   </header>
 
   <main class="page">
-    <p class="meta">/cozinha-teste · line-art posicionado a partir do mock da Gigi</p>
-    <h1 class="title">Cozinha — teste de posicionamento</h1>
+    <p class="meta">/cozinha-teste · SVG composto + hotspots</p>
+    <h1 class="title">Cozinha — teste</h1>
 
     <label class="mock-toggle">
-      <input type="checkbox" id="mock-toggle" checked />
-      mostrar mock como referência
+      <input type="checkbox" id="hotspot-toggle" checked />
+      destacar áreas clicáveis
     </label>
 
     <section class="kitchen" aria-label="Cena da cozinha com hotspots">
-      <!-- Mock de referência (overlay translúcido) -->
-      <img class="mock-overlay" src="/kitchen/mock.png" alt="" />
-      <!-- Geladeira (corpo) -->
-      <div class="el geladeira" aria-hidden="true">
-        <img src="/kitchen/geladeira.svg" alt="" />
-      </div>
-      <!-- Divisor da geladeira pra criar 'para congelar' em cima -->
-      <div class="freezer-divider" aria-hidden="true"></div>
+      <img class="scene" src="/kitchen/cozinha.svg" alt="" />
 
-      <!-- Vaso (vegetarianas) — em cima da geladeira -->
-      <button class="el vaso" data-action="cat" data-key="vegetarianas" type="button" aria-label="Vegetarianas">
-        <img src="/kitchen/vaso.svg" alt="" />
-        <span class="label">vegetarianas</span>
-      </button>
-
-      <!-- Relógio (rápidas) — meio-alto -->
-      <button class="el relogio" data-action="cat" data-key="rapidas" type="button" aria-label="Receitas rápidas">
-        <img src="/kitchen/relogio.svg" alt="" />
-        <span class="label">receitas rápidas</span>
-      </button>
-
-      <!-- Para congelar — seção superior da geladeira -->
-      <button class="el congelar" data-action="cat" data-key="congelar" type="button" aria-label="Para congelar">
-        <span class="label label-on-fridge">para congelar</span>
-      </button>
-
-      <!-- Calendário (datas) — na geladeira -->
-      <button class="el calendario" data-action="cat" data-key="datas" type="button" aria-label="Datas comemorativas">
-        <img src="/kitchen/calendario.svg" alt="" />
-        <span class="label">datas comemorativas</span>
-      </button>
-
-      <!-- Post-it (recado) — losango na geladeira -->
-      <button class="el postit" data-action="recado" type="button" aria-label="Deixe seu recado">
-        <img src="/kitchen/postit.svg" alt="" />
-        <span class="label">deixe seu recado</span>
-      </button>
-
-      <!-- Quadro (sobre mim) — meio-esquerda -->
-      <button class="el quadro" data-action="sobre" type="button" aria-label="Sobre mim">
-        <img src="/kitchen/quadro.svg" alt="" />
-        <span class="label">sobre mim</span>
-      </button>
-
-      <!-- Livros (todas) — meio -->
-      <button class="el livros" data-action="cat" data-key="todas" type="button" aria-label="Todas as receitas">
-        <img src="/kitchen/livros.svg" alt="" />
-        <span class="label">todas as receitas</span>
-      </button>
-
-      <!-- Interruptor (dark mode) -->
-      <button class="el interruptor" data-action="dark-mode" type="button" aria-label="Liga/desliga dark mode">
-        <img src="/kitchen/interruptor.svg" alt="" />
-        <span class="label">dark mode</span>
-      </button>
-
-      <!-- Counter (bancada) -->
-      <div class="counter" aria-hidden="true"></div>
-
-      <!-- Gato (akim) — bancada -->
-      <button class="el akim" data-action="akim" type="button" aria-label="Akim, o gato">
-        <img src="/kitchen/akim.svg" alt="" />
-        <span class="label">akim</span>
-      </button>
-
-      <!-- Prato (principais) — bancada -->
-      <button class="el prato" data-action="cat" data-key="principais" type="button" aria-label="Pratos principais">
-        <img src="/kitchen/prato.svg" alt="" />
-        <span class="label">pratos principais</span>
-      </button>
-
-      <!-- Sobremesa — bancada -->
-      <button class="el sobremesa" data-action="cat" data-key="sobremesas" type="button" aria-label="Sobremesas">
-        <img src="/kitchen/sobremesa.svg" alt="" />
-        <span class="label">sobremesas</span>
-      </button>
+      {hotspots.map((h) => (
+        <button
+          class={`hs hs-${h.id}`}
+          data-action={h.action}
+          data-key={h.key}
+          type="button"
+          style={`left:${h.x}%; top:${h.y}%; width:${h.w}%; height:${h.h}%`}
+          aria-label={h.label}
+        >
+          <span class="hs-label">{h.label}</span>
+        </button>
+      ))}
     </section>
 
     <p class="hint">
-      <Icon name="ph:info-thin" /> passa o mouse em cima dos elementos pra ver o nome.
-      Clique pra testar a navegação (ainda não conectado neste teste).
+      <Icon name="ph:info-thin" /> passa o mouse pra ver o nome de cada área.
     </p>
   </main>
 
@@ -132,8 +85,19 @@ import { Icon } from 'astro-icon/components';
       font-weight: 500;
       font-size: var(--fs-h1);
       letter-spacing: -0.02em;
-      margin: 8px 0 var(--s-6);
+      margin: 8px 0 var(--s-5);
     }
+    .mock-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-soft);
+      margin-bottom: var(--s-4);
+      cursor: pointer;
+    }
+    .mock-toggle input { accent-color: var(--terracota); }
     .hint {
       margin-top: var(--s-5);
       font-family: var(--font-mono);
@@ -145,168 +109,80 @@ import { Icon } from 'astro-icon/components';
     }
     .hint :global(svg) { fill: none; stroke: currentColor; }
 
-    .mock-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: var(--fs-meta);
-      color: var(--ink-soft);
-      margin-bottom: var(--s-3);
-      cursor: pointer;
-    }
-    .mock-toggle input { accent-color: var(--terracota); }
-
-    /* ============ CENA DA COZINHA ============ */
+    /* ============ CENA ============ */
     .kitchen {
       position: relative;
       width: 100%;
-      aspect-ratio: 1512 / 982;
+      aspect-ratio: 998 / 801;
       background: var(--bg);
       color: var(--ink);
-      border: 1px dashed var(--line);
     }
-    .mock-overlay {
+    .scene {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: contain;
       pointer-events: none;
-      opacity: 0.25;
-      z-index: 1;
-      filter: contrast(1.2);
     }
-    body.mock-hidden .mock-overlay { display: none; }
-    /* Eleva os elementos pra ficarem visíveis acima do mock */
-    .el { z-index: 2; }
-    .counter, .freezer-divider { z-index: 2; }
-    /* Linha do chão / bancada — caixa aberta embaixo da cozinha */
-    .kitchen .counter {
-      position: absolute;
-      left: 19.5%; top: 88.1%;
-      width: 76.8%; height: 11.7%;
-      border-top: 3px solid currentColor;
-      border-left: 3px solid currentColor;
-      border-right: 3px solid currentColor;
-      border-bottom: 3px solid currentColor;
-    }
-    /* Geladeira: SVG stretch via preserveAspectRatio none */
-    .geladeira img { width: 100%; height: 100%; object-fit: fill; }
+    body.dark-mode .scene { filter: invert(1); }
 
-    /* Elementos do cenário/hotspots */
-    .el {
+    /* ============ HOTSPOTS ============ */
+    .hs {
       position: absolute;
       background: transparent;
-      border: none;
-      padding: 0;
-      cursor: default;
-      color: var(--ink);
-    }
-    .el img {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    body.dark-mode .el img {
-      filter: invert(1);
-    }
-    /* Hotspots (botões) ganham hover/cursor */
-    button.el {
+      border: 1.5px dashed rgba(197, 107, 74, 0.45);
+      border-radius: 6px;
       cursor: pointer;
-      transition: transform var(--dur-fast);
+      transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
+      z-index: 2;
+      padding: 0;
     }
-    button.el:hover {
-      transform: scale(1.06);
+    body.hotspots-hidden .hs {
+      border-color: transparent;
     }
-    button.el:hover .label {
-      opacity: 1;
-      transform: translate(-50%, 0);
+    .hs:hover {
+      background: rgba(197, 107, 74, 0.12);
+      border-color: var(--terracota);
+      border-style: solid;
+      transform: scale(1.02);
     }
-    .label {
+    .hs-label {
       position: absolute;
       left: 50%;
-      top: -22px;
+      bottom: calc(100% + 6px);
       transform: translate(-50%, 4px);
       font-family: var(--font-mono);
       font-size: 11px;
-      color: var(--ink);
-      background: var(--bg);
-      padding: 2px 8px;
-      border: 1px solid var(--line);
-      border-radius: var(--r-sm);
+      color: var(--bg);
+      background: var(--ink);
+      padding: 3px 8px;
+      border-radius: 4px;
       white-space: nowrap;
       opacity: 0;
       transition: opacity var(--dur-fast), transform var(--dur-fast);
       pointer-events: none;
     }
-    .label-on-fridge {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
+    .hs:hover .hs-label {
       opacity: 1;
-      background: transparent;
-      border: none;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--ink-soft);
-      text-transform: lowercase;
-    }
-
-    /* ============ POSIÇÕES (% do mock 1512x982) ============
-       Centros estimados visualmente — ajustar com o overlay ligado. */
-
-    /* Parede */
-    .relogio    { left: 47.6%; top: 26.5%; width: 7.9%;  height: 12.2%; }
-    .quadro     { left: 28.6%; top: 46.1%; width: 7.6%;  height: 17.8%; }
-    .livros     { left: 40.7%; top: 56.3%; width: 13.2%; height: 7.6%;  }
-    .interruptor{ left: 15.5%; top: 58.5%; width: 4%;    height: 10.2%; }
-
-    /* Geladeira (corpo grande) */
-    .geladeira { left: 57.5%; top: 37.7%; width: 21.2%; height: 49.9%; }
-    .freezer-divider {
-      position: absolute;
-      left: 57.5%; top: 58.2%;
-      width: 21.2%;
-      height: 3px;
-      background: currentColor;
-    }
-    /* Vaso em cima da geladeira */
-    .vaso       { left: 64.8%; top: 17.8%; width: 13.2%; height: 21.4%; }
-
-    /* Hotspot 'para congelar' = metade superior da geladeira */
-    .congelar { left: 57.5%; top: 37.7%; width: 21.2%; height: 20.5%; }
-    .congelar img { display: none; }
-
-    /* Coisas grudadas na geladeira (metade inferior) */
-    .calendario { left: 62.3%; top: 61.4%; width: 7.6%;  height: 11.7%; }
-    .postit     { left: 72.4%; top: 60.5%; width: 7.9%;  height: 12.2%; }
-
-    /* Bancada (counter) e itens sobre ela */
-    .akim       { left: 16.4%; top: 75.4%; width: 10.9%; height: 12.2%; }
-    .prato      { left: 31.7%; top: 73.3%; width: 11.9%; height: 14.3%; }
-    .sobremesa  { left: 46.6%; top: 73.3%; width: 7.3%;  height: 14.3%; }
-
-    @media (max-width: 640px) {
-      .title { font-size: 28px; }
-      .kitchen { aspect-ratio: 1500 / 1200; }
+      transform: translate(-50%, 0);
     }
   </style>
 
   <script>
-    // Dark toggle pelo interruptor
-    document.querySelector('.interruptor')?.addEventListener('click', () => {
+    // Dark toggle pelo interruptor (hotspot 'dark')
+    document.querySelector('.hs-dark')?.addEventListener('click', (e) => {
+      e.preventDefault();
       document.body.classList.toggle('dark-mode');
       try {
         localStorage.setItem('cozy-dark-mode',
           document.body.classList.contains('dark-mode') ? 'true' : 'false');
-      } catch (e) {}
+      } catch (err) {}
     });
 
-    // Toggle do mock como overlay de referência
-    document.getElementById('mock-toggle')?.addEventListener('change', (e) => {
+    // Toggle visibilidade das bordas dos hotspots
+    document.getElementById('hotspot-toggle')?.addEventListener('change', (e) => {
       const target = e.target as HTMLInputElement;
-      document.body.classList.toggle('mock-hidden', !target.checked);
+      document.body.classList.toggle('hotspots-hidden', !target.checked);
     });
   </script>
 </BaseLayout>
