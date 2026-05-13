@@ -329,20 +329,22 @@ import { Icon } from 'astro-icon/components';
       background: var(--surface);
     }
 
-    /* Tooltip flutuante */
+    /* Tooltip flutuante — alinhado ao DS */
     .kitchen-tooltip {
       position: fixed;
-      transform: translate(-50%, -100%) translateY(-6px);
+      transform: translate(-50%, -100%) translateY(-18px);
       background: var(--ink);
       color: var(--bg);
       font-family: var(--font-mono);
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 4px;
+      font-size: var(--fs-meta);
+      letter-spacing: 0.02em;
+      padding: 8px 14px;
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow-1);
       pointer-events: none;
       white-space: nowrap;
       opacity: 0;
-      transition: opacity 120ms;
+      transition: opacity var(--dur-fast);
       z-index: 100;
     }
     .kitchen-tooltip::after {
@@ -434,7 +436,7 @@ import { Icon } from 'astro-icon/components';
         } else if (action === 'recado') {
           openDrawer('drawer-recado');
         } else if (action === 'akim') {
-          toast('miau 🐱');
+          showTooltipAt(g, 'miau 🐱', 1400);
         }
       };
       g.addEventListener('click', fire);
@@ -451,17 +453,38 @@ import { Icon } from 'astro-icon/components';
 
     // Tooltip de hover
     const tooltip = document.getElementById('kitchen-tooltip')!;
+    let tooltipPinTimer: number | undefined;
+
+    function showTooltipAt(g: SVGGElement, text: string, pinMs = 0) {
+      const rect = g.getBoundingClientRect();
+      tooltip.textContent = text;
+      tooltip.style.left = `${rect.left + rect.width / 2}px`;
+      tooltip.style.top = `${rect.top}px`;
+      tooltip.classList.add('show');
+      window.clearTimeout(tooltipPinTimer);
+      if (pinMs > 0) {
+        // Trava o texto por pinMs e depois deixa o hover natural assumir
+        tooltip.dataset.pinned = '1';
+        tooltipPinTimer = window.setTimeout(() => {
+          delete tooltip.dataset.pinned;
+          // Se o mouse não está mais em cima, esconde
+          if (!g.matches(':hover')) tooltip.classList.remove('show');
+          else tooltip.textContent = g.dataset.label ?? '';
+        }, pinMs);
+      }
+    }
+
     document.querySelectorAll<SVGGElement>('.hs').forEach((g) => {
       const label = g.dataset.label;
       if (!label) return;
       const show = () => {
-        const rect = g.getBoundingClientRect();
-        tooltip.textContent = label;
-        tooltip.style.left = `${rect.left + rect.width / 2}px`;
-        tooltip.style.top = `${rect.top}px`;
-        tooltip.classList.add('show');
+        if (tooltip.dataset.pinned) return; // não sobrescreve enquanto pinado
+        showTooltipAt(g, label);
       };
-      const hide = () => tooltip.classList.remove('show');
+      const hide = () => {
+        if (tooltip.dataset.pinned) return; // mantém pinado até timeout
+        tooltip.classList.remove('show');
+      };
       g.addEventListener('mouseenter', show);
       g.addEventListener('mouseleave', hide);
       g.addEventListener('focus', show);
