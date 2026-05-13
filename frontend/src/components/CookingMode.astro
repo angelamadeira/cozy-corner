@@ -41,7 +41,8 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
         <h2 class="cm-end-title">Pronto.</h2>
         <p class="cm-end-sub">Bom apetite, viu.</p>
         <button class="cm-restart" id="cm-restart" type="button">
-          <Icon name="ph:arrow-counter-clockwise-thin" /> revisar do início
+          <Icon name="ph:arrow-counter-clockwise-thin" width={16} height={16} />
+          <span>revisar do início</span>
         </button>
       </div>
 
@@ -90,6 +91,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
   const endScreen = document.getElementById('cm-end');
   const restartBtn = document.getElementById('cm-restart');
   const stage = document.querySelector('.cm-stage');
+  const navEl = document.querySelector('.cm-nav');
 
   let current = 0;
   let wakeLock = null;
@@ -118,11 +120,13 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     if (atEnd) {
       stage.setAttribute('hidden', '');
       endScreen.removeAttribute('hidden');
+      navEl?.setAttribute('hidden', '');
       stepNum.textContent = total;
       progressFill.style.width = '100%';
     } else {
       stage.removeAttribute('hidden');
       endScreen.setAttribute('hidden', '');
+      navEl?.removeAttribute('hidden');
       stepText.textContent = steps[current];
       stepNum.textContent = current + 1;
       progressFill.style.width = ((current + 1) / total) * 100 + '%';
