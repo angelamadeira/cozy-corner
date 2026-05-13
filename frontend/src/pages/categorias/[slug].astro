@@ -81,7 +81,7 @@ const { slug, label, icon, recipes } = Astro.props;
       />
     </div>
 
-    {slug === 'todas' && (
+    {slug === 'todas' ? (
       <div class="filters filters-cats">
         <span class="chip chip-active" data-cat="all">todas as categorias</span>
         {Object.entries(CATEGORY_META).map(([catSlug, meta]) => (
@@ -91,14 +91,14 @@ const { slug, label, icon, recipes } = Astro.props;
           </span>
         ))}
       </div>
+    ) : (
+      <div class="filters">
+        <span class="chip chip-active" data-filter="all">todas</span>
+        <span class="chip" data-filter="30min">até 30 min</span>
+        <span class="chip" data-filter="vegetariana">vegetariana</span>
+        <span class="chip" data-filter="facil">fácil</span>
+      </div>
     )}
-
-    <div class="filters">
-      <span class="chip chip-active" data-filter="all">qualquer tempo</span>
-      <span class="chip" data-filter="30min">até 30 min</span>
-      <span class="chip" data-filter="vegetariana">vegetariana</span>
-      <span class="chip" data-filter="facil">fácil</span>
-    </div>
 
     {recipes.length === 0 ? (
       <div class="empty">
@@ -197,6 +197,7 @@ const { slug, label, icon, recipes } = Astro.props;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: space-between;
       gap: var(--s-2) var(--s-5);
       margin-bottom: var(--s-5);
     }
@@ -262,10 +263,8 @@ const { slug, label, icon, recipes } = Astro.props;
       display: flex;
       flex-wrap: wrap;
       gap: var(--s-2);
-      margin-bottom: var(--s-3);
+      margin-bottom: var(--s-6);
     }
-    .filters:last-of-type { margin-bottom: var(--s-6); }
-    .filters-cats { padding-bottom: var(--s-3); border-bottom: 1px dashed var(--line-soft); }
     .chip {
       display: inline-flex;
       align-items: center;
