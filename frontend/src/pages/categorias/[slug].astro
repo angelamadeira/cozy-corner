@@ -49,9 +49,16 @@ const { slug, label, icon, recipes } = Astro.props;
   </header>
 
   <main class="category">
-    <a href="/" class="back-link">
-      <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
-    </a>
+    <nav class="top-nav">
+      <a href="/" class="back-link">
+        <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+      </a>
+      {slug !== 'todas' && (
+        <a href="/categorias/todas/" class="alt-link">
+          <Icon name="ph:books-thin" /> ver todas as receitas
+        </a>
+      )}
+    </nav>
 
     <div class="title-block">
       <Icon name={icon} class="category-icon" width={32} height={32} />
@@ -173,7 +180,14 @@ const { slug, label, icon, recipes } = Astro.props;
       padding: calc(var(--header-h) + var(--s-7)) var(--s-6) var(--s-9);
     }
 
-    .back-link {
+    .top-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--s-2) var(--s-5);
+      margin-bottom: var(--s-5);
+    }
+    .back-link, .alt-link {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -181,9 +195,8 @@ const { slug, label, icon, recipes } = Astro.props;
       font-size: var(--fs-meta);
       color: var(--ink-soft);
       text-decoration: none;
-      margin-bottom: var(--s-5);
     }
-    .back-link:hover { color: var(--terracota); }
+    .back-link:hover, .alt-link:hover { color: var(--terracota); }
 
     /* ============ TITLE ============ */
     .title-block {
