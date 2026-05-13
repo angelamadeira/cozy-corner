@@ -52,9 +52,14 @@
       filter: invert(1);
     }
 
-    /* Botão Login */
+    /* Botão Login — flex pra centralizar texto e ícone interno */
     [class*="Authentication"] button,
     [class*="AuthPage"] button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
       background: #C56B4A;
       color: #FFFFFF;
       border: 1px solid #C56B4A;
