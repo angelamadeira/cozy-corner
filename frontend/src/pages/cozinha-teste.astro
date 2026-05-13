@@ -482,9 +482,9 @@ const categoryLabels: Record<string, string> = {
 
   <script define:vars={{ recipesByCategory, categoryLabels }}>
     // Toast util
-    const toastEl = document.getElementById('test-toast') as HTMLDivElement | null;
-    let toastTimer: number | undefined;
-    function toast(msg: string) {
+    const toastEl = document.getElementById('test-toast');
+    let toastTimer;
+    function toast(msg) {
       if (!toastEl) return;
       toastEl.textContent = msg;
       toastEl.classList.add('show');
@@ -493,32 +493,33 @@ const categoryLabels: Record<string, string> = {
     }
 
     // Drawers
-    const backdrop = document.getElementById('drawer-backdrop')!;
+    const backdrop = document.getElementById('drawer-backdrop');
     const catTitle = document.getElementById('cat-title');
     const catCount = document.getElementById('cat-count');
     const catList = document.getElementById('cat-list');
-    const catFullpage = document.getElementById('cat-fullpage') as HTMLAnchorElement | null;
+    const catFullpage = document.getElementById('cat-fullpage');
 
-    function openCategoryDrawer(key: string) {
-      const recipes = (recipesByCategory as Record<string, any[]>)[key] ?? [];
-      const label = (categoryLabels as Record<string, string>)[key] ?? key;
+    function openCategoryDrawer(key) {
+      const recipes = recipesByCategory[key] || [];
+      const label = categoryLabels[key] || key;
       if (catTitle) catTitle.textContent = label;
-      if (catCount) catCount.textContent = `${recipes.length} ${recipes.length === 1 ? 'receita' : 'receitas'}`;
-      if (catFullpage) catFullpage.href = `/categorias/${key}/`;
+      if (catCount) catCount.textContent = recipes.length + ' ' + (recipes.length === 1 ? 'receita' : 'receitas');
+      if (catFullpage) catFullpage.href = '/categorias/' + key + '/';
       if (catList) {
         catList.innerHTML = recipes.length === 0
           ? '<li class="drawer-empty">essa categoria ainda está vazia.</li>'
           : recipes.map((r) =>
-              `<li><a href="/receitas/${r.id}/">
-                <span><span class="recipe-name">${r.title}</span><span class="recipe-meta">${r.time} min · ${r.servings} porções · ${r.difficulty}</span></span>
-                <span class="arrow">→</span>
-              </a></li>`
+              '<li><a href="/receitas/' + r.id + '/">' +
+                '<span><span class="recipe-name">' + r.title + '</span>' +
+                '<span class="recipe-meta">' + r.time + ' min · ' + r.servings + ' porções · ' + r.difficulty + '</span></span>' +
+                '<span class="arrow">→</span>' +
+              '</a></li>'
             ).join('');
       }
       openDrawer('drawer-cat');
     }
 
-    function openDrawer(id: string) {
+    function openDrawer(id) {
       const drawer = document.getElementById(id);
       if (!drawer) return;
       drawer.classList.add('open');
@@ -542,8 +543,29 @@ const categoryLabels: Record<string, string> = {
       if (e.key === 'Escape') closeAllDrawers();
     });
 
+    // Tooltip
+    const tooltip = document.getElementById('kitchen-tooltip');
+    let tooltipPinTimer;
+
+    function showTooltipAt(g, text, pinMs = 0) {
+      const rect = g.getBoundingClientRect();
+      tooltip.textContent = text;
+      tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+      tooltip.style.top = rect.top + 'px';
+      tooltip.classList.add('show');
+      window.clearTimeout(tooltipPinTimer);
+      if (pinMs > 0) {
+        tooltip.dataset.pinned = '1';
+        tooltipPinTimer = window.setTimeout(() => {
+          delete tooltip.dataset.pinned;
+          if (!g.matches(':hover')) tooltip.classList.remove('show');
+          else tooltip.textContent = g.dataset.label || '';
+        }, pinMs);
+      }
+    }
+
     // Handler centralizado pros hotspots
-    document.querySelectorAll<SVGGElement>('.hs').forEach((g) => {
+    document.querySelectorAll('.hs').forEach((g) => {
       const fire = () => {
         const action = g.dataset.action;
         const key = g.dataset.key;
@@ -565,49 +587,26 @@ const categoryLabels: Record<string, string> = {
         }
       };
       g.addEventListener('click', fire);
-      g.addEventListener('keydown', (e: KeyboardEvent) => {
+      g.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(); }
       });
     });
 
     // Toggle debug das áreas clicáveis
     document.getElementById('hotspot-toggle')?.addEventListener('change', (e) => {
-      const target = e.target as HTMLInputElement;
-      document.body.classList.toggle('hotspots-debug', target.checked);
+      document.body.classList.toggle('hotspots-debug', e.target.checked);
     });
 
     // Tooltip de hover
-    const tooltip = document.getElementById('kitchen-tooltip')!;
-    let tooltipPinTimer: number | undefined;
-
-    function showTooltipAt(g: SVGGElement, text: string, pinMs = 0) {
-      const rect = g.getBoundingClientRect();
-      tooltip.textContent = text;
-      tooltip.style.left = `${rect.left + rect.width / 2}px`;
-      tooltip.style.top = `${rect.top}px`;
-      tooltip.classList.add('show');
-      window.clearTimeout(tooltipPinTimer);
-      if (pinMs > 0) {
-        // Trava o texto por pinMs e depois deixa o hover natural assumir
-        tooltip.dataset.pinned = '1';
-        tooltipPinTimer = window.setTimeout(() => {
-          delete tooltip.dataset.pinned;
-          // Se o mouse não está mais em cima, esconde
-          if (!g.matches(':hover')) tooltip.classList.remove('show');
-          else tooltip.textContent = g.dataset.label ?? '';
-        }, pinMs);
-      }
-    }
-
-    document.querySelectorAll<SVGGElement>('.hs').forEach((g) => {
+    document.querySelectorAll('.hs').forEach((g) => {
       const label = g.dataset.label;
       if (!label) return;
       const show = () => {
-        if (tooltip.dataset.pinned) return; // não sobrescreve enquanto pinado
+        if (tooltip.dataset.pinned) return;
         showTooltipAt(g, label);
       };
       const hide = () => {
-        if (tooltip.dataset.pinned) return; // mantém pinado até timeout
+        if (tooltip.dataset.pinned) return;
         tooltip.classList.remove('show');
       };
       g.addEventListener('mouseenter', show);
