@@ -30,25 +30,29 @@
       opacity: 1 !important;
     }
 
-    /* Botão "Login" */
+    /* Botão "Login" — primary do DS (terracota, padding 12/20, r-sm) */
     [class*="AuthenticationPage"] button[type="button"],
     [class*="AuthPage"] button[type="button"] {
-      background: #1A1A1A !important;
-      color: #FAF6EE !important;
-      border: none !important;
-      border-radius: 4px !important;
-      padding: 14px 32px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      background: #C56B4A !important;            /* --terracota */
+      color: #FFFFFF !important;
+      border: 1px solid #C56B4A !important;
+      border-radius: 4px !important;              /* --r-sm */
+      padding: 12px 20px !important;
       font-family: 'Cutive Mono', monospace !important;
-      font-size: 14px !important;
+      font-size: 14px !important;                 /* --fs-small */
       font-weight: 400 !important;
       letter-spacing: 0.02em !important;
-      box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08) !important;
-      transition: background 200ms ease, transform 200ms ease !important;
+      box-shadow: none !important;
+      cursor: pointer !important;
+      transition: opacity 150ms, transform 150ms, background 300ms !important;
     }
     [class*="AuthenticationPage"] button[type="button"]:hover,
     [class*="AuthPage"] button[type="button"]:hover {
-      background: #C56B4A !important;
-      transform: translateY(-1px);
+      opacity: 0.92 !important;
+      transform: translateY(-1px) !important;
     }
 
     /* Textos auxiliares (ex: "Use Local Backend") */
