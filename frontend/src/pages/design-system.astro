@@ -3,13 +3,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 
 const colors = [
-  { name: 'intro-blue', hex: '#D7F5FF', role: 'Azul claro · sopro de manhã, assinatura' },
-  { name: 'terracota',  hex: '#C56B4A', role: 'Acento warm · calor, paneladas' },
-  { name: 'cover-dark', hex: '#1A2840', role: 'Cover da intro (azul escuro)' },
-  { name: 'bg',         hex: '#FAF6EE', role: 'Background warm (creme)' },
-  { name: 'surface',    hex: '#F4EFE2', role: 'Surface sutil sobre o bg' },
+  { name: 'bg',         hex: '#FAF6EE', role: 'Background único do site inteiro (creme warm clarinho)' },
+  { name: 'surface',    hex: '#F4EFE2', role: 'Surface — elevação sutil sobre bg' },
+  { name: 'intro-blue', hex: '#D7F5FF', role: 'Acento azul — detalhes, hover, sopro' },
+  { name: 'terracota',  hex: '#C56B4A', role: 'Acento warm — calor contrastante (CTAs, links)' },
+  { name: 'cover-dark', hex: '#1A2840', role: 'Cover da intro (só na tela inicial)' },
   { name: 'ink',        hex: '#1A1A1A', role: 'Texto principal' },
-  { name: 'ink-soft',   hex: '#6B5F4F', role: 'Texto secundário (warm gray)' },
+  { name: 'ink-soft',   hex: '#6B5F4F', role: 'Texto secundário (warm gray-brown)' },
   { name: 'ink-mute',   hex: '#A89F8E', role: 'Texto sutil, metadata' },
   { name: 'line',       hex: '#E5DFD3', role: 'Border padrão' },
   { name: 'success',    hex: '#5C8A4D', role: 'Sucesso' },
@@ -82,11 +82,49 @@ const types = [
       </div>
     </section>
 
-    <!-- ============ CORES ============ -->
+    <!-- ============ USO DE COR ============ -->
     <section class="ds-section">
-      <h2 class="ds-section-title">Cores</h2>
+      <h2 class="ds-section-title">Uso de cor</h2>
+      <p class="t-small" style="color: var(--ink-soft); margin-bottom: 24px; max-width: 640px;">
+        <strong>1 fundo</strong> + <strong>2 acentos</strong>. Tudo no creme. Azul claro e terracota entram como detalhes — nada compete com o creme principal.
+      </p>
+      <div class="color-roles">
+        <div class="color-role">
+          <div class="role-swatch" style="background: var(--bg); border: 1px solid var(--line);"></div>
+          <div>
+            <div class="t-h3">creme · bg</div>
+            <div class="t-small" style="color: var(--ink-soft);">Fundo do site inteiro — homepage, receita, drawer, modal. Aconchegante, neutro, deixa fotos das receitas respirarem.</div>
+          </div>
+        </div>
+        <div class="color-role">
+          <div class="role-swatch" style="background: var(--intro-blue); border: 1px solid var(--line);"></div>
+          <div>
+            <div class="t-h3">azul · acento sopro</div>
+            <div class="t-small" style="color: var(--ink-soft);">Detalhes sutis. Borders dashed dos hotspots, hover frio, foco em inputs, badges informativos.</div>
+          </div>
+        </div>
+        <div class="color-role">
+          <div class="role-swatch" style="background: var(--terracota);"></div>
+          <div>
+            <div class="t-h3">terracota · acento calor</div>
+            <div class="t-small" style="color: var(--ink-soft);">CTAs primárias, números de passos, links importantes, ícones de ação. Onde precisa "chamar".</div>
+          </div>
+        </div>
+        <div class="color-role">
+          <div class="role-swatch" style="background: var(--cover-dark);"></div>
+          <div>
+            <div class="t-h3">cover-dark · só na intro</div>
+            <div class="t-small" style="color: var(--ink-soft);">Cor da cover escura inicial (typewriter). Aparece apenas no primeiro instante — wipe revela o creme e essa cor sai de cena.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CORES (swatches completos) ============ -->
+    <section class="ds-section">
+      <h2 class="ds-section-title">Tokens de cor</h2>
       <p class="t-small" style="color: var(--ink-soft); margin-bottom: 24px;">
-        Light mode em uso. Acionando o interruptor (💡 acima), todas as cores semânticas adaptam.
+        Light mode em uso. Acionando o interruptor (canto superior direito), todos os tokens adaptam pro dark.
       </p>
       <div class="swatch-grid">
         {colors.map(c => (
@@ -286,20 +324,35 @@ const types = [
     }
     @keyframes blink { 0%,50%{opacity:0.7;} 51%,100%{opacity:0;} }
     .moment-hero {
-      background: var(--intro-blue);
+      background: var(--bg);
       min-height: 240px;
-      /* Trava o ink em escuro — intro-blue é cor de marca constante,
-         então o texto sobre ela sempre fica dark, regardless do dark mode. */
-      --ink: #1A1A1A;
-      --ink-soft: #4A4A4A;
-      --ink-mute: #6A6A6A;
-      color: #1A1A1A;
+      border: 1px solid var(--line);
     }
-    body.dark-mode .moment-hero .moment-tag { color: var(--ink-mute); }
     .moment-recipe {
       background: var(--surface);
       text-align: left;
       align-items: flex-start;
+    }
+
+    /* ============ USO DE COR (color roles) ============ */
+    .color-roles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--s-4);
+    }
+    .color-role {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: var(--s-4);
+      align-items: flex-start;
+      padding: var(--s-4);
+      background: var(--surface);
+      border-radius: var(--r-md);
+    }
+    .role-swatch {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--r-md);
     }
 
     /* ============ SWATCHES ============ */

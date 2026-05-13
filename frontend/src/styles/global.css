@@ -7,13 +7,13 @@
   /* ====== CORES ====== */
 
   /* Brand */
-  --intro-blue: #D7F5FF;   /* azul claro — sopro de manhã, assinatura */
-  --terracota:  #C56B4A;   /* acento warm — calor, paneladas */
-  --cover-dark: #1A2840;   /* cover da intro (escuro) */
+  --intro-blue: #D7F5FF;   /* azul claro — ACENTO, detalhes, sopro */
+  --terracota:  #C56B4A;   /* acento warm — calor contrastante */
+  --cover-dark: #1A2840;   /* cover da intro (apenas a tela escura inicial) */
 
-  /* Neutrals warm (light mode) */
-  --bg:         #FAF6EE;   /* creme warm — background principal */
-  --surface:    #F4EFE2;   /* surface ligeiramente mais escura */
+  /* Background único do site inteiro — cream warm */
+  --bg:         #FAF6EE;   /* creme warm clarinho */
+  --surface:    #F4EFE2;   /* elevação sutil sobre o bg */
   --ink:        #1A1A1A;   /* texto principal */
   --ink-soft:   #6B5F4F;   /* texto secundário (warm gray-brown) */
   --ink-mute:   #A89F8E;   /* texto sutil, metadata */
@@ -97,6 +97,7 @@
 
 /* ============ DARK MODE ============ */
 body.dark-mode {
+  /* Background único também no dark — navy escuro */
   --bg:         #0F1A2A;
   --surface:    #15233A;
   --ink:        #F5F0E5;

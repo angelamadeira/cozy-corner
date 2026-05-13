@@ -296,10 +296,7 @@ const countByCategory = Object.fromEntries(
       color: var(--ink);
     }
 
-    /* Hero "land area" — intro-blue locked dark text */
-    #scene-intro, #flow-transition {
-      --ink: #1A1A1A;
-    }
+    /* Hero pousa sobre var(--bg) que adapta light/dark naturalmente */
 
     /* ============ SCROLL HINT ============ */
     .scroll-hint {
@@ -326,14 +323,15 @@ const countByCategory = Object.fromEntries(
       50% { transform: translateX(-50%) translateY(6px); }
     }
 
-    /* ============ CENAS / TRANSIÇÃO ============ */
+    /* ============ SEÇÕES DA HOMEPAGE ============ */
+    /* Tudo no cream warm de --bg. Azul e terracota são acentos/detalhes. */
     #scene-intro {
       min-height: 100vh;
-      background: var(--intro-blue);
+      background: var(--bg);
     }
     #flow-transition {
       height: 50vh;
-      background: linear-gradient(to bottom, var(--intro-blue), var(--bg));
+      background: var(--bg);
     }
 
     /* ============ COZINHA ============ */
@@ -560,13 +558,13 @@ const countByCategory = Object.fromEntries(
       border-color: var(--ink);
     }
 
-    .recipe-list {
-      list-style: none;
-    }
-    .recipe-list li {
+    /* recipe-list é populada via JS innerHTML — precisa ser :global pra
+       o CSS do Astro alcançar os elementos dinâmicos */
+    .recipe-list { list-style: none; }
+    .recipe-list :global(li) {
       border-bottom: 1px solid var(--line-soft);
     }
-    .recipe-list a {
+    .recipe-list :global(a) {
       display: grid;
       grid-template-columns: 80px 1fr;
       gap: var(--s-4);
@@ -575,8 +573,8 @@ const countByCategory = Object.fromEntries(
       color: inherit;
       align-items: center;
     }
-    .recipe-list a:hover .recipe-row-title { color: var(--terracota); }
-    .recipe-thumb {
+    .recipe-list :global(a:hover .recipe-row-title) { color: var(--terracota); }
+    .recipe-list :global(.recipe-thumb) {
       aspect-ratio: 1;
       background: var(--surface);
       border: 1px dashed var(--line);
@@ -588,14 +586,14 @@ const countByCategory = Object.fromEntries(
       font-size: 10px;
       color: var(--ink-mute);
     }
-    .recipe-row-title {
+    .recipe-list :global(.recipe-row-title) {
       font-family: var(--font-display);
       font-weight: 600;
       font-size: var(--fs-h3);
       margin-bottom: 2px;
       transition: color var(--dur-fast);
     }
-    .recipe-row-meta {
+    .recipe-list :global(.recipe-row-meta) {
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
       color: var(--ink-mute);
@@ -793,8 +791,6 @@ const countByCategory = Object.fromEntries(
       if (!userScrolled) scrollHint.classList.add('show');
     }
 
-    runIntroSequence();
-
     // Detecta scroll real
     window.addEventListener('scroll', () => {
       if (window.scrollY > 30 && !userScrolled) {
@@ -803,7 +799,7 @@ const countByCategory = Object.fromEntries(
       }
     }, { passive: true });
 
-    // Esconde a cover e roda quando "pular intro" é clicado
+    // Esconde a cover e leva direto pra cozinha (com morph completo)
     document.getElementById('cover-skip')?.addEventListener('click', () => {
       introCover.style.transition = 'none';
       introCover.classList.add('wiped');
@@ -812,10 +808,11 @@ const countByCategory = Object.fromEntries(
       document.body.classList.remove('intro-active');
       userScrolled = true;
       heroLogo.classList.add('visible');
+      // Scroll suave pra cozinha — durante o scroll o morph acontece naturalmente
+      document.getElementById('flow-kitchen')?.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Ph2 fade out automático depois do typewriter completar (se já está em sequência)
-    // Já gerenciado em runIntroSequence + revealAfterTypewriter cadeia
+    // Roda a sequência do typewriter + reveal automático
     runIntroSequence().then(() => revealAfterTypewriter());
 
     // =============================================
@@ -852,6 +849,8 @@ const countByCategory = Object.fromEntries(
     }
     window.addEventListener('scroll', updateMorph, { passive: true });
     window.addEventListener('resize', updateMorph);
+    // Estado inicial — caso o user já esteja com scroll setado (refresh, anchor)
+    updateMorph();
 
     // =============================================
     // DRAWERS / MODAIS
