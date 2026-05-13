@@ -44,6 +44,17 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
           <Icon name="ph:arrow-counter-clockwise-thin" /> revisar do início
         </button>
       </div>
+
+      <footer class="cm-nav">
+        <button class="cm-nav-btn cm-prev" id="cm-prev" type="button">
+          <Icon name="ph:caret-left-thin" width={18} height={18} />
+          <span>anterior</span>
+        </button>
+        <button class="cm-nav-btn cm-next" id="cm-next" type="button">
+          <span id="cm-next-label">próximo</span>
+          <Icon name="ph:caret-right-thin" width={18} height={18} />
+        </button>
+      </footer>
     </div>
 
     <aside class="cm-ingredients" id="cm-ingredients">
@@ -62,17 +73,6 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
       </ul>
     </aside>
   </div>
-
-  <footer class="cm-nav">
-    <button class="cm-nav-btn cm-prev" id="cm-prev" type="button">
-      <Icon name="ph:caret-left-thin" width={18} height={18} />
-      <span>anterior</span>
-    </button>
-    <button class="cm-nav-btn cm-next" id="cm-next" type="button">
-      <span id="cm-next-label">próximo</span>
-      <Icon name="ph:caret-right-thin" width={18} height={18} />
-    </button>
-  </footer>
 </div>
 
 <script define:vars={{ steps, triggerSelector }}>
@@ -223,24 +223,23 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     z-index: 1000;
     background: var(--bg);
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr;
     overflow: hidden;
   }
   body.dark-mode .cm-overlay { background: var(--bg); }
 
-  /* Body em 2 colunas: passo grande à esquerda, ingredientes à direita.
-     Em telas estreitas vira coluna única (ingredientes em cima, colapsável). */
+  /* Body em 2 colunas: passo + nav à esquerda, ingredientes estáticos à direita. */
   .cm-body {
     display: grid;
     grid-template-columns: 1fr 340px;
     overflow: hidden;
     min-height: 0;
   }
+  /* Coluna esquerda: stage (cresce) + nav (auto) embaixo */
   .cm-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    overflow: hidden;
     min-height: 0;
   }
   /* Botão de toggle só aparece em mobile (em desktop ingredientes é fixo) */
@@ -301,6 +300,10 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
   }
 
   /* ============ STAGE (step display) ============ */
+  /* stage e end ocupam a mesma célula do grid (row 1); o nav vai pra row 2 */
+  .cm-stage, .cm-end { grid-row: 1; }
+  .cm-nav { grid-row: 2; }
+
   .cm-stage {
     display: flex;
     align-items: center;
