@@ -105,9 +105,11 @@ import { Icon } from 'astro-icon/components';
     </section>
 
     <p class="hint">
-      <Icon name="ph:info-thin" /> hover destaca o elemento; clique segue pra categoria/modal.
+      <Icon name="ph:info-thin" /> hover destaca o elemento; clique segue pra categoria ou abre o modal.
     </p>
   </main>
+
+  <div class="test-toast" id="test-toast" role="status" aria-live="polite"></div>
 
   <style>
     .site-header {
@@ -205,9 +207,41 @@ import { Icon } from 'astro-icon/components';
       outline: 2px solid var(--terracota);
       outline-offset: 4px;
     }
+
+    /* Toast de teste */
+    .test-toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translate(-50%, 8px);
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms, transform 200ms;
+      z-index: 200;
+    }
+    .test-toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
   </style>
 
   <script>
+    // Toast util
+    const toastEl = document.getElementById('test-toast') as HTMLDivElement | null;
+    let toastTimer: number | undefined;
+    function toast(msg: string) {
+      if (!toastEl) return;
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toastEl.classList.remove('show'), 1600);
+    }
+
     // Handler centralizado pros hotspots
     document.querySelectorAll<SVGGElement>('.hs').forEach((g) => {
       const fire = () => {
@@ -219,11 +253,15 @@ import { Icon } from 'astro-icon/components';
             localStorage.setItem('cozy-dark-mode',
               document.body.classList.contains('dark-mode') ? 'true' : 'false');
           } catch (err) {}
+          toast('☀️/🌙 dark mode');
         } else if (action === 'cat' && key) {
-          // No teste, só mostra um alert; na home real, abre drawer/categoria
-          console.log('→ categoria:', key);
-        } else if (action === 'sobre' || action === 'recado' || action === 'akim') {
-          console.log('→ modal:', action);
+          window.location.href = `/categorias/${key}/`;
+        } else if (action === 'sobre') {
+          toast('→ sobre mim (modal pendente)');
+        } else if (action === 'recado') {
+          toast('→ deixe seu recado (modal pendente)');
+        } else if (action === 'akim') {
+          toast('miau 🐱');
         }
       };
       g.addEventListener('click', fire);
