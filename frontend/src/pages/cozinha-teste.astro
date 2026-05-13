@@ -1,6 +1,34 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
+import { getCollection } from 'astro:content';
+import { CATEGORY_META } from '../lib/categories';
+
+const allRecipes = await getCollection('recipes', ({ data }) => data.published);
+
+// Agrupa receitas por categoria pra alimentar o drawer
+const recipesByCategory: Record<string, Array<{id: string; title: string; time: number; servings: number; difficulty: string}>> = {};
+for (const r of allRecipes) {
+  (recipesByCategory[r.data.category] ??= []).push({
+    id: r.id,
+    title: r.data.title,
+    time: r.data.time,
+    servings: r.data.servings,
+    difficulty: r.data.difficulty,
+  });
+}
+recipesByCategory.todas = allRecipes.map((r) => ({
+  id: r.id,
+  title: r.data.title,
+  time: r.data.time,
+  servings: r.data.servings,
+  difficulty: r.data.difficulty,
+}));
+
+const categoryLabels: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(CATEGORY_META).map(([k, v]) => [k, v.label])),
+  todas: 'Todas as receitas',
+};
 ---
 
 <BaseLayout title="Cozinha (teste)" description="Teste da cena de cozinha em line-art.">
@@ -109,6 +137,19 @@ import { Icon } from 'astro-icon/components';
 
   <!-- ============ DRAWERS ============ -->
   <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+  <!-- Categoria (lista de receitas) -->
+  <aside class="drawer drawer-cat" id="drawer-cat" aria-hidden="true" aria-labelledby="cat-title">
+    <button class="drawer-close" data-close-drawer type="button" aria-label="fechar">
+      <Icon name="ph:x-thin" width={20} height={20} />
+    </button>
+    <h2 id="cat-title" class="drawer-title">Categoria</h2>
+    <p class="drawer-count" id="cat-count">0 receitas</p>
+    <ul class="drawer-list" id="cat-list"></ul>
+    <a class="drawer-link" id="cat-fullpage" href="/categorias/todas/">
+      ver em página dedicada <Icon name="ph:arrow-right-thin" />
+    </a>
+  </aside>
 
   <!-- Sobre mim -->
   <aside class="drawer" id="drawer-sobre" aria-hidden="true" aria-labelledby="sobre-title">
@@ -305,6 +346,63 @@ import { Icon } from 'astro-icon/components';
       color: var(--ink-soft);
       margin-bottom: var(--s-4);
     }
+    .drawer-count {
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+      margin-bottom: var(--s-5);
+    }
+    .drawer-list { list-style: none; }
+    .drawer-list li { border-bottom: 1px solid var(--line-soft); }
+    .drawer-list li:last-child { border-bottom: none; }
+    .drawer-list a {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: var(--s-3);
+      padding: var(--s-3) 0;
+      text-decoration: none;
+      color: inherit;
+    }
+    .drawer-list a:hover .recipe-name { color: var(--terracota); }
+    .drawer-list .recipe-name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h3);
+      transition: color var(--dur-fast);
+    }
+    .drawer-list .recipe-meta {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+      margin-top: 2px;
+    }
+    .drawer-list .arrow {
+      font-family: var(--font-mono);
+      color: var(--ink-mute);
+    }
+    .drawer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: var(--s-6);
+      padding-top: var(--s-4);
+      border-top: 1px solid var(--line-soft);
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-soft);
+      text-decoration: none;
+    }
+    .drawer-link :global(svg) { fill: none; stroke: currentColor; }
+    .drawer-link:hover { color: var(--terracota); }
+    .drawer-empty {
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      color: var(--ink-mute);
+      text-align: center;
+      padding: var(--s-7) 0;
+    }
 
     .recado-channels {
       display: flex;
@@ -382,7 +480,7 @@ import { Icon } from 'astro-icon/components';
     }
   </style>
 
-  <script>
+  <script define:vars={{ recipesByCategory, categoryLabels }}>
     // Toast util
     const toastEl = document.getElementById('test-toast') as HTMLDivElement | null;
     let toastTimer: number | undefined;
@@ -396,6 +494,30 @@ import { Icon } from 'astro-icon/components';
 
     // Drawers
     const backdrop = document.getElementById('drawer-backdrop')!;
+    const catTitle = document.getElementById('cat-title');
+    const catCount = document.getElementById('cat-count');
+    const catList = document.getElementById('cat-list');
+    const catFullpage = document.getElementById('cat-fullpage') as HTMLAnchorElement | null;
+
+    function openCategoryDrawer(key: string) {
+      const recipes = (recipesByCategory as Record<string, any[]>)[key] ?? [];
+      const label = (categoryLabels as Record<string, string>)[key] ?? key;
+      if (catTitle) catTitle.textContent = label;
+      if (catCount) catCount.textContent = `${recipes.length} ${recipes.length === 1 ? 'receita' : 'receitas'}`;
+      if (catFullpage) catFullpage.href = `/categorias/${key}/`;
+      if (catList) {
+        catList.innerHTML = recipes.length === 0
+          ? '<li class="drawer-empty">essa categoria ainda está vazia.</li>'
+          : recipes.map((r) =>
+              `<li><a href="/receitas/${r.id}/">
+                <span><span class="recipe-name">${r.title}</span><span class="recipe-meta">${r.time} min · ${r.servings} porções · ${r.difficulty}</span></span>
+                <span class="arrow">→</span>
+              </a></li>`
+            ).join('');
+      }
+      openDrawer('drawer-cat');
+    }
+
     function openDrawer(id: string) {
       const drawer = document.getElementById(id);
       if (!drawer) return;
@@ -433,7 +555,7 @@ import { Icon } from 'astro-icon/components';
           } catch (err) {}
           toast('☀️/🌙 dark mode');
         } else if (action === 'cat' && key) {
-          window.location.href = `/categorias/${key}/`;
+          openCategoryDrawer(key);
         } else if (action === 'sobre') {
           openDrawer('drawer-sobre');
         } else if (action === 'recado') {
