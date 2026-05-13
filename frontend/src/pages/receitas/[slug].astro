@@ -22,6 +22,11 @@ const coverIdx = data.media.findIndex((m) => m.cover);
 const orderedMedia = coverIdx > 0
   ? [data.media[coverIdx], ...data.media.filter((_, i) => i !== coverIdx)]
   : data.media;
+
+// Data de publicação em PT-BR ("13 de maio de 2026")
+const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
+  day: 'numeric', month: 'long', year: 'numeric',
+}).format(data.publishedAt);
 ---
 
 <BaseLayout title={data.title} description={data.description}>
@@ -113,6 +118,9 @@ const orderedMedia = coverIdx > 0
         )}
       </p>
       {data.description && <p class="recipe-description">{data.description}</p>}
+      <p class="recipe-added">
+        <Icon name="ph:calendar-thin" /> adicionada em <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
+      </p>
     </section>
 
     <!-- ============ BODY ============ -->
@@ -188,6 +196,12 @@ const orderedMedia = coverIdx > 0
       </div>
     </section>
   </main>
+
+  <footer class="print-footer" aria-hidden="true">
+    <span class="pf-credit">Cozy Corner · recipes by Angela Madeira</span>
+    <span class="pf-sep">·</span>
+    <span class="pf-date">impresso em <span id="print-date"></span></span>
+  </footer>
 
   <CookingMode steps={data.steps} ingredients={data.ingredients} recipeTitle={data.title} />
 
@@ -386,6 +400,21 @@ const orderedMedia = coverIdx > 0
       max-width: var(--max-text);
       color: var(--ink-soft);
       line-height: var(--lh-loose);
+    }
+    .recipe-added {
+      margin-top: var(--s-3);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-mute);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .recipe-added :global(svg) { fill: none; stroke: currentColor; opacity: 0.8; }
+
+    /* Rodapé só pra impressão */
+    .print-footer {
+      display: none;
     }
 
     /* ============ BODY ============ */
@@ -671,7 +700,27 @@ const orderedMedia = coverIdx > 0
         background: #f5f5f5 !important;
         border-left-color: black !important;
       }
+      .recipe-added {
+        color: #666 !important;
+        font-size: 9pt;
+        margin-bottom: 16pt;
+      }
+      .recipe-added :global(svg) { display: none; }
       a { color: black !important; text-decoration: none !important; }
+      .print-footer {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12pt;
+        margin-top: 24pt;
+        padding-top: 8pt;
+        border-top: 1px solid #ccc;
+        font-size: 9pt;
+        color: #666 !important;
+        font-family: 'Helvetica', sans-serif;
+      }
+      .pf-credit { font-style: italic; }
+      .pf-sep { display: none; }
     }
   </style>
 
@@ -784,6 +833,17 @@ const orderedMedia = coverIdx > 0
         document.body.removeChild(textarea);
       }
     });
+
+    // Atualiza a data do rodapé de impressão antes de imprimir
+    function setPrintDate() {
+      const el = document.getElementById('print-date');
+      if (!el) return;
+      el.textContent = new Intl.DateTimeFormat('pt-BR', {
+        day: 'numeric', month: 'long', year: 'numeric',
+      }).format(new Date());
+    }
+    setPrintDate();
+    window.addEventListener('beforeprint', setPrintDate);
 
     document.getElementById('share-print')?.addEventListener('click', () => {
       window.print();
