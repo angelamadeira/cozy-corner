@@ -47,6 +47,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     </a>
 
     <!-- ============ CAROUSEL ============ -->
+    {orderedMedia.length > 0 && (
     <section class="hero" aria-label="Galeria da receita">
       <div class="carousel" data-count={orderedMedia.length}>
         {orderedMedia.length > 1 && (
@@ -56,27 +57,21 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         )}
         <div class="carousel-viewport">
           <div class="carousel-track" id="carousel-track">
-            {orderedMedia.length === 0 ? (
-              <div class="media-slot">
-                <span class="placeholder">sem mídia ainda</span>
+            {orderedMedia.map((m) => (
+              <div class="media-slot" data-type={m.type}>
+                {m.type === 'video' ? (
+                  <span class="placeholder">
+                    <Icon name="ph:play-circle-thin" width={32} height={32} />
+                    vídeo · {m.alt ?? 'sem descrição'}
+                  </span>
+                ) : (
+                  <span class="placeholder">
+                    <Icon name="ph:image-thin" width={32} height={32} />
+                    foto · {m.alt ?? 'sem descrição'}
+                  </span>
+                )}
               </div>
-            ) : (
-              orderedMedia.map((m) => (
-                <div class="media-slot" data-type={m.type}>
-                  {m.type === 'video' ? (
-                    <span class="placeholder">
-                      <Icon name="ph:play-circle-thin" width={32} height={32} />
-                      vídeo · {m.alt ?? 'sem descrição'}
-                    </span>
-                  ) : (
-                    <span class="placeholder">
-                      <Icon name="ph:image-thin" width={32} height={32} />
-                      foto · {m.alt ?? 'sem descrição'}
-                    </span>
-                  )}
-                </div>
-              ))
-            )}
+            ))}
           </div>
         </div>
         {orderedMedia.length > 1 && (
@@ -100,6 +95,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         </div>
       )}
     </section>
+    )}
 
     <!-- ============ TÍTULO + META ============ -->
     <section class="titlebar">
