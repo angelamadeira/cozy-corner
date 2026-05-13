@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection, render } from 'astro:content';
 import { CATEGORY_META } from '../../lib/categories';
+import { iconForMaterial } from '../../lib/materials';
 import CookingMode from '../../components/CookingMode.astro';
 
 export async function getStaticPaths() {
@@ -145,7 +146,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
             <ul class="material-list">
               {data.materials.map((m) => (
                 <li>
-                  <Icon name="ph:wrench-thin" width={14} height={14} />
+                  <Icon name={iconForMaterial(m)} width={14} height={14} />
                   {m}
                 </li>
               ))}
