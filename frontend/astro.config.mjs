@@ -2,6 +2,20 @@
 import { defineConfig } from 'astro/config';
 import icon from 'astro-icon';
 
+// Vite plugin: resolve /admin/ → /admin/index.html no dev server
+// (em produção isso é feito pelo host estático). Necessário pro Decap admin.
+const staticIndexFallback = {
+  name: 'static-index-fallback',
+  configureServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      if (req.url === '/admin' || req.url === '/admin/') {
+        req.url = '/admin/index.html';
+      }
+      next();
+    });
+  },
+};
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://cozycorner.recipes', // troca quando definir o domínio final
@@ -20,5 +34,8 @@ export default defineConfig({
   },
   build: {
     format: 'directory', // gera /receitas/risoto/index.html, amigável pra Cloudflare
+  },
+  vite: {
+    plugins: [staticIndexFallback],
   },
 });
