@@ -101,23 +101,25 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     <!-- ============ TÍTULO + META ============ -->
     <section class="titlebar">
       <h1 class="recipe-title">{data.title}</h1>
-      <p class="recipe-meta">
-        <Icon name="ph:clock-thin" /> {data.time} min
-        <span class="sep">·</span>
-        <Icon name="ph:fork-knife-thin" /> <span id="meta-servings">{data.servings}</span> porções
-        <span class="sep">·</span>
-        <Icon name="ph:gauge-thin" /> {data.difficulty}
-        {data.tags.includes('vegetariana') && (
-          <>
-            <span class="sep">·</span>
-            <Icon name="ph:plant-thin" /> vegetariana
-          </>
-        )}
-      </p>
+      <div class="meta-row">
+        <p class="recipe-meta">
+          <Icon name="ph:clock-thin" /> {data.time} min
+          <span class="sep">·</span>
+          <Icon name="ph:fork-knife-thin" /> <span id="meta-servings">{data.servings}</span> porções
+          <span class="sep">·</span>
+          <Icon name="ph:gauge-thin" /> {data.difficulty}
+          {data.tags.includes('vegetariana') && (
+            <>
+              <span class="sep">·</span>
+              <Icon name="ph:plant-thin" /> vegetariana
+            </>
+          )}
+        </p>
+        <p class="recipe-added">
+          <Icon name="ph:calendar-thin" /> adicionada em <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
+        </p>
+      </div>
       {data.description && <p class="recipe-description">{data.description}</p>}
-      <p class="recipe-added">
-        <Icon name="ph:calendar-thin" /> adicionada em <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
-      </p>
     </section>
 
     <!-- ============ BODY ============ -->
@@ -398,14 +400,23 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       color: var(--ink-soft);
       line-height: var(--lh-loose);
     }
+    .meta-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--s-4);
+    }
+    .meta-row .recipe-meta { margin: 0; }
     .recipe-added {
-      margin-top: var(--s-3);
       font-family: var(--font-mono);
       font-size: var(--fs-caption);
       color: var(--ink-mute);
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
+      margin: 0;
     }
     .recipe-added :global(svg) { fill: none; stroke: currentColor; opacity: 0.8; }
 
