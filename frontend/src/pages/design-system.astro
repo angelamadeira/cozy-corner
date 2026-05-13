@@ -5,7 +5,7 @@ import { Icon } from 'astro-icon/components';
 const colors = [
   { name: 'bg',         hex: '#FAF6EE', role: 'Background único do site inteiro (creme warm clarinho)' },
   { name: 'surface',    hex: '#F4EFE2', role: 'Surface — elevação sutil sobre bg' },
-  { name: 'intro-blue', hex: '#D7F5FF', role: 'Acento azul — detalhes, hover, sopro' },
+  { name: 'accent-blue', hex: '#D7F5FF', role: 'Acento azul — detalhes, hover, sopro' },
   { name: 'terracota',  hex: '#C56B4A', role: 'Acento warm — calor contrastante (CTAs, links)' },
   { name: 'cover-dark', hex: '#1A2840', role: 'Cover da intro (só na tela inicial)' },
   { name: 'ink',        hex: '#1A1A1A', role: 'Texto principal' },
@@ -97,7 +97,7 @@ const types = [
           </div>
         </div>
         <div class="color-role">
-          <div class="role-swatch" style="background: var(--intro-blue); border: 1px solid var(--line);"></div>
+          <div class="role-swatch" style="background: var(--accent-blue); border: 1px solid var(--line);"></div>
           <div>
             <div class="t-h3">azul · acento sopro</div>
             <div class="t-small" style="color: var(--ink-soft);">Detalhes sutis. Borders dashed dos hotspots, hover frio, foco em inputs, badges informativos.</div>
@@ -129,7 +129,7 @@ const types = [
       <div class="swatch-grid">
         {colors.map(c => (
           <div class="swatch">
-            <div class="swatch-color" style={`background: ${c.hex}; ${c.name === 'bg' || c.name === 'surface' || c.name === 'line' || c.name === 'intro-blue' ? 'border: 1px solid var(--line);' : ''}`}></div>
+            <div class="swatch-color" style={`background: ${c.hex}; ${c.name === 'bg' || c.name === 'surface' || c.name === 'line' || c.name === 'accent-blue' ? 'border: 1px solid var(--line);' : ''}`}></div>
             <div class="swatch-info">
               <div class="t-h3">--{c.name}</div>
               <div class="t-meta" style="color: var(--ink-soft);">{c.hex}</div>
