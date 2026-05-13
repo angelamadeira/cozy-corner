@@ -7,17 +7,30 @@ import { CATEGORY_META } from '../../lib/categories';
 export async function getStaticPaths() {
   const allRecipes = await getCollection('recipes', ({ data }) => data.published);
 
+  // Coleta tags distintivas de uma lista de receitas — exclui tags que aparecem
+  // em 100% (são redundantes como filtro)
+  function distinctiveTags(rs) {
+    const count = new Map();
+    for (const r of rs) for (const t of r.data.tags) count.set(t, (count.get(t) ?? 0) + 1);
+    if (rs.length <= 1) return [...count.keys()];
+    return [...count.entries()].filter(([, n]) => n < rs.length).map(([t]) => t);
+  }
+
   // Uma página por categoria + uma especial 'todas'
-  const paths = Object.entries(CATEGORY_META).map(([slug, meta]) => ({
-    params: { slug },
-    props: {
-      slug,
-      label: meta.label,
-      icon: meta.icon,
-      hotspot: meta.hotspot,
-      recipes: allRecipes.filter((r) => r.data.category === slug),
-    },
-  }));
+  const paths = Object.entries(CATEGORY_META).map(([slug, meta]) => {
+    const catRecipes = allRecipes.filter((r) => r.data.category === slug);
+    return {
+      params: { slug },
+      props: {
+        slug,
+        label: meta.label,
+        icon: meta.icon,
+        hotspot: meta.hotspot,
+        recipes: catRecipes,
+        tags: distinctiveTags(catRecipes),
+      },
+    };
+  });
 
   paths.push({
     params: { slug: 'todas' },
@@ -27,13 +40,14 @@ export async function getStaticPaths() {
       icon: 'ph:books-thin',
       hotspot: 'livros',
       recipes: allRecipes,
+      tags: [],
     },
   });
 
   return paths;
 }
 
-const { slug, label, icon, recipes } = Astro.props;
+const { slug, label, icon, recipes, tags } = Astro.props;
 ---
 
 <BaseLayout title={label} description={`Receitas da categoria ${label}.`}>
@@ -91,14 +105,14 @@ const { slug, label, icon, recipes } = Astro.props;
           </span>
         ))}
       </div>
-    ) : (
+    ) : tags.length > 0 ? (
       <div class="filters">
-        <span class="chip chip-active" data-filter="all">todas</span>
-        <span class="chip" data-filter="30min">até 30 min</span>
-        <span class="chip" data-filter="vegetariana">vegetariana</span>
-        <span class="chip" data-filter="facil">fácil</span>
+        <span class="chip chip-active" data-tag="all">todas</span>
+        {tags.map((tag) => (
+          <span class="chip" data-tag={tag}>{tag}</span>
+        ))}
       </div>
-    )}
+    ) : null}
 
     {recipes.length === 0 ? (
       <div class="empty">
@@ -117,6 +131,7 @@ const { slug, label, icon, recipes } = Astro.props;
             data-title={r.data.title.toLowerCase()}
             data-ingredients={r.data.ingredients.join(' ').toLowerCase()}
             data-tags={r.data.tags.join(' ').toLowerCase()}
+            data-tag-list={r.data.tags.join('|')}
             data-time={r.data.time}
             data-difficulty={r.data.difficulty}
             data-cat={r.data.category}
@@ -412,9 +427,9 @@ const { slug, label, icon, recipes } = Astro.props;
     const searchInput = document.getElementById('search') as HTMLInputElement;
     const items = document.querySelectorAll<HTMLElement>('.recipe-item');
     const noResults = document.getElementById('no-results');
-    const metaChips = document.querySelectorAll<HTMLElement>('.filters:not(.filters-cats) .chip');
-    const catChips = document.querySelectorAll<HTMLElement>('.filters-cats .chip');
-    let activeFilter = 'all';
+    const tagChips = document.querySelectorAll<HTMLElement>('[data-tag]');
+    const catChips = document.querySelectorAll<HTMLElement>('[data-cat]:not(.recipe-item)');
+    let activeTag = 'all';
     let activeCat = 'all';
 
     function applyFilters() {
@@ -423,20 +438,15 @@ const { slug, label, icon, recipes } = Astro.props;
       items.forEach((item) => {
         const title = item.dataset.title || '';
         const ingredients = item.dataset.ingredients || '';
-        const tags = item.dataset.tags || '';
-        const time = parseInt(item.dataset.time || '0');
-        const difficulty = item.dataset.difficulty || '';
+        const tagsStr = item.dataset.tags || '';
+        const tagList = (item.dataset.tagList || '').split('|').filter(Boolean);
         const cat = item.dataset.cat || '';
 
-        const matchesSearch = !q || title.includes(q) || ingredients.includes(q) || tags.includes(q);
-        let matchesFilter = true;
-        if (activeFilter === '30min') matchesFilter = time <= 30;
-        else if (activeFilter === 'vegetariana') matchesFilter = tags.includes('vegetariana');
-        else if (activeFilter === 'facil') matchesFilter = difficulty === 'fácil';
-
+        const matchesSearch = !q || title.includes(q) || ingredients.includes(q) || tagsStr.includes(q);
+        const matchesTag = activeTag === 'all' || tagList.includes(activeTag);
         const matchesCat = activeCat === 'all' || cat === activeCat;
 
-        const show = matchesSearch && matchesFilter && matchesCat;
+        const show = matchesSearch && matchesTag && matchesCat;
         item.style.display = show ? '' : 'none';
         if (show) visible++;
       });
@@ -448,11 +458,11 @@ const { slug, label, icon, recipes } = Astro.props;
     }
 
     searchInput?.addEventListener('input', applyFilters);
-    metaChips.forEach((chip) => {
+    tagChips.forEach((chip) => {
       chip.addEventListener('click', () => {
-        metaChips.forEach((c) => c.classList.remove('chip-active'));
+        tagChips.forEach((c) => c.classList.remove('chip-active'));
         chip.classList.add('chip-active');
-        activeFilter = chip.dataset.filter || 'all';
+        activeTag = chip.dataset.tag || 'all';
         applyFilters();
       });
     });
