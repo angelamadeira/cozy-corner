@@ -15,9 +15,15 @@
        UI fica com o estilo nativo do Decap. Os selectors abaixo só
        pegam containers de auth (não vazam pra rest of admin). */
 
-    /* Fundo accent-blue na tela de login */
+    /* Fundo accent-blue + força centralização vertical da auth */
     [class*="AuthenticationPage"], [class*="AuthPage"] {
       background: #D7F5FF !important;
+      min-height: 100vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 24px !important;
     }
 
     /* Logo grande do topo */
@@ -30,21 +36,23 @@
       opacity: 1 !important;
     }
 
-    /* Botão "Login" — primary do DS (terracota, padding 12/20, r-sm) */
+    /* Botão "Login" — primary do DS escalado pra tela cheia */
     [class*="AuthenticationPage"] button[type="button"],
     [class*="AuthPage"] button[type="button"] {
       display: inline-flex !important;
       align-items: center !important;
-      gap: 6px !important;
+      gap: 8px !important;
       background: #C56B4A !important;            /* --terracota */
       color: #FFFFFF !important;
       border: 1px solid #C56B4A !important;
       border-radius: 4px !important;              /* --r-sm */
-      padding: 12px 20px !important;
+      padding: 18px 40px !important;
+      min-width: 240px !important;
+      justify-content: center !important;
       font-family: 'Cutive Mono', monospace !important;
-      font-size: 14px !important;                 /* --fs-small */
+      font-size: 16px !important;                 /* --fs-body */
       font-weight: 400 !important;
-      letter-spacing: 0.02em !important;
+      letter-spacing: 0.04em !important;
       box-shadow: none !important;
       cursor: pointer !important;
       transition: opacity 150ms, transform 150ms, background 300ms !important;
