@@ -166,3 +166,14 @@ button { font: inherit; cursor: pointer; }
   white-space: nowrap;
   border: 0;
 }
+
+/* Dark-toggle: contraste em dark mode (override global, vence specificity dos scoped) */
+body.dark-mode .dark-toggle {
+  background: var(--surface);
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
+body.dark-mode .dark-toggle:hover {
+  background: var(--line);
+  border-color: var(--ink);
+}
