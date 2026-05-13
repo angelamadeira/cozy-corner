@@ -15,9 +15,10 @@
        UI fica com o estilo nativo do Decap. Os selectors abaixo só
        pegam containers de auth (não vazam pra rest of admin). */
 
-    /* Fundo accent-blue + força centralização vertical da auth */
+    /* Fundo navy escuro (--cover-dark) + centralização vertical */
+    html, body { background: #1A2840 !important; }
     [class*="AuthenticationPage"], [class*="AuthPage"] {
-      background: #D7F5FF !important;
+      background: #1A2840 !important;
       min-height: 100vh !important;
       display: flex !important;
       flex-direction: column !important;
@@ -26,14 +27,16 @@
       padding: 24px !important;
     }
 
-    /* Logo grande do topo */
+    /* Logo grandão. invert(1) inverte preto → branco cremoso pra
+       ficar legível no fundo escuro. */
     [class*="AuthenticationPage"] img,
     [class*="AuthPage"] img {
-      max-width: 560px !important;
-      width: 90% !important;
+      max-width: 720px !important;
+      width: 92% !important;
       height: auto !important;
-      margin: 0 auto 40px !important;
+      margin: 0 auto 56px !important;
       opacity: 1 !important;
+      filter: invert(1) hue-rotate(180deg) !important;
     }
 
     /* Botão "Login" — primary do DS escalado pra tela cheia.
@@ -70,7 +73,7 @@
     /* "Go back to site" link */
     [class*="Authentication"] a,
     [class*="AuthPage"] a {
-      color: #6B5F4F !important;
+      color: rgba(245, 240, 229, 0.55) !important;
       font-family: 'Cutive Mono', monospace !important;
       font-size: 13px !important;
       text-decoration: none !important;
@@ -78,7 +81,12 @@
     }
     [class*="Authentication"] a:hover,
     [class*="AuthPage"] a:hover {
-      color: #C56B4A !important;
+      color: #D58860 !important;
+    }
+    /* Setinha do "go back" — força stroke claro no SVG */
+    [class*="Authentication"] a svg,
+    [class*="AuthPage"] a svg {
+      filter: invert(1) opacity(0.55) !important;
     }
 
     /* Textos auxiliares (ex: "Use Local Backend") */
