@@ -23,14 +23,16 @@ const countByCategory = recipes.reduce<Record<string, number>>((acc, r) => {
     </h2>
     <ul style="list-style: none; padding: 0;">
       {recipes.map((r) => (
-        <li style="padding: 12px 0; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; gap: 12px;">
-          <Icon name={CATEGORY_META[r.data.category].icon} width={20} height={20} style="flex-shrink: 0;" />
-          <div>
-            <strong>{r.data.title}</strong>
-            <span style="color: var(--ink-mute); font-size: 13px; margin-left: 8px;">
-              · {CATEGORY_META[r.data.category].label} · {r.data.time} min
-            </span>
-          </div>
+        <li style="padding: 12px 0; border-bottom: 1px solid var(--line-soft);">
+          <a href={`/receitas/${r.id}/`} style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;">
+            <Icon name={CATEGORY_META[r.data.category].icon} width={20} height={20} style="flex-shrink: 0;" />
+            <div>
+              <strong>{r.data.title}</strong>
+              <span style="color: var(--ink-mute); font-size: 13px; margin-left: 8px;">
+                · {CATEGORY_META[r.data.category].label} · {r.data.time} min
+              </span>
+            </div>
+          </a>
         </li>
       ))}
     </ul>

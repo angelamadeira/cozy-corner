@@ -106,8 +106,8 @@ const types = [
     <section class="ds-section">
       <h2 class="ds-section-title">Tipografia</h2>
       <p class="t-small" style="color: var(--ink-soft); margin-bottom: 24px;">
-        <strong>Cutive Mono</strong> aplicada em tudo — identidade unificada de "carta digitada".
-        Hierarquia vem do <em>tamanho</em>, <em>letter-spacing</em> e <em>uppercase</em>, não do peso (Cutive Mono tem só 400).
+        <strong>Inter</strong> nos títulos (display, h1, h2, h3) — clean, moderno, com peso pra hierarquia.
+        <strong>Cutive Mono</strong> no body, intro e meta — typewriter delicado, nostalgia na leitura.
       </p>
       <div class="type-list">
         {types.map(t => (
@@ -169,8 +169,8 @@ const types = [
         </button>
         <button class="btn btn-secondary">Salvar rascunho</button>
         <button class="btn btn-ghost">Cancelar</button>
-        <button class="btn btn-icon" aria-label="favoritar">
-          <Icon name="ph:star-thin" width={20} height={20} />
+        <button class="btn btn-icon" aria-label="copiar link">
+          <Icon name="ph:link-thin" width={20} height={20} />
         </button>
       </div>
 
@@ -179,7 +179,6 @@ const types = [
         <span class="chip chip-active">todas</span>
         <span class="chip"><Icon name="ph:clock-thin" /> até 30 min</span>
         <span class="chip"><Icon name="ph:plant-thin" /> vegetariana</span>
-        <span class="chip"><Icon name="ph:star-thin" /> favoritas</span>
         <span class="chip">sem glúten</span>
       </div>
     </section>
@@ -211,7 +210,7 @@ const types = [
     .t-display { font-family: var(--font-display); font-size: var(--fs-display); font-weight: 500; letter-spacing: -0.03em; line-height: var(--lh-tight); }
     .t-h1      { font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 500; letter-spacing: -0.02em; line-height: var(--lh-tight); }
     .t-h2      { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 500; letter-spacing: -0.01em; line-height: var(--lh-snug); }
-    .t-h3      { font-family: var(--font-sans); font-size: var(--fs-h3); font-weight: 600; letter-spacing: -0.005em; line-height: var(--lh-snug); }
+    .t-h3      { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 600; letter-spacing: -0.005em; line-height: var(--lh-snug); }
     .t-body    { font-family: var(--font-sans); font-size: var(--fs-body); line-height: var(--lh-base); }
     .t-small   { font-family: var(--font-sans); font-size: var(--fs-small); line-height: var(--lh-base); }
     .t-caption { font-family: var(--font-sans); font-size: var(--fs-caption); line-height: var(--lh-base); }
@@ -289,7 +288,14 @@ const types = [
     .moment-hero {
       background: var(--intro-blue);
       min-height: 240px;
+      /* Trava o ink em escuro — intro-blue é cor de marca constante,
+         então o texto sobre ela sempre fica dark, regardless do dark mode. */
+      --ink: #1A1A1A;
+      --ink-soft: #4A4A4A;
+      --ink-mute: #6A6A6A;
+      color: #1A1A1A;
     }
+    body.dark-mode .moment-hero .moment-tag { color: var(--ink-mute); }
     .moment-recipe {
       background: var(--surface);
       text-align: left;
@@ -418,7 +424,9 @@ const types = [
       transition: all var(--dur-fast) var(--ease-out);
     }
     .chip:hover { border-color: var(--terracota); color: var(--ink); }
-    .chip-active {
+    /* Chip ativo mantém os mesmos estilos no hover (não cai pro hover genérico) */
+    .chip-active,
+    .chip-active:hover {
       background: var(--ink);
       color: var(--bg);
       border-color: var(--ink);
