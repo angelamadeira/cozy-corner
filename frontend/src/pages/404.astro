@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+---
+
+<BaseLayout title="Página não encontrada" description="Essa página não está na cozinha.">
+  <header class="site-header">
+    <a href="/" class="logo-link" aria-label="Cozy Corner">
+      <span class="logo-name">Cozy Corner</span>
+      <span class="logo-by">— by Gigi</span>
+    </a>
+    <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">
+      <Icon name="ph:lightbulb-thin" class="icon-light" width={20} height={20} />
+      <Icon name="ph:moon-thin" class="icon-dark" width={20} height={20} />
+    </button>
+  </header>
+
+  <main class="nf">
+    <div class="nf-illustration" aria-hidden="true">
+      <Icon name="ph:cooking-pot-thin" width={120} height={120} />
+      <span class="nf-num">404</span>
+    </div>
+
+    <h1 class="nf-title">essa página não está na cozinha</h1>
+    <p class="nf-sub">
+      talvez tenha sido um link velho, ou um endereço digitado meio torto.
+      sem stress — dá uma olhada por aqui:
+    </p>
+
+    <div class="nf-actions">
+      <a href="/" class="btn btn-primary">
+        <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+      </a>
+      <a href="/busca/" class="btn btn-ghost">
+        <Icon name="ph:magnifying-glass-thin" /> buscar uma receita
+      </a>
+      <a href="/categorias/todas/" class="btn btn-ghost">
+        <Icon name="ph:books-thin" /> ver todas
+      </a>
+    </div>
+  </main>
+
+  <style>
+    .site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      padding: 0 var(--s-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      background: rgba(250, 246, 238, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    body.dark-mode .site-header { background: rgba(15, 26, 42, 0.85); }
+    .logo-link {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.1;
+    }
+    .logo-name { font-family: var(--font-brand); font-weight: 600; font-size: 22px; line-height: 1; }
+    .logo-by { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
+    .dark-toggle {
+      width: 36px; height: 36px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-dark { display: none; }
+    body.dark-mode .icon-light { display: none; }
+    body.dark-mode .icon-dark { display: inline-block; }
+    svg { fill: none; stroke: currentColor; }
+
+    .nf {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: calc(var(--header-h) + var(--s-9)) var(--s-6) var(--s-9);
+      text-align: center;
+    }
+
+    .nf-illustration {
+      position: relative;
+      display: inline-block;
+      margin-bottom: var(--s-6);
+      color: var(--ink-soft);
+    }
+    .nf-num {
+      position: absolute;
+      bottom: -8px;
+      right: -16px;
+      font-family: var(--font-brand);
+      font-weight: 600;
+      font-size: 48px;
+      line-height: 1;
+      color: var(--terracota);
+      transform: rotate(-8deg);
+    }
+
+    .nf-title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h1);
+      letter-spacing: -0.02em;
+      line-height: var(--lh-tight);
+      margin-bottom: var(--s-4);
+    }
+    .nf-sub {
+      font-family: var(--font-mono);
+      font-size: var(--fs-body);
+      color: var(--ink-soft);
+      line-height: var(--lh-loose);
+      margin-bottom: var(--s-7);
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .nf-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-3);
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--r-sm);
+      font: inherit;
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      min-width: 280px;
+      justify-content: center;
+      transition: all var(--dur-fast);
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+    .btn-primary:hover {
+      background: var(--terracota);
+      border-color: var(--terracota);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    .btn-ghost:hover {
+      background: var(--surface);
+      border-color: var(--terracota);
+      color: var(--terracota);
+    }
+
+    @media (max-width: 640px) {
+      .nf-title { font-size: 28px; }
+      .nf-num { font-size: 36px; bottom: -4px; right: -8px; }
+      .btn { min-width: 0; width: 100%; }
+    }
+  </style>
+
+  <script>
+    document.getElementById('dark-toggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      try {
+        localStorage.setItem('cozy-dark-mode',
+          document.body.classList.contains('dark-mode') ? 'true' : 'false');
+      } catch (e) {}
+    });
+  </script>
+</BaseLayout>
