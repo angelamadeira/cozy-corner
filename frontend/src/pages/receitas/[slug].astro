@@ -167,6 +167,13 @@ const orderedMedia = coverIdx > 0
           ))}
         </ol>
 
+        {data.notes && (
+          <aside class="recipe-notes">
+            <h3 class="notes-title">Notas</h3>
+            <p>{data.notes}</p>
+          </aside>
+        )}
+
         <div class="share">
           <button class="btn btn-primary" type="button" id="share-whatsapp">
             <Icon name="ph:whatsapp-logo-thin" /> Mandar pro WhatsApp
@@ -178,13 +185,6 @@ const orderedMedia = coverIdx > 0
             <Icon name="ph:printer-thin" /> Imprimir
           </button>
         </div>
-
-        {data.notes && (
-          <aside class="recipe-notes">
-            <h3 class="notes-title">Notas</h3>
-            <p>{data.notes}</p>
-          </aside>
-        )}
       </div>
     </section>
   </main>
@@ -494,8 +494,7 @@ const orderedMedia = coverIdx > 0
       padding: var(--s-4) 0;
       border-bottom: 1px solid var(--line-soft);
     }
-    .step:last-child,
-    .step:has(+ .share) { border-bottom: none; }
+    .step:last-child { border-bottom: none; }
     .step-num {
       font-family: var(--font-mono);
       font-size: var(--fs-h3);
