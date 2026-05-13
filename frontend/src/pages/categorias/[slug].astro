@@ -81,8 +81,20 @@ const { slug, label, icon, recipes } = Astro.props;
       />
     </div>
 
+    {slug === 'todas' && (
+      <div class="filters filters-cats">
+        <span class="chip chip-active" data-cat="all">todas as categorias</span>
+        {Object.entries(CATEGORY_META).map(([catSlug, meta]) => (
+          <span class="chip" data-cat={catSlug}>
+            <Icon name={meta.icon} width={14} height={14} />
+            {meta.label.toLowerCase()}
+          </span>
+        ))}
+      </div>
+    )}
+
     <div class="filters">
-      <span class="chip chip-active" data-filter="all">todas</span>
+      <span class="chip chip-active" data-filter="all">qualquer tempo</span>
       <span class="chip" data-filter="30min">até 30 min</span>
       <span class="chip" data-filter="vegetariana">vegetariana</span>
       <span class="chip" data-filter="facil">fácil</span>
@@ -107,6 +119,7 @@ const { slug, label, icon, recipes } = Astro.props;
             data-tags={r.data.tags.join(' ').toLowerCase()}
             data-time={r.data.time}
             data-difficulty={r.data.difficulty}
+            data-cat={r.data.category}
           >
             <a href={`/receitas/${r.id}/`}>
               <div class="thumb">foto</div>
@@ -249,9 +262,14 @@ const { slug, label, icon, recipes } = Astro.props;
       display: flex;
       flex-wrap: wrap;
       gap: var(--s-2);
-      margin-bottom: var(--s-6);
+      margin-bottom: var(--s-3);
     }
+    .filters:last-of-type { margin-bottom: var(--s-6); }
+    .filters-cats { padding-bottom: var(--s-3); border-bottom: 1px dashed var(--line-soft); }
     .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       padding: 4px 12px;
       border: 1px solid var(--line);
       border-radius: var(--r-pill);
@@ -263,6 +281,7 @@ const { slug, label, icon, recipes } = Astro.props;
       transition: all var(--dur-fast);
       user-select: none;
     }
+    .chip :global(svg) { fill: none; stroke: currentColor; flex: none; }
     .chip:hover { border-color: var(--terracota); color: var(--ink); }
     .chip-active, .chip-active:hover {
       background: var(--ink);
@@ -394,8 +413,10 @@ const { slug, label, icon, recipes } = Astro.props;
     const searchInput = document.getElementById('search') as HTMLInputElement;
     const items = document.querySelectorAll<HTMLElement>('.recipe-item');
     const noResults = document.getElementById('no-results');
-    const chips = document.querySelectorAll<HTMLElement>('.chip');
+    const metaChips = document.querySelectorAll<HTMLElement>('.filters:not(.filters-cats) .chip');
+    const catChips = document.querySelectorAll<HTMLElement>('.filters-cats .chip');
     let activeFilter = 'all';
+    let activeCat = 'all';
 
     function applyFilters() {
       const q = searchInput.value.trim().toLowerCase();
@@ -406,6 +427,7 @@ const { slug, label, icon, recipes } = Astro.props;
         const tags = item.dataset.tags || '';
         const time = parseInt(item.dataset.time || '0');
         const difficulty = item.dataset.difficulty || '';
+        const cat = item.dataset.cat || '';
 
         const matchesSearch = !q || title.includes(q) || ingredients.includes(q) || tags.includes(q);
         let matchesFilter = true;
@@ -413,7 +435,9 @@ const { slug, label, icon, recipes } = Astro.props;
         else if (activeFilter === 'vegetariana') matchesFilter = tags.includes('vegetariana');
         else if (activeFilter === 'facil') matchesFilter = difficulty === 'fácil';
 
-        const show = matchesSearch && matchesFilter;
+        const matchesCat = activeCat === 'all' || cat === activeCat;
+
+        const show = matchesSearch && matchesFilter && matchesCat;
         item.style.display = show ? '' : 'none';
         if (show) visible++;
       });
@@ -425,11 +449,19 @@ const { slug, label, icon, recipes } = Astro.props;
     }
 
     searchInput?.addEventListener('input', applyFilters);
-    chips.forEach((chip) => {
+    metaChips.forEach((chip) => {
       chip.addEventListener('click', () => {
-        chips.forEach((c) => c.classList.remove('chip-active'));
+        metaChips.forEach((c) => c.classList.remove('chip-active'));
         chip.classList.add('chip-active');
         activeFilter = chip.dataset.filter || 'all';
+        applyFilters();
+      });
+    });
+    catChips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        catChips.forEach((c) => c.classList.remove('chip-active'));
+        chip.classList.add('chip-active');
+        activeCat = chip.dataset.cat || 'all';
         applyFilters();
       });
     });
