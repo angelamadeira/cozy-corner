@@ -40,15 +40,22 @@
       filter: invert(1) hue-rotate(180deg) !important;
     }
 
+    /* Garante que wrappers internos do Decap também centralizem */
+    [class*="Authentication"] > *,
+    [class*="AuthPage"] > * {
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+
     /* Botão "Login" — primary do DS escalado pra tela cheia.
-       Decap v3 usa class names auto-gerados; selectors amplos pegam
-       qualquer <button> dentro do container de auth. */
+       display:flex + margin:auto pra centralizar independente do wrapper. */
     [class*="Authentication"] button,
     [class*="AuthPage"] button,
     [class*="auth"] button[type="button"] {
-      display: inline-flex !important;
+      display: flex !important;
       align-items: center !important;
       gap: 8px !important;
+      margin: 0 auto !important;
       background: #C56B4A !important;
       color: #FFFFFF !important;
       border: 1px solid #C56B4A !important;
@@ -74,11 +81,14 @@
     /* "Go back to site" link */
     [class*="Authentication"] a,
     [class*="AuthPage"] a {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      margin: 24px auto 0 !important;
       color: rgba(245, 240, 229, 0.55) !important;
       font-family: 'Cutive Mono', monospace !important;
       font-size: 13px !important;
       text-decoration: none !important;
-      margin-top: 24px !important;
     }
     [class*="Authentication"] a:hover,
     [class*="AuthPage"] a:hover {
