@@ -10,91 +10,75 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Cutive+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    /* ============ AUTH (LOGIN) — só a tela de login ============
-       Decap renderiza a login no body antes da app montar. O resto da
-       UI fica com o estilo nativo do Decap. Os selectors abaixo só
-       pegam containers de auth (não vazam pra rest of admin). */
+    /* ============ COZY CORNER — Decap login ============
+       Customização mínima da tela de login do Decap.
+       Estratégia: deixa o Decap fazer o layout dele, só pinta e tipografa. */
 
-    /* Fundo navy escuro (--cover-dark) + centralização vertical */
-    html, body { background: #1A2840 !important; }
-    [class*="AuthenticationPage"], [class*="AuthPage"] {
+    /* Fundo navy em toda a página (cobre Decap antes da app montar) */
+    html, body {
+      background: #1A2840;
+    }
+
+    /* Container da auth: centraliza tudo na viewport */
+    [class*="Authentication"],
+    [class*="AuthPage"] {
       background: #1A2840 !important;
-      min-height: 100vh !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      padding: 24px !important;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      gap: 32px;
     }
 
-    /* Logo. invert(1) inverte preto → branco cremoso no fundo escuro.
-       Sizing conservador pra não vazar — pode aumentar depois se ficar pequeno. */
-    [class*="AuthenticationPage"] img,
+    /* Logo: invert pra ficar claro no fundo escuro */
+    [class*="Authentication"] img,
     [class*="AuthPage"] img {
-      display: block !important;
-      width: min(80vw, 720px) !important;
-      max-width: 720px !important;
-      height: auto !important;
-      margin: 0 auto 40px !important;
-      opacity: 1 !important;
-      filter: invert(1) hue-rotate(180deg) !important;
+      width: min(80vw, 640px);
+      height: auto;
+      filter: invert(1);
     }
 
-    /* Botão "Login" — block + margin:0 auto = centralização simples */
+    /* Botão Login */
     [class*="Authentication"] button,
-    [class*="AuthPage"] button,
-    [class*="auth"] button[type="button"] {
-      display: block !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      background: #C56B4A !important;
-      color: #FFFFFF !important;
-      border: 1px solid #C56B4A !important;
-      border-radius: 4px !important;
-      padding: 18px 40px !important;
-      min-width: 240px !important;
-      font-family: 'Cutive Mono', monospace !important;
-      font-size: 16px !important;
-      font-weight: 400 !important;
-      letter-spacing: 0.04em !important;
-      box-shadow: none !important;
-      cursor: pointer !important;
-      transition: opacity 150ms, transform 150ms, background 300ms !important;
+    [class*="AuthPage"] button {
+      background: #C56B4A;
+      color: #FFFFFF;
+      border: 1px solid #C56B4A;
+      border-radius: 4px;
+      padding: 14px 32px;
+      min-width: 220px;
+      font-family: 'Cutive Mono', ui-monospace, monospace;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     [class*="Authentication"] button:hover,
-    [class*="AuthPage"] button:hover,
-    [class*="auth"] button[type="button"]:hover {
-      opacity: 0.92 !important;
-      transform: translateY(-1px) !important;
+    [class*="AuthPage"] button:hover {
+      opacity: 0.92;
     }
 
-    /* "Go back to site" link */
+    /* Link "Go back to site" */
     [class*="Authentication"] a,
     [class*="AuthPage"] a {
-      display: block !important;
-      width: fit-content !important;
-      margin: 24px auto 0 !important;
-      color: rgba(245, 240, 229, 0.55) !important;
-      font-family: 'Cutive Mono', monospace !important;
-      font-size: 13px !important;
-      text-decoration: none !important;
+      color: rgba(245, 240, 229, 0.55);
+      font-family: 'Cutive Mono', ui-monospace, monospace;
+      font-size: 13px;
+      text-decoration: none;
     }
     [class*="Authentication"] a:hover,
     [class*="AuthPage"] a:hover {
-      color: #D58860 !important;
-    }
-    /* Setinha do "go back" — força stroke claro no SVG */
-    [class*="Authentication"] a svg,
-    [class*="AuthPage"] a svg {
-      filter: invert(1) opacity(0.55) !important;
+      color: #D58860;
     }
 
-    /* Textos auxiliares (ex: "Use Local Backend") */
-    [class*="AuthenticationPage"] p,
+    /* Texto auxiliar (qualquer p, span solto) */
+    [class*="Authentication"] p,
     [class*="AuthPage"] p {
-      font-family: 'Cutive Mono', monospace !important;
-      color: #6B5F4F !important;
-      font-size: 13px !important;
+      color: rgba(245, 240, 229, 0.55);
+      font-family: 'Cutive Mono', ui-monospace, monospace;
+      font-size: 13px;
     }
   </style>
 </head>
