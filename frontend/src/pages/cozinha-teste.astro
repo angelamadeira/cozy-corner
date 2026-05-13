@@ -15,7 +15,14 @@ import { Icon } from 'astro-icon/components';
     <p class="meta">/cozinha-teste · line-art posicionado a partir do mock da Gigi</p>
     <h1 class="title">Cozinha — teste de posicionamento</h1>
 
+    <label class="mock-toggle">
+      <input type="checkbox" id="mock-toggle" checked />
+      mostrar mock como referência
+    </label>
+
     <section class="kitchen" aria-label="Cena da cozinha com hotspots">
+      <!-- Mock de referência (overlay translúcido) -->
+      <img class="mock-overlay" src="/kitchen/mock.png" alt="" />
       <!-- Geladeira (corpo) -->
       <div class="el geladeira" aria-hidden="true">
         <img src="/kitchen/geladeira.svg" alt="" />
@@ -138,24 +145,54 @@ import { Icon } from 'astro-icon/components';
     }
     .hint :global(svg) { fill: none; stroke: currentColor; }
 
+    .mock-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-soft);
+      margin-bottom: var(--s-3);
+      cursor: pointer;
+    }
+    .mock-toggle input { accent-color: var(--terracota); }
+
     /* ============ CENA DA COZINHA ============ */
     .kitchen {
       position: relative;
       width: 100%;
-      aspect-ratio: 1500 / 1000;
+      aspect-ratio: 1512 / 982;
       background: var(--bg);
       color: var(--ink);
+      border: 1px dashed var(--line);
     }
-    /* Linha do chão / bancada */
+    .mock-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      opacity: 0.25;
+      z-index: 1;
+      filter: contrast(1.2);
+    }
+    body.mock-hidden .mock-overlay { display: none; }
+    /* Eleva os elementos pra ficarem visíveis acima do mock */
+    .el { z-index: 2; }
+    .counter, .freezer-divider { z-index: 2; }
+    /* Linha do chão / bancada — caixa aberta embaixo da cozinha */
     .kitchen .counter {
       position: absolute;
-      left: 8%; right: 0%;
-      bottom: 4%;
-      height: 8%;
-      border-top: 4px solid currentColor;
-      border-left: 4px solid currentColor;
-      border-right: 4px solid currentColor;
+      left: 19.5%; top: 88.1%;
+      width: 76.8%; height: 11.7%;
+      border-top: 3px solid currentColor;
+      border-left: 3px solid currentColor;
+      border-right: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
     }
+    /* Geladeira: SVG stretch via preserveAspectRatio none */
+    .geladeira img { width: 100%; height: 100%; object-fit: fill; }
 
     /* Elementos do cenário/hotspots */
     .el {
@@ -216,34 +253,39 @@ import { Icon } from 'astro-icon/components';
       text-transform: lowercase;
     }
 
-    /* ============ POSIÇÕES (% do canvas 1500x1000) ============ */
-    .geladeira { top: 30%; right: 4%; width: 23%; height: 50%; }
+    /* ============ POSIÇÕES (% do mock 1512x982) ============
+       Centros estimados visualmente — ajustar com o overlay ligado. */
+
+    /* Parede */
+    .relogio    { left: 47.6%; top: 26.5%; width: 7.9%;  height: 12.2%; }
+    .quadro     { left: 28.6%; top: 46.1%; width: 7.6%;  height: 17.8%; }
+    .livros     { left: 40.7%; top: 56.3%; width: 13.2%; height: 7.6%;  }
+    .interruptor{ left: 15.5%; top: 58.5%; width: 4%;    height: 10.2%; }
+
+    /* Geladeira (corpo grande) */
+    .geladeira { left: 57.5%; top: 37.7%; width: 21.2%; height: 49.9%; }
     .freezer-divider {
       position: absolute;
-      top: 50%;
-      right: 4%;
-      width: 23%;
-      height: 4px;
+      left: 57.5%; top: 58.2%;
+      width: 21.2%;
+      height: 3px;
       background: currentColor;
     }
-    .congelar {
-      /* Área clicável invisível na parte superior da geladeira */
-      top: 30%; right: 4%; width: 23%; height: 20%;
-    }
+    /* Vaso em cima da geladeira */
+    .vaso       { left: 64.8%; top: 17.8%; width: 13.2%; height: 21.4%; }
+
+    /* Hotspot 'para congelar' = metade superior da geladeira */
+    .congelar { left: 57.5%; top: 37.7%; width: 21.2%; height: 20.5%; }
     .congelar img { display: none; }
 
-    .vaso       { top: 4%;  right: 7%;  width: 14%; height: 28%; }
-    .relogio    { top: 12%; left: 50%;  width: 9%;  height: 14%; transform: translateX(-50%); }
-    .calendario { top: 56%; right: 16%; width: 8%;  height: 12%; }
-    .postit     { top: 56%; right: 6%;  width: 6%;  height: 10%; }
-    .quadro     { top: 35%; left: 28%;  width: 9%;  height: 16%; }
-    .livros     { top: 60%; left: 42%;  width: 10%; height: 6%;  }
-    .interruptor{ top: 50%; left: 14%;  width: 4%;  height: 8%;  }
+    /* Coisas grudadas na geladeira (metade inferior) */
+    .calendario { left: 62.3%; top: 61.4%; width: 7.6%;  height: 11.7%; }
+    .postit     { left: 72.4%; top: 60.5%; width: 7.9%;  height: 12.2%; }
 
-    /* Bancada */
-    .akim       { bottom: 12%; left: 16%; width: 14%; height: 12%; }
-    .prato      { bottom: 12%; left: 35%; width: 14%; height: 8%; }
-    .sobremesa  { bottom: 12%; left: 52%; width: 9%;  height: 8%; }
+    /* Bancada (counter) e itens sobre ela */
+    .akim       { left: 16.4%; top: 75.4%; width: 10.9%; height: 12.2%; }
+    .prato      { left: 31.7%; top: 73.3%; width: 11.9%; height: 14.3%; }
+    .sobremesa  { left: 46.6%; top: 73.3%; width: 7.3%;  height: 14.3%; }
 
     @media (max-width: 640px) {
       .title { font-size: 28px; }
@@ -259,6 +301,12 @@ import { Icon } from 'astro-icon/components';
         localStorage.setItem('cozy-dark-mode',
           document.body.classList.contains('dark-mode') ? 'true' : 'false');
       } catch (e) {}
+    });
+
+    // Toggle do mock como overlay de referência
+    document.getElementById('mock-toggle')?.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      document.body.classList.toggle('mock-hidden', !target.checked);
     });
   </script>
 </BaseLayout>
