@@ -18,7 +18,8 @@ const colors = [
 ];
 
 const types = [
-  { name: 'display', size: '96px max · clamp', usage: 'Hero da homepage (logo)', sample: 'Cozy Corner', font: 'var(--font-display)', cls: 't-display' },
+  { name: 'brand',   size: '128px max · clamp', usage: 'Logo "Cozy Corner" (assinatura handwritten)', sample: 'Cozy Corner', font: 'var(--font-brand)', cls: 't-brand' },
+  { name: 'display', size: '96px max · clamp', usage: 'Hero de seção/página', sample: 'Risoto de cogumelos', font: 'var(--font-display)', cls: 't-display' },
   { name: 'intro',   size: '32px max · clamp', usage: 'Frases typewriter da intro', sample: 'que bom te ver por aqui :)', font: 'var(--font-mono)', cls: 't-intro' },
   { name: 'h1',      size: '48px max · clamp', usage: 'Título de página (receita)', sample: 'Risoto de cogumelos', font: 'var(--font-display)', cls: 't-h1' },
   { name: 'h2',      size: '32px max · clamp', usage: 'Título de seção', sample: 'Ingredientes', font: 'var(--font-display)', cls: 't-h2' },
@@ -59,7 +60,7 @@ const types = [
       <div class="moment moment-hero">
         <span class="moment-tag">hero pós-wipe</span>
         <div style="text-align: center;">
-          <div class="t-display">Cozy Corner</div>
+          <div class="t-brand">Cozy Corner</div>
           <div class="t-meta" style="opacity: 0.6; margin-top: 4px;">recipes by Gigi</div>
         </div>
       </div>
@@ -245,6 +246,7 @@ const types = [
     body.dark-mode .icon-dark { display: inline-block; }
 
     /* ============ TYPE CLASSES ============ */
+    .t-brand   { font-family: var(--font-brand); font-size: clamp(64px, 12vw, 128px); font-weight: 600; letter-spacing: 0; line-height: 1; }
     .t-display { font-family: var(--font-display); font-size: var(--fs-display); font-weight: 500; letter-spacing: -0.03em; line-height: var(--lh-tight); }
     .t-h1      { font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 500; letter-spacing: -0.02em; line-height: var(--lh-tight); }
     .t-h2      { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 500; letter-spacing: -0.01em; line-height: var(--lh-snug); }

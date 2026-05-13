@@ -33,10 +33,13 @@
   --danger:  #B8503A;
 
   /* ====== TIPOGRAFIA ====== */
-  /* Contraste inverso: títulos modernos, body em typewriter (nostalgia na leitura)
-     Inter = títulos (hero, h1, h2) — clean, presente
-     Cutive Mono = body, intro, meta (carta digitada, alma) */
-  --font-display: 'Inter', system-ui, sans-serif;          /* hero, h1, h2 */
+  /* 4 famílias com papéis distintos:
+     - --font-brand: Caveat — APENAS o logo "Cozy Corner" (assinatura handwritten)
+     - --font-display: Inter — h1, h2 (títulos de páginas/seções)
+     - --font-sans: Cutive Mono — body, h3, UI (typewriter delicado)
+     - --font-mono: Cutive Mono — intro typewriter + meta info */
+  --font-brand:   'Caveat', cursive;                       /* logo "Cozy Corner" */
+  --font-display: 'Inter', system-ui, sans-serif;          /* h1, h2 */
   --font-sans:    'Cutive Mono', ui-monospace, monospace;  /* body, ui */
   --font-mono:    'Cutive Mono', ui-monospace, monospace;  /* intro + meta */
 

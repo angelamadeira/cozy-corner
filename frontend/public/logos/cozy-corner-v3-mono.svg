@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 140" role="img" aria-labelledby="title-v3">
+  <title id="title-v3">Cozy Corner · recipes by Gigi · V3 typewriter outline</title>
+  <text x="240" y="68"
+        font-family="'Cutive Mono', monospace"
+        font-size="42"
+        text-anchor="middle"
+        fill="none"
+        stroke="#1A1A1A"
+        stroke-width="0.5">cozy corner</text>
+  <text x="240" y="106"
+        font-family="'Cutive Mono', monospace"
+        font-size="14"
+        text-anchor="middle"
+        fill="#1A1A1A"
+        opacity="0.55">recipes by gigi</text>
+</svg>

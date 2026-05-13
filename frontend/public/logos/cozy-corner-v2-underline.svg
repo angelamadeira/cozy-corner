@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 140" role="img" aria-labelledby="title-v2">
+  <title id="title-v2">Cozy Corner · recipes by Gigi · V2 outline + accent</title>
+  <text x="240" y="70"
+        font-family="Inter, sans-serif"
+        font-size="56"
+        font-weight="500"
+        letter-spacing="-1.5"
+        text-anchor="middle"
+        fill="none"
+        stroke="#1A1A1A"
+        stroke-width="0.6">Cozy Corner</text>
+  <!-- Traço fino terracota como assinatura -->
+  <line x1="180" y1="84" x2="300" y2="84"
+        stroke="#C56B4A"
+        stroke-width="0.8"
+        stroke-linecap="round" />
+  <text x="240" y="116"
+        font-family="'Cutive Mono', monospace"
+        font-size="14"
+        text-anchor="middle"
+        fill="#1A1A1A"
+        opacity="0.55">recipes by Gigi</text>
+</svg>
