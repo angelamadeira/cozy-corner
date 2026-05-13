@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORY_META } from '../lib/categories';
+
+const recipes = await getCollection('recipes', ({ data }) => data.published);
+
+// Conta receitas por categoria (pra exibir contador nos hotspots no futuro)
+const countByCategory = recipes.reduce<Record<string, number>>((acc, r) => {
+  acc[r.data.category] = (acc[r.data.category] || 0) + 1;
+  return acc;
+}, {});
+---
+
+<BaseLayout description="Receitas autorais da Gigi — narrativa, lenta, com carinho.">
+  <main style="padding: 64px 32px; max-width: 720px; margin: 0 auto;">
+    <h1 style="font-size: 32px; margin-bottom: 8px; letter-spacing: -0.02em;">Cozy Corner</h1>
+    <p style="color: var(--ink-soft); margin-bottom: 32px;">recipes by Gigi · scaffold inicial</p>
+
+    <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; margin: 32px 0 12px; color: var(--ink-mute);">Receitas ({recipes.length})</h2>
+    <ul style="list-style: none; padding: 0;">
+      {recipes.map((r) => (
+        <li style="padding: 12px 0; border-bottom: 1px solid var(--line-soft);">
+          <strong>{r.data.title}</strong>
+          <span style="color: var(--ink-mute); font-size: 13px; margin-left: 8px;">
+            · {CATEGORY_META[r.data.category].label} · {r.data.time} min
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; margin: 48px 0 12px; color: var(--ink-mute);">Categorias</h2>
+    <ul style="list-style: none; padding: 0;">
+      {Object.entries(CATEGORY_META).map(([slug, meta]) => (
+        <li style="padding: 8px 0; font-size: 14px;">
+          {meta.emoji} <strong>{meta.label}</strong>
+          <span style="color: var(--ink-mute); font-size: 12px; margin-left: 6px;">
+            · hotspot: {meta.hotspot} · {countByCategory[slug] || 0} receitas
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    <p style="margin-top: 48px; padding: 16px; background: var(--surface); border-radius: 4px; font-size: 13px; color: var(--ink-soft);">
+      📁 Próximos passos: importar o flow.html do mockup-v1, criar componentes (IntroCover, KitchenScene, RecipeCard), página individual de receita, drawer de categoria.
+    </p>
+  </main>
+</BaseLayout>

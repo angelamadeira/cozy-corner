@@ -1,0 +1,7 @@
+{
+  "title": "Deixe seu recado",
+  "subtitle": "manda um oi, dúvida ou sugestão de receita 💌",
+  "whatsappNumber": "55SEUNUMERO",
+  "whatsappTemplate": "Oi Gigi, sou {nome}.\n\n{mensagem}",
+  "emailFallback": "angelmadeira@gmail.com"
+}

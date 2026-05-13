@@ -1,0 +1,155 @@
+# Decap CMS config
+# https://decapcms.org/docs/configuration-options/
+
+backend:
+  name: github
+  repo: SEU-USUARIO/cozy-corner # SUBSTITUIR quando subir o repo no GitHub
+  branch: main
+
+# Permite rodar Decap localmente com `npx decap-server`
+local_backend: true
+
+# Workflow editorial: rascunho → revisão → publicado
+publish_mode: editorial_workflow
+
+# Onde Decap salva uploads (imagens/vídeos)
+media_folder: "frontend/public/uploads"
+public_folder: "/uploads"
+
+# Logo + título customizado do admin
+logo_url: /favicon.svg
+site_url: https://cozycorner.recipes
+
+collections:
+  # ====================== RECEITAS ======================
+  - name: recipes
+    label: Receitas
+    label_singular: Receita
+    folder: frontend/src/content/recipes
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}} · {{category}}"
+    sortable_fields: [title, publishedAt, category, time]
+    view_filters:
+      - { label: Publicadas, field: published, pattern: true }
+      - { label: Rascunhos, field: published, pattern: false }
+    fields:
+      - { name: title, label: Título, widget: string }
+      - { name: description, label: Descrição curta, widget: text, required: false }
+      - name: category
+        label: Categoria
+        widget: select
+        options:
+          - { label: "Pratos principais", value: principais }
+          - { label: "Sobremesas", value: sobremesas }
+          - { label: "Datas comemorativas", value: datas }
+          - { label: "Vegetarianas", value: vegetarianas }
+          - { label: "Para congelar", value: congelar }
+          - { label: "Receitas rápidas", value: rapidas }
+      - { name: time, label: "Tempo (minutos)", widget: number, default: 30, value_type: int }
+      - { name: servings, label: Porções, widget: number, default: 4, value_type: int }
+      - name: difficulty
+        label: Dificuldade
+        widget: select
+        default: médio
+        options: [fácil, médio, difícil]
+      - name: unitSystem
+        label: Sistema de unidades
+        widget: select
+        default: metric
+        options:
+          - { label: "Métrico (g, ml, °C)", value: metric }
+          - { label: "Imperial (oz, cup, °F)", value: imperial }
+      - name: tags
+        label: Tags (filtros)
+        widget: list
+        required: false
+      - name: media
+        label: Mídia (fotos e vídeos)
+        widget: list
+        required: false
+        summary: "{{fields.src}}"
+        fields:
+          - name: type
+            label: Tipo
+            widget: select
+            options: [image, video]
+            default: image
+          - { name: src, label: Arquivo, widget: file }
+          - { name: alt, label: "Descrição (alt text)", widget: string, required: false }
+          - { name: cover, label: "É a capa?", widget: boolean, default: false }
+      - name: ingredients
+        label: Ingredientes
+        widget: list
+        summary: "{{fields.text}}"
+        field: { name: text, label: "", widget: string }
+      - name: materials
+        label: "Materiais (utensílios)"
+        widget: list
+        required: false
+        summary: "{{fields.text}}"
+        field: { name: text, label: "", widget: string }
+      - name: steps
+        label: Modo de preparo
+        widget: list
+        summary: "{{fields.text}}"
+        field: { name: text, label: Passo, widget: text }
+      - { name: notes, label: Observações, widget: text, required: false }
+      - { name: published, label: Publicada, widget: boolean, default: true }
+      - { name: publishedAt, label: Data de publicação, widget: datetime }
+      - name: lang
+        label: Idioma
+        widget: select
+        default: pt-br
+        options: [pt-br] # adicionar 'en' quando habilitar EN
+      - { name: body, label: "Markdown adicional (opcional)", widget: markdown, required: false }
+
+  # ====================== PÁGINAS / TEXTOS ======================
+  - name: pages
+    label: "Páginas (textos do site)"
+    files:
+      - name: intro
+        label: 🟦 Intro
+        file: frontend/src/content/pages/intro.json
+        format: json
+        fields:
+          - { name: phrase1, label: "Frase 1 (typewriter)", widget: string, default: "olá!" }
+          - { name: phrase2, label: "Frase 2 (typewriter)", widget: string, default: "que bom te ver por aqui :)" }
+          - { name: skipLabel, label: "Texto do botão pular", widget: string, default: "pular intro ✕" }
+
+      - name: cozinha
+        label: 🍳 Cozinha — labels dos hotspots
+        file: frontend/src/content/pages/cozinha.json
+        format: json
+        fields:
+          - { name: labelVaso, label: "Vaso → Vegetarianas", widget: string, default: "Vegetarianas" }
+          - { name: labelLivros, label: "Livros → Todas", widget: string, default: "Todas as receitas" }
+          - { name: labelRelogio, label: "Relógio → Rápidas", widget: string, default: "Receitas rápidas" }
+          - { name: labelFreezer, label: "Freezer → Congelar", widget: string, default: "Para congelar" }
+          - { name: labelCalendario, label: "Calendário → Datas", widget: string, default: "Datas comemorativas" }
+          - { name: labelPostit, label: "Post-it → Recado", widget: string, default: "Deixe seu recado" }
+          - { name: labelPrato, label: "Prato → Principais", widget: string, default: "Pratos principais" }
+          - { name: labelDoce, label: "Doce → Sobremesas", widget: string, default: "Sobremesas" }
+
+      - name: recado
+        label: 💌 Recado (post-it)
+        file: frontend/src/content/pages/recado.json
+        format: json
+        fields:
+          - { name: title, label: Título, widget: string, default: "Deixe seu recado" }
+          - { name: subtitle, label: Subtítulo, widget: string, default: "manda um oi, dúvida ou sugestão de receita 💌" }
+          - { name: whatsappNumber, label: "Número WhatsApp (com 55 + DDD)", widget: string, default: "55SEUNUMERO" }
+          - { name: whatsappTemplate, label: "Template da mensagem", widget: text, default: "Oi Gigi, sou {nome}.\n\n{mensagem}" }
+          - { name: emailFallback, label: Email fallback, widget: string, default: "angelmadeira@gmail.com" }
+
+      - name: site
+        label: ⚙️ Configuração geral
+        file: frontend/src/content/pages/site.json
+        format: json
+        fields:
+          - { name: title, label: Título do site, widget: string, default: "Cozy Corner · recipes by Gigi" }
+          - { name: tagline, label: Tagline, widget: string, default: "recipes by Gigi" }
+          - { name: instagram, label: Instagram (handle, sem @), widget: string, required: false }
+          - { name: email, label: Email principal, widget: string, default: "angelmadeira@gmail.com" }
