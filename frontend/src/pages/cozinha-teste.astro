@@ -247,13 +247,26 @@ const categoryLabels: Record<string, string> = {
     /* Quando o drawer abre, reduz a largura útil do body em 480px
        (largura do drawer). O .page tem max-width 1400px + margin:auto,
        então re-centraliza no espaço reduzido e a cozinha (width:100%
-       + aspect-ratio fixo) encolhe junto pra caber inteira. */
+       + aspect-ratio fixo) encolhe junto pra caber inteira.
+       Também alinha a bancada da cozinha ao bottom da viewport. */
     body {
       transition: padding-right 0.45s var(--ease-out);
     }
     @media (min-width: 960px) {
       body.drawer-open {
         padding-right: 480px;
+      }
+      body.drawer-open .page {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding-bottom: var(--s-6);
+      }
+      body.drawer-open .kitchen {
+        margin-top: auto;
+      }
+      body.drawer-open .hint {
+        display: none;
       }
     }
 
