@@ -1,0 +1,264 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+---
+
+<BaseLayout title="Cozinha (teste)" description="Teste da cena de cozinha em line-art.">
+  <header class="site-header">
+    <a href="/" class="logo-link" aria-label="Cozy Corner">
+      <span class="logo-name">Cozy Corner</span>
+      <span class="logo-by">— by Gigi</span>
+    </a>
+  </header>
+
+  <main class="page">
+    <p class="meta">/cozinha-teste · line-art posicionado a partir do mock da Gigi</p>
+    <h1 class="title">Cozinha — teste de posicionamento</h1>
+
+    <section class="kitchen" aria-label="Cena da cozinha com hotspots">
+      <!-- Geladeira (corpo) -->
+      <div class="el geladeira" aria-hidden="true">
+        <img src="/kitchen/geladeira.svg" alt="" />
+      </div>
+      <!-- Divisor da geladeira pra criar 'para congelar' em cima -->
+      <div class="freezer-divider" aria-hidden="true"></div>
+
+      <!-- Vaso (vegetarianas) — em cima da geladeira -->
+      <button class="el vaso" data-action="cat" data-key="vegetarianas" type="button" aria-label="Vegetarianas">
+        <img src="/kitchen/vaso.svg" alt="" />
+        <span class="label">vegetarianas</span>
+      </button>
+
+      <!-- Relógio (rápidas) — meio-alto -->
+      <button class="el relogio" data-action="cat" data-key="rapidas" type="button" aria-label="Receitas rápidas">
+        <img src="/kitchen/relogio.svg" alt="" />
+        <span class="label">receitas rápidas</span>
+      </button>
+
+      <!-- Para congelar — seção superior da geladeira -->
+      <button class="el congelar" data-action="cat" data-key="congelar" type="button" aria-label="Para congelar">
+        <span class="label label-on-fridge">para congelar</span>
+      </button>
+
+      <!-- Calendário (datas) — na geladeira -->
+      <button class="el calendario" data-action="cat" data-key="datas" type="button" aria-label="Datas comemorativas">
+        <img src="/kitchen/calendario.svg" alt="" />
+        <span class="label">datas comemorativas</span>
+      </button>
+
+      <!-- Post-it (recado) — losango na geladeira -->
+      <button class="el postit" data-action="recado" type="button" aria-label="Deixe seu recado">
+        <img src="/kitchen/postit.svg" alt="" />
+        <span class="label">deixe seu recado</span>
+      </button>
+
+      <!-- Quadro (sobre mim) — meio-esquerda -->
+      <button class="el quadro" data-action="sobre" type="button" aria-label="Sobre mim">
+        <img src="/kitchen/quadro.svg" alt="" />
+        <span class="label">sobre mim</span>
+      </button>
+
+      <!-- Livros (todas) — meio -->
+      <button class="el livros" data-action="cat" data-key="todas" type="button" aria-label="Todas as receitas">
+        <img src="/kitchen/livros.svg" alt="" />
+        <span class="label">todas as receitas</span>
+      </button>
+
+      <!-- Interruptor (dark mode) -->
+      <button class="el interruptor" data-action="dark-mode" type="button" aria-label="Liga/desliga dark mode">
+        <img src="/kitchen/interruptor.svg" alt="" />
+        <span class="label">dark mode</span>
+      </button>
+
+      <!-- Counter (bancada) -->
+      <div class="counter" aria-hidden="true"></div>
+
+      <!-- Gato (akim) — bancada -->
+      <button class="el akim" data-action="akim" type="button" aria-label="Akim, o gato">
+        <img src="/kitchen/akim.svg" alt="" />
+        <span class="label">akim</span>
+      </button>
+
+      <!-- Prato (principais) — bancada -->
+      <button class="el prato" data-action="cat" data-key="principais" type="button" aria-label="Pratos principais">
+        <img src="/kitchen/prato.svg" alt="" />
+        <span class="label">pratos principais</span>
+      </button>
+
+      <!-- Sobremesa — bancada -->
+      <button class="el sobremesa" data-action="cat" data-key="sobremesas" type="button" aria-label="Sobremesas">
+        <img src="/kitchen/sobremesa.svg" alt="" />
+        <span class="label">sobremesas</span>
+      </button>
+    </section>
+
+    <p class="hint">
+      <Icon name="ph:info-thin" /> passa o mouse em cima dos elementos pra ver o nome.
+      Clique pra testar a navegação (ainda não conectado neste teste).
+    </p>
+  </main>
+
+  <style>
+    .site-header {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      padding: 0 var(--s-6);
+      display: flex; align-items: center;
+      z-index: 100;
+      background: rgba(250, 246, 238, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    body.dark-mode .site-header { background: rgba(15, 26, 42, 0.85); }
+    .logo-link { text-decoration: none; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+    .logo-name { font-family: var(--font-brand); font-weight: 600; font-size: 22px; line-height: 1; }
+    .logo-by { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: calc(var(--header-h) + var(--s-7)) var(--s-6) var(--s-9);
+    }
+    .meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-mute); }
+    .title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h1);
+      letter-spacing: -0.02em;
+      margin: 8px 0 var(--s-6);
+    }
+    .hint {
+      margin-top: var(--s-5);
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hint :global(svg) { fill: none; stroke: currentColor; }
+
+    /* ============ CENA DA COZINHA ============ */
+    .kitchen {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1500 / 1000;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    /* Linha do chão / bancada */
+    .kitchen .counter {
+      position: absolute;
+      left: 8%; right: 0%;
+      bottom: 4%;
+      height: 8%;
+      border-top: 4px solid currentColor;
+      border-left: 4px solid currentColor;
+      border-right: 4px solid currentColor;
+    }
+
+    /* Elementos do cenário/hotspots */
+    .el {
+      position: absolute;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: default;
+      color: var(--ink);
+    }
+    .el img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    body.dark-mode .el img {
+      filter: invert(1);
+    }
+    /* Hotspots (botões) ganham hover/cursor */
+    button.el {
+      cursor: pointer;
+      transition: transform var(--dur-fast);
+    }
+    button.el:hover {
+      transform: scale(1.06);
+    }
+    button.el:hover .label {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    .label {
+      position: absolute;
+      left: 50%;
+      top: -22px;
+      transform: translate(-50%, 4px);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink);
+      background: var(--bg);
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity var(--dur-fast), transform var(--dur-fast);
+      pointer-events: none;
+    }
+    .label-on-fridge {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+      background: transparent;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-transform: lowercase;
+    }
+
+    /* ============ POSIÇÕES (% do canvas 1500x1000) ============ */
+    .geladeira { top: 30%; right: 4%; width: 23%; height: 50%; }
+    .freezer-divider {
+      position: absolute;
+      top: 50%;
+      right: 4%;
+      width: 23%;
+      height: 4px;
+      background: currentColor;
+    }
+    .congelar {
+      /* Área clicável invisível na parte superior da geladeira */
+      top: 30%; right: 4%; width: 23%; height: 20%;
+    }
+    .congelar img { display: none; }
+
+    .vaso       { top: 4%;  right: 7%;  width: 14%; height: 28%; }
+    .relogio    { top: 12%; left: 50%;  width: 9%;  height: 14%; transform: translateX(-50%); }
+    .calendario { top: 56%; right: 16%; width: 8%;  height: 12%; }
+    .postit     { top: 56%; right: 6%;  width: 6%;  height: 10%; }
+    .quadro     { top: 35%; left: 28%;  width: 9%;  height: 16%; }
+    .livros     { top: 60%; left: 42%;  width: 10%; height: 6%;  }
+    .interruptor{ top: 50%; left: 14%;  width: 4%;  height: 8%;  }
+
+    /* Bancada */
+    .akim       { bottom: 12%; left: 16%; width: 14%; height: 12%; }
+    .prato      { bottom: 12%; left: 35%; width: 14%; height: 8%; }
+    .sobremesa  { bottom: 12%; left: 52%; width: 9%;  height: 8%; }
+
+    @media (max-width: 640px) {
+      .title { font-size: 28px; }
+      .kitchen { aspect-ratio: 1500 / 1200; }
+    }
+  </style>
+
+  <script>
+    // Dark toggle pelo interruptor
+    document.querySelector('.interruptor')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      try {
+        localStorage.setItem('cozy-dark-mode',
+          document.body.classList.contains('dark-mode') ? 'true' : 'false');
+      } catch (e) {}
+    });
+  </script>
+</BaseLayout>
