@@ -1,0 +1,454 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  steps: string[];
+  ingredients: string[];
+  recipeTitle: string;
+  triggerSelector?: string;
+}
+
+const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' } = Astro.props;
+---
+
+<div class="cm-overlay" id="cooking-mode" hidden role="dialog" aria-modal="true" aria-label={`Modo cozinha — ${recipeTitle}`}>
+  <header class="cm-header">
+    <button class="cm-icon-btn" id="cm-ingredients-toggle" type="button" aria-label="ver ingredientes">
+      <Icon name="ph:list-bullets-thin" width={22} height={22} />
+    </button>
+    <div class="cm-progress">
+      <span class="cm-step-num" id="cm-step-num">1</span>
+      <span class="cm-of">de</span>
+      <span class="cm-step-total">{steps.length}</span>
+    </div>
+    <button class="cm-icon-btn" id="cm-close" type="button" aria-label="sair do modo cozinha">
+      <Icon name="ph:x-thin" width={22} height={22} />
+    </button>
+  </header>
+
+  <div class="cm-progress-bar" aria-hidden="true">
+    <div class="cm-progress-fill" id="cm-progress-fill"></div>
+  </div>
+
+  <main class="cm-stage">
+    <p class="cm-step-text" id="cm-step-text"></p>
+  </main>
+
+  <div class="cm-end" id="cm-end" hidden>
+    <Icon name="ph:fork-knife-thin" width={56} height={56} />
+    <h2 class="cm-end-title">Pronto.</h2>
+    <p class="cm-end-sub">Bom apetite, viu.</p>
+    <button class="cm-restart" id="cm-restart" type="button">
+      <Icon name="ph:arrow-counter-clockwise-thin" /> revisar do início
+    </button>
+  </div>
+
+  <footer class="cm-nav">
+    <button class="cm-nav-btn cm-prev" id="cm-prev" type="button">
+      <Icon name="ph:caret-left-thin" width={18} height={18} />
+      <span>anterior</span>
+    </button>
+    <button class="cm-nav-btn cm-next" id="cm-next" type="button">
+      <span id="cm-next-label">próximo</span>
+      <Icon name="ph:caret-right-thin" width={18} height={18} />
+    </button>
+  </footer>
+
+  <aside class="cm-ingredients" id="cm-ingredients" hidden>
+    <header class="cm-ing-header">
+      <h3>Ingredientes</h3>
+      <button class="cm-icon-btn" id="cm-ingredients-close" type="button" aria-label="fechar">
+        <Icon name="ph:x-thin" width={20} height={20} />
+      </button>
+    </header>
+    <ul class="cm-ing-list">
+      {ingredients.map((ing) => (
+        <li>
+          <label>
+            <input type="checkbox" />
+            <span>{ing}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  </aside>
+</div>
+
+<script define:vars={{ steps, triggerSelector }}>
+  const overlay = document.getElementById('cooking-mode');
+  const trigger = document.querySelector(triggerSelector);
+  const stepText = document.getElementById('cm-step-text');
+  const stepNum = document.getElementById('cm-step-num');
+  const progressFill = document.getElementById('cm-progress-fill');
+  const prevBtn = document.getElementById('cm-prev');
+  const nextBtn = document.getElementById('cm-next');
+  const nextLabel = document.getElementById('cm-next-label');
+  const closeBtn = document.getElementById('cm-close');
+  const ingredientsBtn = document.getElementById('cm-ingredients-toggle');
+  const ingredientsPanel = document.getElementById('cm-ingredients');
+  const ingredientsClose = document.getElementById('cm-ingredients-close');
+  const endScreen = document.getElementById('cm-end');
+  const restartBtn = document.getElementById('cm-restart');
+  const stage = document.querySelector('.cm-stage');
+
+  let current = 0;
+  let wakeLock = null;
+
+  async function requestWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (err) {
+      // wakelock pode ser bloqueado pelo SO ou pela falta de visibilidade — silencioso por design
+    }
+  }
+
+  async function releaseWakeLock() {
+    if (wakeLock) {
+      try { await wakeLock.release(); } catch (e) {}
+      wakeLock = null;
+    }
+  }
+
+  function render() {
+    const total = steps.length;
+    const atEnd = current >= total;
+
+    if (atEnd) {
+      stage.setAttribute('hidden', '');
+      endScreen.removeAttribute('hidden');
+      stepNum.textContent = total;
+      progressFill.style.width = '100%';
+    } else {
+      stage.removeAttribute('hidden');
+      endScreen.setAttribute('hidden', '');
+      stepText.textContent = steps[current];
+      stepNum.textContent = current + 1;
+      progressFill.style.width = ((current + 1) / total) * 100 + '%';
+      nextLabel.textContent = current === total - 1 ? 'concluir' : 'próximo';
+    }
+
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = false;
+  }
+
+  function open() {
+    if (!overlay) return;
+    current = 0;
+    overlay.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+    requestWakeLock();
+    render();
+    // Re-request wakelock quando a aba volta a ficar visível
+    document.addEventListener('visibilitychange', onVisibilityChange);
+  }
+
+  function close() {
+    if (!overlay) return;
+    overlay.setAttribute('hidden', '');
+    ingredientsPanel.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+    releaseWakeLock();
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'visible' && !overlay.hasAttribute('hidden')) {
+      requestWakeLock();
+    }
+  }
+
+  function next() {
+    if (current < steps.length) current++;
+    render();
+  }
+
+  function prev() {
+    if (current > 0) current--;
+    if (current < steps.length) {
+      stage.removeAttribute('hidden');
+      endScreen.setAttribute('hidden', '');
+    }
+    render();
+  }
+
+  function restart() {
+    current = 0;
+    render();
+  }
+
+  trigger?.addEventListener('click', open);
+  closeBtn?.addEventListener('click', close);
+  prevBtn?.addEventListener('click', prev);
+  nextBtn?.addEventListener('click', next);
+  restartBtn?.addEventListener('click', restart);
+
+  ingredientsBtn?.addEventListener('click', () => {
+    ingredientsPanel.removeAttribute('hidden');
+  });
+  ingredientsClose?.addEventListener('click', () => {
+    ingredientsPanel.setAttribute('hidden', '');
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (overlay.hasAttribute('hidden')) return;
+    if (e.key === 'Escape') {
+      if (!ingredientsPanel.hasAttribute('hidden')) {
+        ingredientsPanel.setAttribute('hidden', '');
+      } else {
+        close();
+      }
+    } else if (e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      next();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prev();
+    }
+  });
+
+  // Swipe em mobile
+  let touchStartX = 0;
+  stage?.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  stage?.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) < 50) return;
+    if (dx < 0) next();
+    else prev();
+  });
+</script>
+
+<style>
+  .cm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg);
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    overflow: hidden;
+  }
+  body.dark-mode .cm-overlay { background: var(--bg); }
+
+  /* ============ HEADER ============ */
+  .cm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--s-4) var(--s-5);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .cm-icon-btn {
+    width: 40px; height: 40px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    transition: all var(--dur-fast);
+  }
+  .cm-icon-btn:hover { background: var(--surface); border-color: var(--ink); }
+  .cm-icon-btn :global(svg) { fill: none; stroke: currentColor; }
+
+  .cm-progress {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .cm-step-num {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--terracota);
+    line-height: 1;
+  }
+  .cm-of { opacity: 0.6; }
+  .cm-step-total { font-weight: 500; }
+
+  /* ============ PROGRESS BAR ============ */
+  .cm-progress-bar {
+    height: 3px;
+    background: var(--line-soft);
+    overflow: hidden;
+  }
+  .cm-progress-fill {
+    height: 100%;
+    width: 0;
+    background: var(--terracota);
+    transition: width var(--dur-base) ease;
+  }
+
+  /* ============ STAGE (step display) ============ */
+  .cm-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--s-8) var(--s-6);
+    overflow-y: auto;
+    user-select: none;
+  }
+  .cm-step-text {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(24px, 4vw, 40px);
+    line-height: 1.4;
+    color: var(--ink);
+    max-width: 720px;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ END SCREEN ============ */
+  .cm-end {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--s-8) var(--s-6);
+    text-align: center;
+    color: var(--ink);
+  }
+  .cm-end :global(svg) {
+    color: var(--terracota);
+    fill: none;
+    stroke: currentColor;
+    margin-bottom: var(--s-5);
+  }
+  .cm-end-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(40px, 6vw, 56px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--s-3);
+  }
+  .cm-end-sub {
+    font-family: var(--font-mono);
+    font-size: var(--fs-body);
+    color: var(--ink-soft);
+    margin-bottom: var(--s-6);
+  }
+  .cm-restart {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all var(--dur-fast);
+  }
+  .cm-restart:hover { background: var(--surface); border-color: var(--terracota); color: var(--terracota); }
+  .cm-restart :global(svg) { fill: none; stroke: currentColor; }
+
+  /* ============ NAV ============ */
+  .cm-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line-soft);
+    border-top: 1px solid var(--line-soft);
+  }
+  .cm-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    background: var(--bg);
+    border: none;
+    padding: var(--s-5) var(--s-4);
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: var(--fs-body);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background var(--dur-fast);
+  }
+  .cm-nav-btn:hover:not(:disabled) { background: var(--surface); }
+  .cm-nav-btn:disabled {
+    color: var(--ink-mute);
+    cursor: default;
+  }
+  .cm-next { color: var(--terracota); font-weight: 500; }
+  .cm-nav-btn :global(svg) { fill: none; stroke: currentColor; }
+
+  /* ============ INGREDIENTS SIDE PANEL ============ */
+  .cm-ingredients {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(420px, 90vw);
+    background: var(--surface);
+    border-left: 1px solid var(--line);
+    box-shadow: -20px 0 60px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    animation: cm-slide-in var(--dur-base) ease;
+  }
+  @keyframes cm-slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+  }
+  .cm-ing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--s-5) var(--s-5);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .cm-ing-header h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+  }
+  .cm-ing-list {
+    list-style: none;
+    padding: var(--s-4) 0;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .cm-ing-list li { border-bottom: 1px solid var(--line-soft); }
+  .cm-ing-list label {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background var(--dur-fast);
+  }
+  .cm-ing-list label:hover { background: var(--bg); }
+  .cm-ing-list input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: var(--terracota);
+    cursor: pointer;
+  }
+  .cm-ing-list input:checked + span {
+    text-decoration: line-through;
+    color: var(--ink-mute);
+  }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 640px) {
+    .cm-header { padding: var(--s-3) var(--s-4); }
+    .cm-step-num { font-size: 22px; }
+    .cm-stage { padding: var(--s-6) var(--s-4); }
+    .cm-nav-btn { padding: var(--s-4) var(--s-3); font-size: var(--fs-small); }
+  }
+</style>

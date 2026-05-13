@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection, render } from 'astro:content';
 import { CATEGORY_META } from '../../lib/categories';
+import CookingMode from '../../components/CookingMode.astro';
 
 export async function getStaticPaths() {
   const recipes = await getCollection('recipes', ({ data }) => data.published);
@@ -125,7 +126,7 @@ const otherMedia = data.media.filter((m) => m !== coverMedia);
       <div class="steps-col">
         <div class="steps-header">
           <h2 class="section-title">Modo de preparo</h2>
-          <button class="btn btn-primary cooking-mode" type="button">
+          <button class="btn btn-primary cooking-mode" type="button" id="open-cooking-mode">
             <Icon name="ph:cooking-pot-thin" /> Modo cozinha
           </button>
         </div>
@@ -160,6 +161,8 @@ const otherMedia = data.media.filter((m) => m !== coverMedia);
       </div>
     </section>
   </main>
+
+  <CookingMode steps={data.steps} ingredients={data.ingredients} recipeTitle={data.title} />
 
   <style>
     /* ============ HEADER ============ */
