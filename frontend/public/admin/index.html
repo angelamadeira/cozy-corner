@@ -31,10 +31,10 @@
        ficar legível no fundo escuro. */
     [class*="AuthenticationPage"] img,
     [class*="AuthPage"] img {
-      max-width: 720px !important;
-      width: 92% !important;
+      width: min(92vw, 1200px) !important;
+      max-width: none !important;
       height: auto !important;
-      margin: 0 auto 56px !important;
+      margin: 0 auto 48px !important;
       opacity: 1 !important;
       filter: invert(1) hue-rotate(180deg) !important;
     }
