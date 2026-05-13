@@ -246,7 +246,7 @@ const countByCategory = Object.fromEntries(
       transform: translate(-50%, -50%);
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-end; /* "— by Gigi" alinhado à direita */
       line-height: 1.1;
       opacity: 0;
     }
@@ -272,7 +272,7 @@ const countByCategory = Object.fromEntries(
       transform-origin: center center;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-end; /* "— by Gigi" alinhado à direita do "Cozy Corner" */
       gap: var(--s-2);
       opacity: 0;
       z-index: 80;
