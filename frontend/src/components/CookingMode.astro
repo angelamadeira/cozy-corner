@@ -360,6 +360,10 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     margin-bottom: var(--s-6);
   }
   .cm-restart {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 12px 18px;
     background: transparent;
     border: 1px solid var(--line);
@@ -373,11 +377,9 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
   }
   .cm-restart:hover { background: var(--surface); border-color: var(--terracota); color: var(--terracota); }
   .cm-restart :global(svg) {
+    flex-shrink: 0;
     width: 16px;
     height: 16px;
-    vertical-align: middle;
-    margin-right: 8px;
-    margin-top: -2px; /* compensa peso visual do path concentrado embaixo */
     fill: none;
     stroke: currentColor;
   }
