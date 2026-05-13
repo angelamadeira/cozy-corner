@@ -1,0 +1,424 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { getCollection } from 'astro:content';
+import { CATEGORY_META } from '../../lib/categories';
+
+export async function getStaticPaths() {
+  const allRecipes = await getCollection('recipes', ({ data }) => data.published);
+
+  // Uma página por categoria + uma especial 'todas'
+  const paths = Object.entries(CATEGORY_META).map(([slug, meta]) => ({
+    params: { slug },
+    props: {
+      slug,
+      label: meta.label,
+      icon: meta.icon,
+      hotspot: meta.hotspot,
+      recipes: allRecipes.filter((r) => r.data.category === slug),
+    },
+  }));
+
+  paths.push({
+    params: { slug: 'todas' },
+    props: {
+      slug: 'todas',
+      label: 'Todas as receitas',
+      icon: 'ph:books-thin',
+      hotspot: 'livros',
+      recipes: allRecipes,
+    },
+  });
+
+  return paths;
+}
+
+const { slug, label, icon, recipes } = Astro.props;
+---
+
+<BaseLayout title={label} description={`Receitas da categoria ${label}.`}>
+  <header class="site-header">
+    <a href="/" class="logo-link" aria-label="Cozy Corner">
+      <span class="logo-name">Cozy Corner</span>
+      <span class="logo-by">— by Gigi</span>
+    </a>
+    <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">
+      <Icon name="ph:lightbulb-thin" class="icon-light" width={20} height={20} />
+      <Icon name="ph:moon-thin" class="icon-dark" width={20} height={20} />
+    </button>
+  </header>
+
+  <main class="category">
+    <a href="/" class="back-link">
+      <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+    </a>
+
+    <div class="title-block">
+      <Icon name={icon} class="category-icon" width={32} height={32} />
+      <div>
+        <h1 class="cat-title">{label}</h1>
+        <p class="cat-count">
+          {recipes.length} {recipes.length === 1 ? 'receita' : 'receitas'}
+        </p>
+      </div>
+    </div>
+
+    <div class="search">
+      <Icon name="ph:magnifying-glass-thin" width={18} height={18} />
+      <input
+        class="search-input"
+        type="search"
+        id="search"
+        placeholder={`buscar em ${label.toLowerCase()}...`}
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="filters">
+      <span class="chip chip-active" data-filter="all">todas</span>
+      <span class="chip" data-filter="30min">até 30 min</span>
+      <span class="chip" data-filter="vegetariana">vegetariana</span>
+      <span class="chip" data-filter="facil">fácil</span>
+    </div>
+
+    {recipes.length === 0 ? (
+      <div class="empty">
+        <Icon name="ph:bowl-food-thin" width={64} height={64} />
+        <h2 class="t-h2">ainda sem receitas por aqui</h2>
+        <p class="empty-sub">essa categoria está em construção. volte em breve, ou bisbilhote outras gavetas da cozinha.</p>
+        <a href="/" class="btn btn-ghost">
+          <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+        </a>
+      </div>
+    ) : (
+      <ul class="recipe-list" id="recipe-list">
+        {recipes.map((r) => (
+          <li
+            class="recipe-item"
+            data-title={r.data.title.toLowerCase()}
+            data-ingredients={r.data.ingredients.join(' ').toLowerCase()}
+            data-tags={r.data.tags.join(' ').toLowerCase()}
+            data-time={r.data.time}
+            data-difficulty={r.data.difficulty}
+          >
+            <a href={`/receitas/${r.id}/`}>
+              <div class="thumb">foto</div>
+              <div class="info">
+                <h3 class="recipe-name">{r.data.title}</h3>
+                <p class="recipe-meta">
+                  <Icon name="ph:clock-thin" /> {r.data.time} min
+                  <span class="sep">·</span>
+                  <Icon name="ph:fork-knife-thin" /> {r.data.servings} porções
+                  <span class="sep">·</span>
+                  <Icon name="ph:gauge-thin" /> {r.data.difficulty}
+                </p>
+              </div>
+              <Icon name="ph:caret-right-thin" class="row-arrow" width={20} height={20} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <div class="no-results" id="no-results" hidden>
+      <Icon name="ph:magnifying-glass-thin" width={48} height={48} />
+      <p>nenhuma receita encontrada</p>
+    </div>
+  </main>
+
+  <style>
+    /* ============ HEADER ============ */
+    .site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      padding: 0 var(--s-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      background: rgba(250, 246, 238, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    body.dark-mode .site-header { background: rgba(15, 26, 42, 0.85); }
+    .logo-link {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.1;
+    }
+    .logo-name { font-family: var(--font-brand); font-weight: 600; font-size: 22px; line-height: 1; }
+    .logo-by { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 1px; }
+    .dark-toggle {
+      width: 36px; height: 36px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-dark { display: none; }
+    body.dark-mode .icon-light { display: none; }
+    body.dark-mode .icon-dark { display: inline-block; }
+    svg { fill: none; stroke: currentColor; }
+
+    /* ============ MAIN ============ */
+    .category {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: calc(var(--header-h) + var(--s-7)) var(--s-6) var(--s-9);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-soft);
+      text-decoration: none;
+      margin-bottom: var(--s-5);
+    }
+    .back-link:hover { color: var(--terracota); }
+
+    /* ============ TITLE ============ */
+    .title-block {
+      display: flex;
+      align-items: center;
+      gap: var(--s-4);
+      margin-bottom: var(--s-6);
+    }
+    .category-icon { color: var(--terracota); flex-shrink: 0; }
+    .cat-title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h1);
+      letter-spacing: -0.02em;
+      line-height: var(--lh-tight);
+    }
+    .cat-count {
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+      margin-top: 4px;
+    }
+
+    /* ============ SEARCH ============ */
+    .search {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      background: var(--surface);
+      margin-bottom: var(--s-3);
+      color: var(--ink-soft);
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      font: inherit;
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      outline: none;
+      color: var(--ink);
+    }
+    .search-input::placeholder { color: var(--ink-mute); }
+
+    /* ============ FILTERS ============ */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      margin-bottom: var(--s-6);
+    }
+    .chip {
+      padding: 4px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--ink-soft);
+      transition: all var(--dur-fast);
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--terracota); color: var(--ink); }
+    .chip-active, .chip-active:hover {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+
+    /* ============ RECIPE LIST ============ */
+    .recipe-list { list-style: none; }
+    .recipe-item { border-bottom: 1px solid var(--line-soft); }
+    .recipe-item a {
+      display: grid;
+      grid-template-columns: 96px 1fr 24px;
+      gap: var(--s-4);
+      padding: var(--s-4) 0;
+      text-decoration: none;
+      color: inherit;
+      align-items: center;
+      transition: background var(--dur-fast);
+    }
+    .recipe-item a:hover {
+      background: var(--surface);
+      padding-left: var(--s-3);
+      padding-right: var(--s-3);
+      margin: 0 calc(-1 * var(--s-3));
+      border-radius: var(--r-sm);
+    }
+    .recipe-item a:hover .recipe-name { color: var(--terracota); }
+    .recipe-item a:hover .row-arrow { transform: translateX(4px); }
+
+    .thumb {
+      aspect-ratio: 1;
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-mute);
+    }
+    .recipe-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--fs-h3);
+      margin-bottom: 4px;
+      transition: color var(--dur-fast);
+    }
+    .recipe-meta {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink-mute);
+    }
+    .recipe-meta svg { vertical-align: -0.15em; margin-right: 2px; }
+    .recipe-meta .sep { opacity: 0.4; }
+    .row-arrow {
+      color: var(--ink-mute);
+      transition: transform var(--dur-fast);
+    }
+
+    /* ============ EMPTY / NO RESULTS ============ */
+    .empty, .no-results {
+      text-align: center;
+      padding: var(--s-8) var(--s-5);
+      color: var(--ink-mute);
+    }
+    .empty svg, .no-results svg {
+      margin: 0 auto var(--s-4);
+      color: var(--ink-mute);
+    }
+    .t-h2 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h2);
+      color: var(--ink);
+      margin-bottom: var(--s-2);
+    }
+    .empty-sub {
+      max-width: 480px;
+      margin: 0 auto var(--s-6);
+      font-family: var(--font-mono);
+      line-height: var(--lh-loose);
+    }
+    .no-results p {
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: var(--r-sm);
+      font: inherit;
+      font-size: var(--fs-small);
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    .btn-ghost:hover { background: var(--surface); }
+
+    @media (max-width: 640px) {
+      .recipe-item a { grid-template-columns: 72px 1fr 20px; }
+      .cat-title { font-size: 32px; }
+    }
+  </style>
+
+  <script>
+    // Dark mode
+    document.getElementById('dark-toggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      try {
+        localStorage.setItem('cozy-dark-mode',
+          document.body.classList.contains('dark-mode') ? 'true' : 'false');
+      } catch (e) {}
+    });
+
+    // Search + filter ao vivo
+    const searchInput = document.getElementById('search') as HTMLInputElement;
+    const items = document.querySelectorAll<HTMLElement>('.recipe-item');
+    const noResults = document.getElementById('no-results');
+    const chips = document.querySelectorAll<HTMLElement>('.chip');
+    let activeFilter = 'all';
+
+    function applyFilters() {
+      const q = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+      items.forEach((item) => {
+        const title = item.dataset.title || '';
+        const ingredients = item.dataset.ingredients || '';
+        const tags = item.dataset.tags || '';
+        const time = parseInt(item.dataset.time || '0');
+        const difficulty = item.dataset.difficulty || '';
+
+        const matchesSearch = !q || title.includes(q) || ingredients.includes(q) || tags.includes(q);
+        let matchesFilter = true;
+        if (activeFilter === '30min') matchesFilter = time <= 30;
+        else if (activeFilter === 'vegetariana') matchesFilter = tags.includes('vegetariana');
+        else if (activeFilter === 'facil') matchesFilter = difficulty === 'fácil';
+
+        const show = matchesSearch && matchesFilter;
+        item.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      if (noResults) {
+        if (visible === 0 && items.length > 0) noResults.removeAttribute('hidden');
+        else noResults.setAttribute('hidden', '');
+      }
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.classList.remove('chip-active'));
+        chip.classList.add('chip-active');
+        activeFilter = chip.dataset.filter || 'all';
+        applyFilters();
+      });
+    });
+  </script>
+</BaseLayout>
