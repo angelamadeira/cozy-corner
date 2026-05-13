@@ -17,7 +17,7 @@ media_folder: "frontend/public/uploads"
 public_folder: "/uploads"
 
 # Logo + título customizado do admin
-logo_url: /logos/cozy-corner-logo.svg?v=4
+logo_url: /logos/cozy-corner-logo.svg?v=5
 site_url: https://cozycorner.recipes
 
 collections:
