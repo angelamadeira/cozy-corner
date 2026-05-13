@@ -41,9 +41,11 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
         <h2 class="cm-end-title">Pronto.</h2>
         <p class="cm-end-sub">Bom apetite, viu.</p>
         <button class="cm-restart" id="cm-restart" type="button">
-          <svg class="cm-restart-icon" viewBox="0 0 256 256" aria-hidden="true">
-            <path fill="currentColor" d="M220 128a92 92 0 0 1-90.77 92H128a91.47 91.47 0 0 1-63.13-25.1a4 4 0 1 1 5.5-5.82A84 84 0 1 0 68.6 68.57l-.13.12L34.3 100H72a4 4 0 0 1 0 8H24a4 4 0 0 1-4-4V56a4 4 0 0 1 8 0v38.89l35-32A92 92 0 0 1 220 128"/>
-          </svg>revisar do início</button>
+          <svg class="cm-restart-icon" viewBox="0 0 256 256" width="16" height="16" aria-hidden="true">
+            <path d="M220 128a92 92 0 0 1-90.77 92H128a91.47 91.47 0 0 1-63.13-25.1a4 4 0 1 1 5.5-5.82A84 84 0 1 0 68.6 68.57l-.13.12L34.3 100H72a4 4 0 0 1 0 8H24a4 4 0 0 1-4-4V56a4 4 0 0 1 8 0v38.89l35-32A92 92 0 0 1 220 128"/>
+          </svg>
+          <span class="cm-restart-text">revisar do início</span>
+        </button>
       </div>
 
       <footer class="cm-nav">
@@ -337,7 +339,8 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     text-align: center;
     color: var(--ink);
   }
-  .cm-end :global(svg) {
+  /* '>' limita ao SVG filho direto (o fork-knife no topo), não o do botão restart */
+  .cm-end > :global(svg) {
     color: var(--terracota);
     fill: none;
     stroke: currentColor;
@@ -358,26 +361,32 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     margin-bottom: var(--s-6);
   }
   .cm-restart {
-    padding: 12px 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    margin: 0;
     background: transparent;
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
     font-family: var(--font-mono);
     font-size: var(--fs-small);
+    line-height: 1;
     color: var(--ink);
     cursor: pointer;
-    transition: all var(--dur-fast);
-    white-space: nowrap;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
   }
   .cm-restart:hover { background: var(--surface); border-color: var(--terracota); color: var(--terracota); }
   .cm-restart :global(.cm-restart-icon) {
-    width: 1em;
-    height: 1em;
-    vertical-align: -0.18em;
-    margin-right: 0.4em;
-    fill: none;
-    stroke: currentColor;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    fill: currentColor;
+    color: var(--terracota);
   }
+  .cm-restart:hover :global(.cm-restart-icon) { color: var(--terracota); }
+  .cm-restart :global(.cm-restart-text) { line-height: 1; }
 
   /* ============ NAV ============ */
   .cm-nav {
