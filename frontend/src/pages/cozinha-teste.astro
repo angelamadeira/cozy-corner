@@ -6,16 +6,20 @@ import { CATEGORY_META } from '../lib/categories';
 
 const allRecipes = await getCollection('recipes', ({ data }) => data.published);
 
-// Agrupa receitas por categoria pra alimentar o drawer
+// Agrupa receitas por categoria pra alimentar o drawer.
+// Uma receita em N categorias aparece em cada uma.
 const recipesByCategory: Record<string, Array<{id: string; title: string; time: number; servings: number; difficulty: string}>> = {};
 for (const r of allRecipes) {
-  (recipesByCategory[r.data.category] ??= []).push({
+  const item = {
     id: r.id,
     title: r.data.title,
     time: r.data.time,
     servings: r.data.servings,
     difficulty: r.data.difficulty,
-  });
+  };
+  for (const cat of r.data.category) {
+    (recipesByCategory[cat] ??= []).push(item);
+  }
 }
 recipesByCategory.todas = allRecipes.map((r) => ({
   id: r.id,

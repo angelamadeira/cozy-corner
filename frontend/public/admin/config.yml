@@ -41,8 +41,11 @@ collections:
       - { name: title, label: Título, widget: string }
       - { name: description, label: Descrição curta, widget: text, required: false }
       - name: category
-        label: Categoria
+        label: Categorias
         widget: select
+        multiple: true
+        min: 1
+        hint: "Pode selecionar mais de uma. A PRIMEIRA da lista é a principal (usada no link 'voltar pra categoria' da receita)."
         options:
           - { label: "Pratos principais", value: principais }
           - { label: "Sobremesas", value: sobremesas }

@@ -11,8 +11,9 @@ const index = allRecipes.map((r) => ({
   id: r.id,
   title: r.data.title,
   description: r.data.description ?? '',
-  category: r.data.category,
-  categoryLabel: CATEGORY_META[r.data.category]?.label ?? r.data.category,
+  // Categoria principal (primeira da lista). UI mostra só uma pra não poluir.
+  category: r.data.category[0],
+  categoryLabel: CATEGORY_META[r.data.category[0]]?.label ?? r.data.category[0],
   time: r.data.time,
   servings: r.data.servings,
   difficulty: r.data.difficulty,

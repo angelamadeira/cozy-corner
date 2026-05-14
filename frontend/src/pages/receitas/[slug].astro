@@ -16,7 +16,9 @@ export async function getStaticPaths() {
 
 const { recipe } = Astro.props;
 const data = recipe.data;
-const category = CATEGORY_META[data.category];
+// Primeira categoria = principal (usada pro back link e tooltip).
+const primaryCategory = data.category[0];
+const category = CATEGORY_META[primaryCategory];
 
 // Reordena pra cover vir primeiro
 const coverIdx = data.media.findIndex((m) => m.cover);
@@ -49,8 +51,8 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
   </header>
 
   <main class="recipe">
-    <a href={`/categorias/${data.category}`} class="back-link">
-      <Icon name="ph:arrow-left-thin" /> <span data-t={`category.${data.category}`}>{category.label}</span>
+    <a href={`/categorias/${primaryCategory}`} class="back-link">
+      <Icon name="ph:arrow-left-thin" /> <span data-t={`category.${primaryCategory}`}>{category.label}</span>
     </a>
 
     <!-- ============ CAROUSEL ============ -->

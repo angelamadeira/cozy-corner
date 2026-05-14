@@ -1,6 +1,7 @@
 ---
 title: Teste generico
-category: principais
+category:
+  - principais
 time: 30
 difficulty: médio
 unitSystem: metric

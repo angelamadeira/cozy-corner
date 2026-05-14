@@ -18,7 +18,14 @@ const recipes = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-    category: z.enum(CATEGORIES),
+    // Categoria(s): aceita string OU array. Sempre normaliza pra array,
+    // assim consumidores podem fazer .includes(slug) sem se preocupar com forma.
+    // A primeira categoria é considerada a "principal" (usada como back link
+    // padrão na página da receita).
+    category: z.preprocess(
+      (val) => Array.isArray(val) ? val : (val ? [val] : []),
+      z.array(z.enum(CATEGORIES)).min(1, 'Adicione pelo menos uma categoria')
+    ),
     time: z.number().int().positive(), // minutos
     // Decap salva campo number vazio como "" — pré-processa pra virar undefined
     servings: z.preprocess(

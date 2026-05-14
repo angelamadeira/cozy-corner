@@ -18,7 +18,7 @@ export async function getStaticPaths() {
 
   // Uma página por categoria + uma especial 'todas'
   const paths = Object.entries(CATEGORY_META).map(([slug, meta]) => {
-    const catRecipes = allRecipes.filter((r) => r.data.category === slug);
+    const catRecipes = allRecipes.filter((r) => r.data.category.includes(slug as any));
     return {
       params: { slug },
       props: {
@@ -135,7 +135,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
             data-tag-list={r.data.tags.join('|')}
             data-time={r.data.time}
             data-difficulty={r.data.difficulty}
-            data-cat={r.data.category}
+            data-cat={r.data.category.join('|')}
           >
             <a href={`/receitas/${r.id}/`}>
               <div class="thumb" data-t="recipe.photo">foto</div>
@@ -372,7 +372,9 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       padding: var(--s-8) var(--s-5);
       color: var(--ink-mute);
     }
-    .empty svg, .no-results svg {
+    /* Filho direto só — pra não pegar SVGs dentro de botões/links aninhados. */
+    .empty > svg, .no-results > svg {
+      display: block;
       margin: 0 auto var(--s-4);
       color: var(--ink-mute);
     }
@@ -469,11 +471,12 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         const ingredients = item.dataset.ingredients || '';
         const tagsStr = item.dataset.tags || '';
         const tagList = (item.dataset.tagList || '').split('|').filter(Boolean);
-        const cat = item.dataset.cat || '';
+        // data-cat agora é "principais|datas" — uma receita pode ter N categorias.
+        const catList = (item.dataset.cat || '').split('|').filter(Boolean);
 
         const matchesSearch = !q || title.includes(q) || ingredients.includes(q) || tagsStr.includes(q);
         const matchesTag = activeTag === 'all' || tagList.includes(activeTag);
-        const matchesCat = activeCat === 'all' || cat === activeCat;
+        const matchesCat = activeCat === 'all' || catList.includes(activeCat);
 
         const show = matchesSearch && matchesTag && matchesCat;
         item.style.display = show ? '' : 'none';

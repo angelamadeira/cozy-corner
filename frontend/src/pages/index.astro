@@ -18,10 +18,13 @@ const kitchenMobile2Svg = readFileSync(resolve(process.cwd(), 'public/kitchen/co
 
 const recipes = await getCollection('recipes', ({ data }) => data.published);
 
-// Agrupa receitas por categoria pra alimentar o drawer dinamicamente
+// Agrupa receitas por categoria pra alimentar o drawer dinamicamente.
+// Uma receita pode estar em várias categorias → aparece em cada uma.
 const recipesByCategory: Record<string, typeof recipes> = {};
 for (const r of recipes) {
-  (recipesByCategory[r.data.category] ??= []).push(r);
+  for (const cat of r.data.category) {
+    (recipesByCategory[cat] ??= []).push(r);
+  }
 }
 // "todas" engloba todas
 recipesByCategory.todas = recipes;
