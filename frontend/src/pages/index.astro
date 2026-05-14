@@ -389,7 +389,11 @@ const countByCategory = Object.fromEntries(
     /* ============ COZINHA ============ */
     #flow-kitchen {
       background: var(--bg);
-      padding: var(--s-7) var(--s-6) var(--s-9);
+      padding: var(--s-7) var(--s-6) 0; /* sem padding-bottom — cozinha encosta na borda */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
     }
     .kitchen-title {
       max-width: var(--max-content);
