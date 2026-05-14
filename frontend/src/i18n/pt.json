@@ -1,0 +1,159 @@
+{
+  "site": {
+    "tagline": "recipes by Gigi"
+  },
+  "nav": {
+    "back_to_kitchen": "voltar pra cozinha",
+    "all_recipes": "todas as receitas",
+    "see_all_recipes": "ver todas as receitas",
+    "search": "buscar",
+    "go_back_to_site": "voltar pro site"
+  },
+  "category": {
+    "principais": "Pratos principais",
+    "sobremesas": "Sobremesas",
+    "datas": "Datas comemorativas",
+    "vegetarianas": "Vegetarianas",
+    "congelar": "Para congelar",
+    "rapidas": "Receitas rápidas",
+    "todas": "Todas as receitas"
+  },
+  "hotspot": {
+    "recado": "Deixar um recadinho",
+    "sobre": "Nossa cozinha",
+    "dark_mode": "dark mode",
+    "dark_mode_off": "Que tal apagar a luz?",
+    "dark_mode_on": "Que tal acender a luz?",
+    "akim_meow": "miau 🐱",
+    "vegetarianas": "vegetarianas"
+  },
+  "meta": {
+    "minutes": "min",
+    "servings_one": "porção",
+    "servings_other": "porções",
+    "difficulty_easy": "fácil",
+    "difficulty_medium": "médio",
+    "difficulty_hard": "difícil",
+    "vegetarian": "vegetariana",
+    "added_on": "Adicionada em {date}",
+    "added_on_prefix": "adicionada em",
+    "no_recipes_yet": "ainda sem receitas por aqui...",
+    "category_empty_sub": "essa categoria está em construção. volte em breve, ou bisbilhote outras gavetas da cozinha."
+  },
+  "filter": {
+    "all": "todas",
+    "all_categories": "todas as categorias",
+    "quick": "até 30 min",
+    "vegetarian": "vegetariana",
+    "gluten_free": "sem glúten"
+  },
+  "recipe": {
+    "ingredients": "Ingredientes",
+    "materials": "Materiais",
+    "steps": "Modo de preparo",
+    "notes": "Notas",
+    "adjust_servings": "ajustar porções",
+    "units_metric": "métrico",
+    "units_imperial": "imperial",
+    "cooking_mode": "Modo cozinha",
+    "share_whatsapp": "WhatsApp",
+    "share_whatsapp_full": "Mandar pro WhatsApp",
+    "copy_link": "Copiar link",
+    "copy_link_done": "Link copiado!",
+    "print": "Imprimir",
+    "printed_on": "impresso em",
+    "no_description": "sem descrição",
+    "photo": "foto",
+    "video": "vídeo",
+    "no_media": "sem mídia"
+  },
+  "timer": {
+    "label": "Cronômetro",
+    "title": "Cronômetro",
+    "presets": "Atalhos",
+    "custom": "Personalizado",
+    "or_type": "ou digite:",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "reset": "Zerar",
+    "start_lower": "iniciar",
+    "pause_lower": "pausar",
+    "reset_lower": "zerar",
+    "close": "fechar",
+    "format_hint": "MM:SS",
+    "done": "Pronto!",
+    "confirm_title": "Cronômetro rodando",
+    "confirm_body": "Se sair desta página agora, o cronômetro vai parar e você perde o tempo restante.",
+    "confirm_cancel": "Cancelar",
+    "confirm_leave": "Sair mesmo assim"
+  },
+  "cooking": {
+    "exit": "sair do modo cozinha",
+    "show_ingredients": "mostrar ingredientes",
+    "hide_ingredients": "esconder ingredientes",
+    "prev": "anterior",
+    "next": "próximo",
+    "finish": "concluir",
+    "step": "Passo {n} de {total}",
+    "step_of": "de",
+    "done_title": "Prontinho!",
+    "done_subtitle": "Itadakimasu :)",
+    "restart": "revisar do início",
+    "leave_confirm_title": "Sair do modo cozinha?",
+    "leave_confirm_body": "Você está no meio de uma receita. Se sair agora, o cronômetro para.",
+    "leave_confirm_stay": "Ficar",
+    "leave_confirm_leave": "Sair"
+  },
+  "recado": {
+    "title": "Deixa um recado",
+    "subtitle": "ou só um oi mesmo",
+    "name_label": "seu nome",
+    "message_label": "mensagem",
+    "placeholder": "oi Gigi!",
+    "send": "enviar pelo WhatsApp",
+    "alt_prefix": "ou me escreve em"
+  },
+  "sobre": {
+    "title": "Oi, sou a Gigi",
+    "p1": "Cozinhar é meu jeito de juntar gente. Esse cantinho é onde eu vou guardando o que aprendi — receitas autorais, herdadas, adaptadas — pra ter sempre à mão e pra dividir com quem aparece.",
+    "p2": "Mais sobre mim, sobre o blog e sobre as cozinhas que me inspiram em breve por aqui. Por enquanto: fica à vontade pra bisbilhotar as gavetas. 💛"
+  },
+  "intro": {
+    "hello": "olá!",
+    "welcome": "que bom te ver por aqui :)",
+    "scroll_hint": "role pra continuar",
+    "skip": "pular intro"
+  },
+  "search": {
+    "title": "buscar",
+    "placeholder": "buscar receita…",
+    "placeholder_full": "título, ingrediente ou tag...",
+    "placeholder_in": "buscar em {category}...",
+    "clear": "limpar busca",
+    "suggest_categories": "categorias",
+    "suggest_tags": "tags populares",
+    "no_results": "nenhuma receita encontrada",
+    "no_results_long": "não achei nada por aqui.",
+    "no_results_hint_prefix": "tenta com menos palavras, ou explore por ",
+    "no_results_hint_link": "categoria",
+    "no_results_hint_suffix": ".",
+    "match_in": "em",
+    "results_count_one": "{n} receita",
+    "results_count_other": "{n} receitas",
+    "result_one": "{n} resultado",
+    "result_other": "{n} resultados"
+  },
+  "swipe_hint": {
+    "label": "ver mais da cozinha"
+  },
+  "radio": {
+    "label": "tocando"
+  },
+  "nf": {
+    "title": "essa página não está na cozinha",
+    "sub": "talvez tenha sido um link velho, ou um endereço digitado meio torto. sem stress — dá uma olhada por aqui:",
+    "search_recipe": "buscar uma receita",
+    "see_all": "ver todas"
+  }
+}

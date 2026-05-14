@@ -1,0 +1,159 @@
+{
+  "site": {
+    "tagline": "recipes by Gigi"
+  },
+  "nav": {
+    "back_to_kitchen": "back to the kitchen",
+    "all_recipes": "all recipes",
+    "see_all_recipes": "see all recipes",
+    "search": "search",
+    "go_back_to_site": "back to site"
+  },
+  "category": {
+    "principais": "Main dishes",
+    "sobremesas": "Desserts",
+    "datas": "Special occasions",
+    "vegetarianas": "Vegetarian",
+    "congelar": "To freeze",
+    "rapidas": "Quick recipes",
+    "todas": "All recipes"
+  },
+  "hotspot": {
+    "recado": "Leave a little note",
+    "sobre": "Our kitchen",
+    "dark_mode": "dark mode",
+    "dark_mode_off": "Care to turn off the light?",
+    "dark_mode_on": "Care to turn on the light?",
+    "akim_meow": "meow 🐱",
+    "vegetarianas": "vegetarian"
+  },
+  "meta": {
+    "minutes": "min",
+    "servings_one": "serving",
+    "servings_other": "servings",
+    "difficulty_easy": "easy",
+    "difficulty_medium": "medium",
+    "difficulty_hard": "hard",
+    "vegetarian": "vegetarian",
+    "added_on": "Added on {date}",
+    "added_on_prefix": "added on",
+    "no_recipes_yet": "no recipes here yet...",
+    "category_empty_sub": "this category is still being built. check back soon, or peek into other drawers in the kitchen."
+  },
+  "filter": {
+    "all": "all",
+    "all_categories": "all categories",
+    "quick": "under 30 min",
+    "vegetarian": "vegetarian",
+    "gluten_free": "gluten-free"
+  },
+  "recipe": {
+    "ingredients": "Ingredients",
+    "materials": "Tools",
+    "steps": "Instructions",
+    "notes": "Notes",
+    "adjust_servings": "adjust servings",
+    "units_metric": "metric",
+    "units_imperial": "imperial",
+    "cooking_mode": "Cooking mode",
+    "share_whatsapp": "WhatsApp",
+    "share_whatsapp_full": "Share on WhatsApp",
+    "copy_link": "Copy link",
+    "copy_link_done": "Link copied!",
+    "print": "Print",
+    "printed_on": "printed on",
+    "no_description": "no description",
+    "photo": "photo",
+    "video": "video",
+    "no_media": "no media"
+  },
+  "timer": {
+    "label": "Timer",
+    "title": "Timer",
+    "presets": "Presets",
+    "custom": "Custom",
+    "or_type": "or type:",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "reset": "Reset",
+    "start_lower": "start",
+    "pause_lower": "pause",
+    "reset_lower": "reset",
+    "close": "close",
+    "format_hint": "MM:SS",
+    "done": "Done!",
+    "confirm_title": "Timer running",
+    "confirm_body": "If you leave this page now, the timer will stop and you'll lose the remaining time.",
+    "confirm_cancel": "Cancel",
+    "confirm_leave": "Leave anyway"
+  },
+  "cooking": {
+    "exit": "exit cooking mode",
+    "show_ingredients": "show ingredients",
+    "hide_ingredients": "hide ingredients",
+    "prev": "previous",
+    "next": "next",
+    "finish": "finish",
+    "step": "Step {n} of {total}",
+    "step_of": "of",
+    "done_title": "All done!",
+    "done_subtitle": "Bon appétit :)",
+    "restart": "review from the start",
+    "leave_confirm_title": "Exit cooking mode?",
+    "leave_confirm_body": "You're in the middle of a recipe. The timer will stop if you leave.",
+    "leave_confirm_stay": "Stay",
+    "leave_confirm_leave": "Leave"
+  },
+  "recado": {
+    "title": "Leave a note",
+    "subtitle": "or just say hi",
+    "name_label": "your name",
+    "message_label": "message",
+    "placeholder": "hi Gigi!",
+    "send": "send via WhatsApp",
+    "alt_prefix": "or email me at"
+  },
+  "sobre": {
+    "title": "Hi, I'm Gigi",
+    "p1": "Cooking is my way of bringing people together. This little corner is where I keep what I've learned — original recipes, inherited ones, adapted ones — to always have on hand and to share with whoever drops by.",
+    "p2": "More about me, about the blog, and about the kitchens that inspire me coming here soon. For now: feel free to peek into the drawers. 💛"
+  },
+  "intro": {
+    "hello": "hello!",
+    "welcome": "happy to see you here :)",
+    "scroll_hint": "scroll to continue",
+    "skip": "skip intro"
+  },
+  "search": {
+    "title": "search",
+    "placeholder": "search recipes…",
+    "placeholder_full": "title, ingredient or tag...",
+    "placeholder_in": "search in {category}...",
+    "clear": "clear search",
+    "suggest_categories": "categories",
+    "suggest_tags": "popular tags",
+    "no_results": "no recipes found",
+    "no_results_long": "couldn't find anything here.",
+    "no_results_hint_prefix": "try fewer words, or explore by ",
+    "no_results_hint_link": "category",
+    "no_results_hint_suffix": ".",
+    "match_in": "in",
+    "results_count_one": "{n} recipe",
+    "results_count_other": "{n} recipes",
+    "result_one": "{n} result",
+    "result_other": "{n} results"
+  },
+  "swipe_hint": {
+    "label": "see more of the kitchen"
+  },
+  "nf": {
+    "title": "this page isn't in the kitchen",
+    "sub": "maybe an old link, or an address typed slightly off. no stress — have a look around:",
+    "search_recipe": "search for a recipe",
+    "see_all": "see all"
+  },
+  "radio": {
+    "label": "playing"
+  }
+}

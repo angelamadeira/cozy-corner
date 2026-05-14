@@ -8,9 +8,17 @@ import cozinhaData from '../content/pages/cozinha.json';
 import recadoData from '../content/pages/recado.json';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { useT, localePath } from '../i18n';
 
-// SVG da cozinha inlined em build time (pra hotspots com hit-area exata)
+const locale = Astro.currentLocale;
+const t = useT(locale);
+
+// SVG da cozinha inlined em build time (pra hotspots com hit-area exata).
+// Três versões responsivas — só uma fica visível por vez, controlada por CSS.
 const kitchenSvg = readFileSync(resolve(process.cwd(), 'public/kitchen/cozinha.svg'), 'utf-8');
+const kitchenTabletSvg = readFileSync(resolve(process.cwd(), 'public/kitchen/cozinha-tablet.svg'), 'utf-8');
+const kitchenMobile1Svg = readFileSync(resolve(process.cwd(), 'public/kitchen/cozinha-mobile-1.svg'), 'utf-8');
+const kitchenMobile2Svg = readFileSync(resolve(process.cwd(), 'public/kitchen/cozinha-mobile-2.svg'), 'utf-8');
 
 const recipes = await getCollection('recipes', ({ data }) => data.published);
 
@@ -32,7 +40,7 @@ const countByCategory = Object.fromEntries(
   <!-- ===================== INTRO COVER (azul escuro, typewriter) ===================== -->
   <div class="intro-cover" id="intro-cover">
     <button class="cover-skip" id="cover-skip" type="button">
-      {introData.skipLabel.replace(' ✕', '')}
+      <span data-t="intro.skip">{introData.skipLabel.replace(' ✕', '')}</span>
       <Icon name="ph:x-thin" width={14} height={14} />
     </button>
     <p class="phrase typewriter" id="ph1"></p>
@@ -48,7 +56,7 @@ const countByCategory = Object.fromEntries(
   </header>
 
   <div class="scroll-hint" id="scroll-hint">
-    <Icon name="ph:arrow-down-thin" /> role pra continuar
+    <Icon name="ph:arrow-down-thin" /> <span data-t="intro.scroll_hint">role pra continuar</span>
   </div>
 
   <!-- ===================== HERO (fixed, morfa pro header) ===================== -->
@@ -65,8 +73,27 @@ const countByCategory = Object.fromEntries(
 
   <!-- ===================== COZINHA ===================== -->
   <section id="flow-kitchen">
-    <div class="kitchen-canvas">
+    <!-- Desktop (>= 1024px) -->
+    <div class="kitchen-canvas kitchen-desktop">
       <Fragment set:html={kitchenSvg} />
+    </div>
+    <!-- Tablet (601-1023px) -->
+    <div class="kitchen-canvas kitchen-tablet">
+      <Fragment set:html={kitchenTabletSvg} />
+    </div>
+    <!-- Mobile (<=600px) — duas partes lado a lado, com scroll horizontal -->
+    <div class="kitchen-mobile-wrap">
+      <div class="kitchen-mobile-scroll" id="kitchen-mobile-scroll">
+        <div class="kitchen-canvas kitchen-mobile-part">
+          <Fragment set:html={kitchenMobile1Svg} />
+        </div>
+        <div class="kitchen-canvas kitchen-mobile-part">
+          <Fragment set:html={kitchenMobile2Svg} />
+        </div>
+      </div>
+      <button class="mobile-swipe-hint" id="mobile-swipe-hint" type="button" aria-label="ver mais da cozinha">
+        <Icon name="ph:arrow-right-thin" width={22} height={22} />
+      </button>
     </div>
   </section>
 
@@ -79,21 +106,21 @@ const countByCategory = Object.fromEntries(
       <Icon name="ph:x-thin" width={20} height={20} />
     </button>
     <button class="drawer-crumb" data-close type="button">
-      <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+      <Icon name="ph:arrow-left-thin" /> <span data-t="nav.back_to_kitchen">voltar pra cozinha</span>
     </button>
     <h2 id="cat-title" class="drawer-title">Pratos principais</h2>
     <p class="drawer-count" id="cat-count">0 receitas</p>
 
     <div class="drawer-search">
       <Icon name="ph:magnifying-glass-thin" width={16} height={16} />
-      <input class="search-input" type="search" placeholder="buscar nesta categoria..." />
+      <input class="search-input" type="search" placeholder="buscar nesta categoria..." data-t-attr="placeholder:search.placeholder" />
     </div>
 
     <div class="drawer-filters">
-      <span class="chip chip-active">todas</span>
-      <span class="chip">até 30 min</span>
-      <span class="chip">vegetariana</span>
-      <span class="chip">sem glúten</span>
+      <span class="chip chip-active" data-t="filter.all">todas</span>
+      <span class="chip" data-t="filter.quick">até 30 min</span>
+      <span class="chip" data-t="filter.vegetarian">vegetariana</span>
+      <span class="chip" data-t="filter.gluten_free">sem glúten</span>
     </div>
 
     <ul class="recipe-list" id="cat-results"></ul>
@@ -104,13 +131,13 @@ const countByCategory = Object.fromEntries(
     <button class="drawer-close" data-close type="button" aria-label="fechar">
       <Icon name="ph:x-thin" width={20} height={20} />
     </button>
-    <h2 id="sobre-title" class="drawer-title">Oi, sou a Gigi</h2>
-    <p class="drawer-prose">
+    <h2 id="sobre-title" class="drawer-title" data-t="sobre.title">Oi, sou a Gigi</h2>
+    <p class="drawer-prose" data-t="sobre.p1">
       Cozinhar é meu jeito de juntar gente. Esse cantinho é onde eu vou guardando
       o que aprendi — receitas autorais, herdadas, adaptadas — pra ter sempre à
       mão e pra dividir com quem aparece.
     </p>
-    <p class="drawer-prose">
+    <p class="drawer-prose" data-t="sobre.p2">
       Mais sobre mim, sobre o blog e sobre as cozinhas que me inspiram em breve
       por aqui. Por enquanto: fica à vontade pra bisbilhotar as gavetas. 💛
     </p>
@@ -124,16 +151,16 @@ const countByCategory = Object.fromEntries(
     <button class="drawer-close" data-close type="button" aria-label="fechar">
       <Icon name="ph:x-thin" width={20} height={20} />
     </button>
-    <h2 id="recado-title" class="recado-title">{recadoData.title}</h2>
-    <p class="recado-sub">{recadoData.subtitle}</p>
-    <label class="field-label">seu nome</label>
+    <h2 id="recado-title" class="recado-title" data-t="recado.title">{recadoData.title}</h2>
+    <p class="recado-sub" data-t="recado.subtitle">{recadoData.subtitle}</p>
+    <label class="field-label" data-t="recado.name_label">seu nome</label>
     <input class="field-input" id="r-name" type="text" />
-    <label class="field-label">mensagem</label>
-    <textarea class="field-input" id="r-msg" placeholder={`oi Gigi!`}></textarea>
+    <label class="field-label" data-t="recado.message_label">mensagem</label>
+    <textarea class="field-input" id="r-msg" placeholder="oi Gigi!" data-t-attr="placeholder:recado.placeholder"></textarea>
     <button class="btn btn-primary recado-send" id="r-send" type="button">
-      <Icon name="ph:whatsapp-logo-thin" /> enviar pelo WhatsApp
+      <Icon name="ph:whatsapp-logo-thin" /> <span data-t="recado.send">enviar pelo WhatsApp</span>
     </button>
-    <p class="recado-alt">ou me escreve em <a href={`mailto:${recadoData.emailFallback}`}>{recadoData.emailFallback}</a></p>
+    <p class="recado-alt"><span data-t="recado.alt_prefix">ou me escreve em</span> <a href={`mailto:${recadoData.emailFallback}`}>{recadoData.emailFallback}</a></p>
   </div>
 
   <!-- Recipes data pra o drawer (renderizado via JS) -->
@@ -331,11 +358,14 @@ const countByCategory = Object.fromEntries(
     /* ============ COZINHA ============ */
     #flow-kitchen {
       background: var(--bg);
-      padding: var(--s-7) var(--s-6) 0; /* sem padding-bottom — cozinha encosta na borda */
+      padding: 0;
+      height: 100vh;
       min-height: 100vh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
+      align-items: center;
     }
     .kitchen-title {
       max-width: var(--max-content);
@@ -348,17 +378,130 @@ const countByCategory = Object.fromEntries(
     }
     .kitchen-canvas {
       position: relative;
-      width: 70%;
-      aspect-ratio: 1500 / 1000;
-      margin: 0 auto;
       color: var(--ink);
+    }
+    /* Desktop: preenche 100vh de altura, aspect 1500:1000.
+       Excesso lateral cortado pelo overflow:hidden do #flow-kitchen. */
+    .kitchen-desktop {
+      height: min(100vh, 1000px);
+      aspect-ratio: 1500 / 1000;
     }
     .kitchen-canvas :global(svg) {
       width: 100%;
       height: 100%;
       display: block;
     }
-    body.dark-mode .kitchen-canvas :global(svg) { filter: invert(1); }
+    /* ============ RESPONSIVO ============
+       Por padrão (desktop) mostra só .kitchen-desktop.
+       Tablet e mobile ficam escondidos. */
+    .kitchen-tablet,
+    .kitchen-mobile-wrap { display: none; }
+
+    /* Tablet: 601-1023px — usa o SVG 991x1000 com aspect compatível */
+    @media (max-width: 1023px) and (min-width: 601px) {
+      .kitchen-desktop { display: none; }
+      .kitchen-tablet {
+        display: block;
+        /* Largura limitada por viewport-width OU height-derivada (não passa
+           do viewport vertical). Garante que a altura nunca excede 100vh. */
+        width: min(90vw, calc(100vh * 991 / 1000));
+        aspect-ratio: 991 / 1000;
+      }
+    }
+
+    /* Mobile: <=600px — duas partes lado a lado, scroll horizontal */
+    @media (max-width: 600px) {
+      .kitchen-desktop,
+      .kitchen-tablet { display: none; }
+      /* No mobile o SVG é mais alto que o viewport — não usa flex/100vh.
+         Volta pra block flow + altura natural pra página scrollar verticalmente. */
+      #flow-kitchen {
+        padding-left: 0;
+        padding-right: 0;
+        display: block;
+        height: auto;
+        min-height: auto;
+        overflow: visible;
+      }
+      /* Altura explícita = largura × proporção do SVG (1000/425), cascateando.
+         Evita problemas de aspect-ratio dentro de flex container. */
+      .kitchen-mobile-wrap {
+        display: block;
+        position: relative;
+        width: 100vw;
+        height: calc(100vw * 1000 / 460);
+      }
+      .kitchen-mobile-scroll {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .kitchen-mobile-scroll::-webkit-scrollbar { display: none; }
+      .kitchen-mobile-part {
+        flex: 0 0 100vw;
+        width: 100vw;
+        height: 100%;
+        margin: 0;
+        scroll-snap-align: start;
+      }
+      .kitchen-mobile-part :global(svg) {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      /* Botão de navegação: setinha clicável que alterna entre as duas partes.
+         Fixed pra ficar sempre acessível enquanto o usuário rola pela cozinha. */
+      .mobile-swipe-hint {
+        position: fixed;
+        right: var(--s-3);
+        left: auto;
+        bottom: var(--s-5);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: var(--ink);
+        color: var(--bg);
+        border: none;
+        border-radius: 999px;
+        box-shadow: var(--shadow-2);
+        opacity: 0.9;
+        cursor: pointer;
+        animation: swipe-nudge 1.6s ease-in-out infinite;
+        z-index: 50;
+        transition: opacity 200ms ease-out;
+      }
+      .mobile-swipe-hint:hover { opacity: 1; }
+      .mobile-swipe-hint :global(svg) { display: block; }
+      /* Quando estiver na segunda parte: seta vira, botão muda pra esquerda, nudge inverte */
+      .mobile-swipe-hint.flipped {
+        left: var(--s-3);
+        right: auto;
+        animation: swipe-nudge-rev 1.6s ease-in-out infinite;
+      }
+      .mobile-swipe-hint.flipped :global(svg) { transform: scaleX(-1); }
+      @keyframes swipe-nudge {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(-6px); }
+      }
+      @keyframes swipe-nudge-rev {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(6px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .mobile-swipe-hint,
+        .mobile-swipe-hint.flipped { animation: none; }
+      }
+    }
+    /* Em dark mode, o currentColor já vira cream (--ink) automaticamente,
+       então não precisa de filter: invert (que inverteria o cream pra navy
+       e deixaria a cena imperceptível sobre o fundo navy). */
 
     /* Hotspots no SVG — bounding-box do grupo é a área clicável.
        Cobre tanto <g class='hs'> quanto <path class='hs'>. */
@@ -390,6 +533,34 @@ const countByCategory = Object.fromEntries(
       stroke: var(--terracota);
     }
 
+    /* Zzz do gatinho dormindo — flutuam pra cima-direita e somem */
+    .kitchen-canvas :global(.zzz-puff) {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: zzz-drift 4.5s ease-out infinite;
+    }
+    .kitchen-canvas :global(.zzz-2) { animation-delay: 1.5s; }
+    .kitchen-canvas :global(.zzz-3) { animation-delay: 3s; }
+    /* Gato acordado: pausa os zzz no clique (durante o tooltip "miau") */
+    body.cat-awake .kitchen-canvas :global(.zzz-puff) {
+      animation-play-state: paused;
+    }
+    @keyframes zzz-drift {
+      0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+      15%  { opacity: 0.8; }
+      70%  { opacity: 0.4; }
+      100% { opacity: 0; transform: translate(40px, -55px) scale(1.4); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .kitchen-canvas :global(.zzz-puff) {
+        animation: none;
+        opacity: 0.5;
+      }
+      .kitchen-canvas :global(.zzz-2) { transform: translate(15px, -20px); }
+      .kitchen-canvas :global(.zzz-3) { transform: translate(30px, -40px) scale(1.2); }
+    }
+
     /* Quando um drawer abre, encolhe o body, alinha cena ao bottom */
     body {
       transition: padding-right 0.45s var(--ease-out);
@@ -419,22 +590,23 @@ const countByCategory = Object.fromEntries(
       transition: right 0.45s var(--ease-out);
     }
 
-    /* Tooltip flutuante */
+    /* Tooltip flutuante — alinhado ao DS */
     .kitchen-tooltip {
       position: fixed;
-      transform: translate(-50%, -100%) translateY(-18px);
+      transform: translate(-50%, -100%) translateY(calc(-1 * var(--s-3)));
       background: var(--ink);
       color: var(--bg);
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
       letter-spacing: 0.02em;
-      padding: 8px 14px;
-      border-radius: var(--r-sm);
-      box-shadow: var(--shadow-1);
+      line-height: 1;
+      padding: var(--s-2) var(--s-4);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-2);
       pointer-events: none;
       white-space: nowrap;
       opacity: 0;
-      transition: opacity var(--dur-fast);
+      transition: opacity var(--dur-base) var(--ease-out);
       z-index: 300;
     }
     .kitchen-tooltip::after {
@@ -442,7 +614,7 @@ const countByCategory = Object.fromEntries(
       position: absolute;
       top: 100%; left: 50%;
       transform: translateX(-50%);
-      border: 5px solid transparent;
+      border: 6px solid transparent;
       border-top-color: var(--ink);
     }
     .kitchen-tooltip.show { opacity: 1; }
@@ -717,19 +889,8 @@ const countByCategory = Object.fromEntries(
     }
     .btn-primary:hover { opacity: 0.92; }
 
-    /* ============ MOBILE ============ */
+    /* ============ MOBILE/TABLET ajustes ============ */
     @media (max-width: 768px) {
-      #flow-kitchen { padding: var(--s-6) var(--s-4) var(--s-7); }
-      .kitchen-canvas { aspect-ratio: 3/4; }
-      .hs-vaso        { top: 10%; left: 8%;  width: 22%; height: 12%; }
-      .hs-livros      { top: 10%; right: 8%; width: 22%; height: 12%; }
-      .hs-relogio     { top: 26%; left: 38%; width: 24%; height: 8%; }
-      .hs-prato       { top: 40%; left: 16%; width: 28%; height: 8%; }
-      .hs-doce        { top: 40%; right: 16%; width: 28%; height: 8%; }
-      .hs-freezer     { top: 56%; left: 25%; width: 50%; height: 10%; }
-      .hs-calendario  { top: 70%; left: 18%; width: 28%; height: 10%; }
-      .hs-postit      { top: 70%; right: 18%; width: 28%; height: 10%; }
-      .hs-switch      { top: 18%; right: 8%; width: 8%; height: 6%; }
       .cat-drawer { width: 100%; }
       .recado-modal { padding: 32px 20px 24px; }
     }
@@ -759,26 +920,37 @@ const countByCategory = Object.fromEntries(
     let userScrolled = false;
     let typewriterDone = false;
 
-    // Intro só roda na PRIMEIRA visita. Próximas vão direto pro hero.
-    const INTRO_SEEN_KEY = 'cozy-intro-seen';
-    const introSeen = (() => {
-      try { return localStorage.getItem(INTRO_SEEN_KEY) === 'true'; } catch (e) { return false; }
+    // "Já chegou na cozinha" — flag que persiste entre visitas.
+    // Na primeira visita roda intro + hero + morph até chegar na cozinha.
+    // A partir do momento que chega na cozinha (em qualquer visita), trava ali.
+    const KITCHEN_REACHED_KEY = 'cozy-kitchen-reached';
+    const kitchenReachedBefore = (() => {
+      try { return localStorage.getItem(KITCHEN_REACHED_KEY) === 'true'; } catch (e) { return false; }
     })();
-    function markIntroSeen() {
-      try { localStorage.setItem(INTRO_SEEN_KEY, 'true'); } catch (e) {}
+    let kitchenLocked = false;
+    function lockKitchen() {
+      if (kitchenLocked) return;
+      kitchenLocked = true;
+      try { localStorage.setItem(KITCHEN_REACHED_KEY, 'true'); } catch (e) {}
+      // Cozinha vira o topo da página — esconde intro e transição.
+      sceneIntro.style.display = 'none';
+      const flowTransition = document.getElementById('flow-transition');
+      if (flowTransition) flowTransition.style.display = 'none';
+      // Hero some, header já visível e sem morph.
+      heroLogo.style.display = 'none';
+      headerLogo.style.opacity = '1';
+      // Snap pro topo (que agora é a cozinha) sem scroll animado.
+      window.scrollTo(0, 0);
     }
 
-    if (introSeen) {
-      // Skip intro: já viu antes, vai direto pra cozinha sem morph animado
+    if (kitchenReachedBefore) {
+      // Visita recorrente / volta de outra tela: já trava direto na cozinha,
+      // sem intro, sem hero, sem morph.
       introCover.style.transition = 'none';
       introCover.classList.add('wiped');
       document.body.classList.remove('intro-active');
-      heroLogo.classList.add('visible');
       userScrolled = true;
-      // Pula pro flow-kitchen instantaneamente — sem scroll suave, sem morph visível
-      requestAnimationFrame(() => {
-        document.getElementById('flow-kitchen')?.scrollIntoView({ behavior: 'auto', block: 'start' });
-      });
+      lockKitchen();
     } else {
       document.body.classList.add('intro-active');
     }
@@ -793,8 +965,10 @@ const countByCategory = Object.fromEntries(
     // =============================================
     // TYPEWRITER + WIPE
     // =============================================
-    const TEXT_1 = 'olá!';
-    const TEXT_2 = 'que bom te ver por aqui :)';
+    // Strings i18n — usam __cozyT injetado no BaseLayout (fallback PT em runtime)
+    const T = (window as any).__cozyT || ((k: string) => k);
+    const TEXT_1 = T('intro.hello');
+    const TEXT_2 = T('intro.welcome');
     const TYPE_SPEED = 70;
     const DELAY_BEFORE_1 = 500;
     const PAUSE_AFTER_1 = 700;
@@ -858,23 +1032,39 @@ const countByCategory = Object.fromEntries(
       document.body.classList.remove('intro-active');
       userScrolled = true;
       heroLogo.classList.add('visible');
-      // Scroll suave pra cozinha — durante o scroll o morph acontece naturalmente
+      // Scroll suave pra cozinha — durante o scroll o morph acontece naturalmente.
+      // Quando chegar na cozinha o listener de scroll abaixo chama lockKitchen().
       document.getElementById('flow-kitchen')?.scrollIntoView({ behavior: 'smooth' });
-      markIntroSeen();
     });
 
     // Roda a sequência do typewriter SÓ na primeira visita
-    if (!introSeen) {
+    if (!kitchenReachedBefore) {
       runIntroSequence()
-        .then(() => revealAfterTypewriter())
-        .then(() => markIntroSeen());
+        .then(() => revealAfterTypewriter());
     }
+
+    // Detecta quando o user chega na cozinha pela primeira vez — trava ali.
+    function checkKitchenReached() {
+      if (kitchenLocked) return;
+      const rect = sceneIntro.getBoundingClientRect();
+      // Quando o fim da intro passa pelo topo da viewport, já chegou na cozinha.
+      // (sceneIntro tem 100vh + flow-transition 50vh acima da cozinha)
+      const flowTransition = document.getElementById('flow-transition');
+      const transitionRect = flowTransition?.getBoundingClientRect();
+      const reachedKitchen = transitionRect
+        ? transitionRect.bottom <= 0
+        : rect.bottom <= 0;
+      if (reachedKitchen) lockKitchen();
+    }
+    window.addEventListener('scroll', checkKitchenReached, { passive: true });
 
     // =============================================
     // MORPH — hero diminui e morfa pro header conforme rola
     // =============================================
     let firstMorphCall = true;
     function updateMorph() {
+      // Depois que a cozinha foi travada, o hero está oculto — nada a morfar.
+      if (kitchenLocked) return;
       if (firstMorphCall) {
         heroLogo.style.transition = 'none';
         firstMorphCall = false;
@@ -918,23 +1108,26 @@ const countByCategory = Object.fromEntries(
             <div class="recipe-thumb">foto</div>
             <div>
               <div class="recipe-row-title">${r.title}</div>
-              <div class="recipe-row-meta">${r.time} min · ${r.servings} porções · ${r.difficulty}</div>
+              <div class="recipe-row-meta">${[`${r.time} min`, r.servings ? `${r.servings} porções` : null, r.difficulty].filter(Boolean).join(' · ')}</div>
             </div>
           </a>
         </li>
       `).join('');
       if (recipes.length === 0) {
-        catResults.innerHTML = `<li style="padding: 24px 0; color: var(--ink-mute); font-family: var(--font-mono); font-size: 14px;">ainda sem receitas por aqui...</li>`;
+        const emptyMsg = T('meta.no_recipes_yet') || 'ainda sem receitas por aqui...';
+        catResults.innerHTML = `<li style="padding: 24px 0; color: var(--ink-mute); font-family: var(--font-mono); font-size: 14px;">${emptyMsg}</li>`;
       }
     }
 
     const sobreDrawer = document.getElementById('sobre-drawer')!;
 
     function openCategory(key: string) {
-      const label = key === 'todas' ? (RECIPES.catMetaTodas || 'Todas as receitas') : (RECIPES.catMeta[key] || key);
+      // Pega label do dicionário i18n (category.{key}) — fallback pro PT do JSON
+      const label = T(`category.${key}`) || RECIPES.catMeta[key] || key;
       catTitle.textContent = label;
       const count = RECIPES.counts[key] || 0;
-      catCount.textContent = `${count} receita${count === 1 ? '' : 's'}`;
+      const unitKey = count === 1 ? 'search.results_count_one' : 'search.results_count_other';
+      catCount.textContent = T(unitKey, { n: count });
       renderRecipeList(key);
       catDrawer.classList.add('open');
       backdrop.classList.add('open');
@@ -981,6 +1174,21 @@ const countByCategory = Object.fromEntries(
       }
     }
 
+    // Pega a chave i18n correta pra cada hotspot baseado em action/key.
+    // Pro dark-mode, escolhe a mensagem conforme o estado atual (light/dark).
+    function hotspotLabelKey(ds: DOMStringMap): string | null {
+      const action = ds.action;
+      if (action === 'cat' && ds.key) return `category.${ds.key}`;
+      if (action === 'recado') return 'hotspot.recado';
+      if (action === 'sobre') return 'hotspot.sobre';
+      if (action === 'dark-mode') {
+        return document.body.classList.contains('dark-mode')
+          ? 'hotspot.dark_mode_on'   // tá escuro → "acender"
+          : 'hotspot.dark_mode_off'; // tá claro → "apagar"
+      }
+      return null; // akim não tem hover label (só miau no click)
+    }
+
     // Hotspots (elementos SVG <g>/<path> com class="hs" no inline SVG)
     document.querySelectorAll<Element>('.kitchen-canvas .hs').forEach((g) => {
       const ds = (g as HTMLElement | SVGElement).dataset;
@@ -990,7 +1198,11 @@ const countByCategory = Object.fromEntries(
         if (action === 'cat' && key) openCategory(key);
         else if (action === 'recado') openRecado();
         else if (action === 'sobre') openSobre();
-        else if (action === 'akim') showTooltipAt(g, 'miau 🐱', 1400);
+        else if (action === 'akim') {
+          showTooltipAt(g, T('hotspot.akim_meow') || 'miau 🐱', 1400);
+          document.body.classList.add('cat-awake');
+          window.setTimeout(() => document.body.classList.remove('cat-awake'), 1400);
+        }
         else if (action === 'dark-mode') {
           document.body.classList.toggle('dark-mode');
           try {
@@ -1005,10 +1217,17 @@ const countByCategory = Object.fromEntries(
         if (k === 'Enter' || k === ' ') { e.preventDefault(); fire(); }
       });
 
-      // Tooltip hover (sem akim — gato é silencioso, só miau no clique)
-      const label = ds.label;
-      if (label) {
-        const show = () => { if (!tooltip.dataset.pinned) showTooltipAt(g, label); };
+      // Tooltip hover — resolve a chave i18n NA HORA do show pra respeitar:
+      // - troca de idioma (PT/EN)
+      // - estado dinâmico (ex.: dark_mode_off/on muda com a luz)
+      if (hotspotLabelKey(ds) !== null) {
+        const show = () => {
+          if (!tooltip.dataset.pinned) {
+            const key = hotspotLabelKey(ds);
+            const text = (key && (window as any).__cozyT?.(key)) || ds.label || '';
+            showTooltipAt(g, text);
+          }
+        };
         const hide = () => { if (!tooltip.dataset.pinned) tooltip.classList.remove('show'); };
         g.addEventListener('mouseenter', show);
         g.addEventListener('mouseleave', hide);
@@ -1016,6 +1235,58 @@ const countByCategory = Object.fromEntries(
         g.addEventListener('blur', hide);
       }
     });
+
+    // Relógio analógico — gira os ponteiros pra hora atual do navegador.
+    // Cada ponteiro tem data-baked (ângulo em graus que o path já carrega
+    // desenhado) e data-cx/data-cy (centro de rotação). A rotação aplicada
+    // é (alvo - baked) em torno de (cx, cy).
+    // querySelectorAll pega todas as instâncias (desktop, tablet, mobile-2).
+    const hourHands = document.querySelectorAll<SVGGElement>('[id="clock-hour"]');
+    const minuteHands = document.querySelectorAll<SVGGElement>('[id="clock-minute"]');
+    const secondHands = document.querySelectorAll<SVGGElement>('[id="clock-second"]');
+    function rotateHand(el: SVGGElement, target: number) {
+      const baked = Number(el.dataset.baked ?? 0);
+      const cx = Number(el.dataset.cx ?? 0);
+      const cy = Number(el.dataset.cy ?? 0);
+      const delta = target - baked;
+      el.setAttribute('transform', `rotate(${delta} ${cx} ${cy})`);
+    }
+    function tickClock() {
+      if (!hourHands.length && !minuteHands.length && !secondHands.length) return;
+      const now = new Date();
+      const h = now.getHours() % 12;
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+      const hourTarget = h * 30 + m * 0.5;
+      const minuteTarget = m * 6 + s * 0.1;
+      const secondTarget = s * 6;
+      hourHands.forEach(el => rotateHand(el, hourTarget));
+      minuteHands.forEach(el => rotateHand(el, minuteTarget));
+      secondHands.forEach(el => rotateHand(el, secondTarget));
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // Mobile: botão clicável que alterna entre as duas partes da cozinha
+    const mobileScroll = document.getElementById('kitchen-mobile-scroll');
+    const swipeHint = document.getElementById('mobile-swipe-hint');
+    if (mobileScroll && swipeHint) {
+      function updateHintDirection() {
+        // Se já passou da metade, a seta aponta pra esquerda (voltar pra parte 1)
+        const half = mobileScroll.scrollWidth / 2;
+        const isAtSecond = mobileScroll.scrollLeft > half * 0.5;
+        swipeHint.classList.toggle('flipped', isAtSecond);
+      }
+      swipeHint.addEventListener('click', () => {
+        const isAtFirst = mobileScroll.scrollLeft < mobileScroll.scrollWidth * 0.25;
+        mobileScroll.scrollTo({
+          left: isAtFirst ? mobileScroll.scrollWidth : 0,
+          behavior: 'smooth',
+        });
+      });
+      // Atualiza direção da seta quando scrolla (manual via swipe ou click)
+      mobileScroll.addEventListener('scroll', updateHintDirection, { passive: true });
+    }
 
     backdrop.addEventListener('click', closeAll);
     document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeAll));

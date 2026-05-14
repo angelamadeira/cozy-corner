@@ -45,10 +45,10 @@ const popularTags = [...tagCount.entries()]
 
   <main class="search-page">
     <a href="/" class="back-link">
-      <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+      <Icon name="ph:arrow-left-thin" /> <span data-t="nav.back_to_kitchen">voltar pra cozinha</span>
     </a>
 
-    <h1 class="page-title">buscar</h1>
+    <h1 class="page-title" data-t="search.title">buscar</h1>
 
     <div class="search-bar">
       <Icon name="ph:magnifying-glass-thin" width={20} height={20} />
@@ -57,10 +57,11 @@ const popularTags = [...tagCount.entries()]
         type="search"
         id="search"
         placeholder="título, ingrediente ou tag..."
+        data-t-attr="placeholder:search.placeholder_full"
         autocomplete="off"
         autofocus
       />
-      <button class="clear-btn" id="clear-btn" type="button" hidden aria-label="limpar busca">
+      <button class="clear-btn" id="clear-btn" type="button" hidden aria-label="limpar busca" data-t-attr="aria-label:search.clear">
         <Icon name="ph:x-thin" width={16} height={16} />
       </button>
     </div>
@@ -69,10 +70,10 @@ const popularTags = [...tagCount.entries()]
 
     <div class="suggestions" id="suggestions">
       <div class="sug-block">
-        <h2 class="sug-title">categorias</h2>
+        <h2 class="sug-title" data-t="search.suggest_categories">categorias</h2>
         <div class="chips">
           {Object.entries(CATEGORY_META).map(([slug, meta]) => (
-            <a href={`/categorias/${slug}/`} class="chip chip-link">
+            <a href={`/categorias/${slug}/`} class="chip chip-link" data-t={`category.${slug}`}>
               <Icon name={meta.icon} width={14} height={14} />
               {meta.label.toLowerCase()}
             </a>
@@ -81,7 +82,7 @@ const popularTags = [...tagCount.entries()]
       </div>
       {popularTags.length > 0 && (
         <div class="sug-block">
-          <h2 class="sug-title">tags populares</h2>
+          <h2 class="sug-title" data-t="search.suggest_tags">tags populares</h2>
           <div class="chips">
             {popularTags.map((tag) => (
               <button class="chip chip-suggest" type="button" data-suggest={tag}>
@@ -97,8 +98,10 @@ const popularTags = [...tagCount.entries()]
 
     <div class="no-results" id="no-results" hidden>
       <Icon name="ph:magnifying-glass-thin" width={48} height={48} />
-      <p>não achei nada por aqui.</p>
-      <p class="hint">tenta com menos palavras, ou explore por <a href="/">categoria</a>.</p>
+      <p data-t="search.no_results_long">não achei nada por aqui.</p>
+      <p class="hint">
+        <span data-t="search.no_results_hint_prefix">tenta com menos palavras, ou explore por </span><a href="/" data-t="search.no_results_hint_link">categoria</a><span data-t="search.no_results_hint_suffix">.</span>
+      </p>
     </div>
   </main>
 
@@ -154,7 +157,32 @@ const popularTags = [...tagCount.entries()]
       return scored;
     }
 
+    // i18n helper — usa __cozyT do BaseLayout com fallback PT
+    const T = (key, fallback, values) => {
+      const fn = window.__cozyT;
+      return fn ? fn(key, values) : (fallback || key);
+    };
+    // Mapeia difficulty PT pra chave i18n. Conteúdo é gravado em PT no CMS.
+    const DIFF_KEY = {
+      'fácil': 'meta.difficulty_easy',
+      'facil': 'meta.difficulty_easy',
+      'médio': 'meta.difficulty_medium',
+      'medio': 'meta.difficulty_medium',
+      'difícil': 'meta.difficulty_hard',
+      'dificil': 'meta.difficulty_hard',
+    };
+    const translateDifficulty = (d) => {
+      const k = DIFF_KEY[(d || '').toLowerCase()];
+      return k ? T(k, d) : d;
+    };
+
+    // Última query — pra re-renderizar quando o idioma muda
+    let lastQ = '';
+    let lastResults = [];
+
     function renderResults(results, q) {
+      lastQ = q;
+      lastResults = results;
       resultsEl.innerHTML = '';
       if (results.length === 0) {
         resultsEl.setAttribute('hidden', '');
@@ -166,8 +194,9 @@ const popularTags = [...tagCount.entries()]
       noResultsEl.setAttribute('hidden', '');
       resultsEl.removeAttribute('hidden');
       resultCountEl.removeAttribute('hidden');
-      resultCountEl.textContent =
-        results.length + ' ' + (results.length === 1 ? 'resultado' : 'resultados');
+      const countKey = results.length === 1 ? 'search.result_one' : 'search.result_other';
+      const countFallback = results.length + ' ' + (results.length === 1 ? 'resultado' : 'resultados');
+      resultCountEl.textContent = T(countKey, countFallback, { n: results.length });
 
       const frag = document.createDocumentFragment();
       for (const { doc, matchedIn } of results) {
@@ -184,23 +213,26 @@ const popularTags = [...tagCount.entries()]
         let matchContext = '';
         if (!titleMatched && ingredientMatched) {
           const ing = doc.ingredients.find((i) => norm(i).includes(norm(q)));
-          if (ing) matchContext = '<span class="match-ctx">em <em>' + highlight(ing, q) + '</em></span>';
+          if (ing) matchContext = '<span class="match-ctx">' + T('search.match_in', 'em') + ' <em>' + highlight(ing, q) + '</em></span>';
         } else if (!titleMatched && tagMatched) {
           const realTag = doc.tags.find((t) => norm(t) === tagMatched);
           if (realTag) matchContext = '<span class="match-ctx">tag <em>#' + realTag + '</em></span>';
         }
 
+        // Categoria traduzida via chave (doc.category é o slug)
+        const catLabel = T('category.' + doc.category, doc.categoryLabel);
+
         li.innerHTML =
           '<a href="/receitas/' + doc.id + '/">' +
-            '<div class="thumb">foto</div>' +
+            '<div class="thumb">' + T('recipe.photo', 'foto') + '</div>' +
             '<div class="info">' +
               '<h3 class="recipe-name">' + highlight(doc.title, q) + '</h3>' +
               '<p class="recipe-meta">' +
-                '<span class="cat-pill">' + doc.categoryLabel + '</span>' +
+                '<span class="cat-pill">' + catLabel + '</span>' +
                 '<span class="sep">·</span>' +
-                doc.time + ' min' +
+                doc.time + ' ' + T('meta.minutes', 'min') +
                 '<span class="sep">·</span>' +
-                doc.difficulty +
+                translateDifficulty(doc.difficulty) +
               '</p>' +
               (matchContext ? '<p class="match-line">' + matchContext + '</p>' : '') +
             '</div>' +
@@ -210,6 +242,11 @@ const popularTags = [...tagCount.entries()]
       }
       resultsEl.appendChild(frag);
     }
+
+    // Re-renderiza quando o user troca o idioma
+    document.addEventListener('cozy-lang-changed', () => {
+      if (lastQ.trim()) renderResults(lastResults, lastQ);
+    });
 
     function update(q) {
       if (!q.trim()) {

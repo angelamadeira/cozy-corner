@@ -20,19 +20,30 @@ const recipes = defineCollection({
     description: z.string().optional(),
     category: z.enum(CATEGORIES),
     time: z.number().int().positive(), // minutos
-    servings: z.number().int().positive(),
+    servings: z.number().int().positive().optional(),
     difficulty: z.enum(['fácil', 'médio', 'difícil']).default('médio'),
     tags: z.array(z.string()).default([]),
     unitSystem: z.enum(['metric', 'imperial']).default('metric'),
     media: z.array(z.object({
       type: z.enum(['image', 'video']),
-      src: z.string(),
+      src: z.string().optional(),
+      url: z.string().optional(),
       alt: z.string().optional(),
       cover: z.boolean().optional(),
-    })).default([]),
-    ingredients: z.array(z.string()).default([]),
-    materials: z.array(z.string()).default([]),
-    steps: z.array(z.string()).default([]),
+    }).transform(m => ({ ...m, src: m.url || m.src || '' })))
+      .default([]),
+    // Aceita tanto formato legado (array de strings) quanto novo do Decap
+    // com `field` definido (array de objetos { item: string }). Normaliza
+    // pra array de strings no transform.
+    ingredients: z.array(z.union([z.string(), z.object({ item: z.string() })]))
+      .default([])
+      .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item)),
+    materials: z.array(z.union([z.string(), z.object({ item: z.string() })]))
+      .default([])
+      .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item)),
+    steps: z.array(z.union([z.string(), z.object({ item: z.string() })]))
+      .default([])
+      .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item)),
     notes: z.string().optional(),
     published: z.boolean().default(true),
     publishedAt: z.coerce.date(),

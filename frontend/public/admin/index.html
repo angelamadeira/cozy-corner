@@ -97,6 +97,43 @@
       font-family: 'Cutive Mono', ui-monospace, monospace;
       font-size: 13px;
     }
+
+    /* ============ EDITOR — esconde painel de preview ============
+       Mira só a classe específica do preview do Decap pra não esconder
+       o form de edição por acidente. */
+    [class*="EditorPreviewPane"] {
+      display: none !important;
+    }
+
+    /* Elimina a barra de rolagem dupla na tela do editor — só o scroll
+       interno do form precisa estar visível. */
+    html:has([class*="EditorContainer"]),
+    body:has([class*="EditorContainer"]) {
+      overflow: hidden;
+    }
+
+    /* ============ EDITOR — lista (media) ============
+       Trunca summaries longos (URLs etc) pra não vazar do container. */
+    [class*="StyledListItemTopBar"],
+    [class*="ListItem"] [class*="TopBar"] {
+      overflow: hidden;
+    }
+    [class*="StyledListItemTopBar"] span,
+    [class*="ListItem"] [class*="TopBar"] span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    /* Wrap aggressive em qualquer summary com URL longa */
+    [class*="StyledSummary"],
+    [class*="-Summary"] {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>

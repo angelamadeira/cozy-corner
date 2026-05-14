@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import siteData from '../content/pages/site.json';
+import ptDict from '../i18n/pt.json';
+import enDict from '../i18n/en.json';
 
 interface Props {
   title?: string;
@@ -10,6 +12,9 @@ interface Props {
 
 const { title, description, lang = 'pt-br' } = Astro.props;
 const pageTitle = title ? `${title} · ${siteData.title}` : siteData.title;
+
+// Serializa dicionários pro client-side runtime
+const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
 ---
 <!doctype html>
 <html lang={lang}>
@@ -31,6 +36,75 @@ const pageTitle = title ? `${title} · ${siteData.title}` : siteData.title;
         }
       } catch (e) {}
     </script>
+
+    <!-- Transição entre páginas: se o link de saída setou o flag,
+         começa com um overlay cobrindo a tela e some no load. -->
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('cozy-fade-in') === '1') {
+          document.documentElement.classList.add('cozy-fading-in');
+          sessionStorage.removeItem('cozy-fade-in');
+        }
+      } catch (e) {}
+    </script>
+
+    <!-- i18n: detecta idioma, aplica traduções via data-t -->
+    <script is:inline define:vars={{ dictsJson }}>
+      window.__COZY_I18N = JSON.parse(dictsJson);
+      window.__COZY_LANG = (function () {
+        try {
+          const saved = localStorage.getItem('cozy-lang');
+          if (saved === 'pt' || saved === 'en') return saved;
+          // Primeira visita: detecta navegador. Tudo que NÃO começa com 'pt' vira 'en'.
+          const nav = (navigator.language || 'pt').toLowerCase();
+          return nav.startsWith('pt') ? 'pt' : 'en';
+        } catch (e) { return 'pt'; }
+      })();
+      document.documentElement.lang = window.__COZY_LANG === 'en' ? 'en' : 'pt-br';
+      window.__cozyT = function (key, values) {
+        const lang = window.__COZY_LANG;
+        const dicts = window.__COZY_I18N;
+        function get(dict, path) {
+          const parts = path.split('.');
+          let cur = dict;
+          for (const p of parts) {
+            if (cur && typeof cur === 'object' && p in cur) cur = cur[p];
+            else return null;
+          }
+          return typeof cur === 'string' ? cur : null;
+        }
+        let value = get(dicts[lang], key) || get(dicts.pt, key) || key;
+        if (values) {
+          value = value.replace(/\{(\w+)\}/g, function (m, k) {
+            return k in values ? values[k] : '{' + k + '}';
+          });
+        }
+        return value;
+      };
+      // Aplica traduções em data-t / data-t-attr quando DOM carrega
+      window.__cozyApplyI18n = function (root) {
+        root = root || document;
+        root.querySelectorAll('[data-t]').forEach(function (el) {
+          const key = el.getAttribute('data-t');
+          el.textContent = window.__cozyT(key);
+        });
+        // data-t-attr="alt:meta.no_recipes_yet,placeholder:search.placeholder"
+        root.querySelectorAll('[data-t-attr]').forEach(function (el) {
+          const spec = el.getAttribute('data-t-attr');
+          spec.split(',').forEach(function (pair) {
+            const idx = pair.indexOf(':');
+            if (idx < 0) return;
+            const attr = pair.slice(0, idx).trim();
+            const key = pair.slice(idx + 1).trim();
+            el.setAttribute(attr, window.__cozyT(key));
+          });
+        });
+      };
+      // Roda assim que body existe
+      document.addEventListener('DOMContentLoaded', function () {
+        window.__cozyApplyI18n();
+      });
+    </script>
     <style>
       /* pre-dark é aplicado no html pelo script inline acima.
          Quando o body é criado, JS migra pra body.dark-mode.
@@ -47,6 +121,188 @@ const pageTitle = title ? `${title} · ${siteData.title}` : siteData.title;
         document.documentElement.classList.remove('pre-dark');
       }
     </script>
+
+    <!-- Overlay de transição entre páginas (cream warm, fade) -->
+    <div class="cozy-fade" id="cozy-fade" aria-hidden="true"></div>
+
+    <!-- Toggle de idioma — pequeno pill no canto superior direito -->
+    <button class="lang-toggle" id="lang-toggle" type="button" aria-label="alternar idioma">
+      <span class="lang-pt">PT</span>
+      <span class="lang-sep">·</span>
+      <span class="lang-en">EN</span>
+    </button>
+
     <slot />
+
+    <script is:inline>
+      // Sistema de transição entre páginas. Uso:
+      //   window.cozyNavigate('/url')  — fade-out e navega.
+      // Receiving page: se sessionStorage tem 'cozy-fade-in', o overlay
+      // já começa visível (script no <head>) e some no load.
+      (function () {
+        const overlay = document.getElementById('cozy-fade');
+        if (!overlay) return;
+
+        // Fade-in (chegando): o overlay começa visível pelo CSS, vamos
+        // disparar a animação pra ele sumir.
+        if (document.documentElement.classList.contains('cozy-fading-in')) {
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              overlay.classList.add('is-leaving');
+              setTimeout(function () {
+                document.documentElement.classList.remove('cozy-fading-in');
+                overlay.classList.remove('is-leaving');
+              }, 600);
+            });
+          });
+        }
+
+        // Fade-out (saindo): expõe helper global.
+        window.cozyNavigate = function (url) {
+          try { sessionStorage.setItem('cozy-fade-in', '1'); } catch (e) {}
+          overlay.classList.add('is-entering');
+          setTimeout(function () { window.location.href = url; }, 280);
+        };
+
+        // Intercepta TODOS os cliques em links internos por padrão.
+        // Opt-out: data-no-fade no <a> (ex: âncoras, ações inline).
+        document.addEventListener('click', function (e) {
+          if (e.defaultPrevented) return;
+          const target = e.target instanceof Element ? e.target : null;
+          if (!target) return;
+          const a = target.closest('a');
+          if (!a) return;
+          if (a.hasAttribute('data-no-fade')) return;
+          if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+          const href = a.getAttribute('href');
+          if (!href) return;
+          // Ignora âncoras, mailto, tel, javascript:, protocolos externos, downloads.
+          if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+          if (a.hasAttribute('download')) return;
+          // Só intercepta same-origin (links relativos ou do mesmo host).
+          try {
+            const url = new URL(href, window.location.href);
+            if (url.origin !== window.location.origin) return;
+            // Mesma URL exata (só hash mudou): deixa o browser tratar.
+            if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+          } catch (_) { return; }
+          e.preventDefault();
+          window.cozyNavigate(href);
+        });
+      })();
+    </script>
+
+    <script is:inline>
+      (function () {
+        const btn = document.getElementById('lang-toggle');
+        if (!btn) return;
+        function syncBtn() {
+          btn.classList.toggle('is-en', window.__COZY_LANG === 'en');
+        }
+        syncBtn();
+        btn.addEventListener('click', function () {
+          const next = window.__COZY_LANG === 'pt' ? 'en' : 'pt';
+          window.__COZY_LANG = next;
+          try { localStorage.setItem('cozy-lang', next); } catch (e) {}
+          document.documentElement.lang = next === 'en' ? 'en' : 'pt-br';
+          syncBtn();
+          window.__cozyApplyI18n();
+          // Notifica páginas que querem atualizar textos dinâmicos
+          document.dispatchEvent(new CustomEvent('cozy-lang-changed', { detail: { lang: next } }));
+        });
+      })();
+    </script>
+
+    <style is:global>
+      /* ============ TRANSIÇÃO ENTRE PÁGINAS ============
+         Overlay cream que faz fade-in/out entre navegações opt-in.
+         - Página de saída: .is-entering → fade IN (cobre tudo)
+         - Página de chegada: html.cozy-fading-in → começa cobrindo,
+           depois .is-leaving → fade OUT (revela conteúdo) */
+      .cozy-fade {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 280ms ease-out;
+      }
+      .cozy-fade.is-entering {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      /* Chegada: overlay já visível pelo class no html (set pelo inline script).
+         Sem transição inicial — ele já tá em cima da tela quando o paint começa. */
+      html.cozy-fading-in .cozy-fade {
+        opacity: 1;
+        pointer-events: auto;
+        transition: none;
+      }
+      html.cozy-fading-in .cozy-fade.is-leaving {
+        opacity: 0;
+        transition: opacity 450ms ease-out;
+      }
+
+      .lang-toggle {
+        position: fixed;
+        top: 10px;          /* alinhado com dark-toggle: (header-h 56 - btn 36) / 2 */
+        right: 16px;        /* default — home, sem header dark-toggle */
+        z-index: 220;
+        height: 36px;       /* mesmo height do dark-toggle */
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 0 14px;
+        background: transparent;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: var(--ink-mute);
+        cursor: pointer;
+        opacity: 1;
+        pointer-events: auto;
+        /* Default = aparecendo: espera o drawer fechar (500ms) antes de fade-in */
+        transition: opacity 200ms ease-out 500ms,
+                    border-color 150ms,
+                    color 150ms;
+      }
+      .lang-toggle:hover { border-color: var(--ink); color: var(--ink); }
+      .lang-toggle .lang-pt { color: var(--ink); font-weight: 500; }
+      .lang-toggle .lang-en { color: var(--ink-mute); }
+      .lang-toggle.is-en .lang-pt { color: var(--ink-mute); font-weight: 400; }
+      .lang-toggle.is-en .lang-en { color: var(--ink); font-weight: 500; }
+      .lang-toggle .lang-sep { color: var(--ink-mute); opacity: 0.5; }
+      /* Quando a página tem dark-toggle no header (receita, categoria, busca),
+         desloca o lang-toggle pra esquerda pra não sobrepor.
+         Dark-toggle: right edge a 24px (header padding s-6), width 36 →
+         left edge a 60px. Lang-toggle right edge = 60 + 24 (gap) = 84px. */
+      body:has(.dark-toggle) .lang-toggle {
+        right: 84px;
+      }
+      /* Em mobile e no intro/loading, esconde */
+      @media (max-width: 600px) {
+        .lang-toggle { top: 8px; right: 12px; height: 32px; padding: 0 12px; font-size: 11px; }
+        body:has(.dark-toggle) .lang-toggle {
+          right: calc(16px + 32px + 24px);  /* 16 header padding + 32 dark + 24 gap */
+        }
+      }
+      /* Esconde durante intro, drawer aberto, cooking mode e print.
+         Transition rápida e SEM delay quando esconde (sai instantâneo).
+         Volta a aparecer só depois que o drawer fecha (delay 500ms no default). */
+      body.intro-active .lang-toggle,
+      body.drawer-open .lang-toggle,
+      body.cm-open .lang-toggle {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 120ms ease-in;
+      }
+      @media print {
+        .lang-toggle { display: none; }
+      }
+    </style>
   </body>
 </html>

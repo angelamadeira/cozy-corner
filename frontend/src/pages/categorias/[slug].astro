@@ -52,7 +52,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
 
 <BaseLayout title={label} description={`Receitas da categoria ${label}.`}>
   <header class="site-header">
-    <a href="/" class="logo-link" aria-label="Cozy Corner">
+    <a href="/" class="logo-link" data-fade aria-label="Cozy Corner">
       <span class="logo-name">Cozy Corner</span>
       <span class="logo-by">— by Gigi</span>
     </a>
@@ -64,12 +64,12 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
 
   <main class="category">
     <nav class="top-nav">
-      <a href="/" class="back-link">
-        <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+      <a href="/" class="back-link" data-fade>
+        <Icon name="ph:arrow-left-thin" /> <span data-t="nav.back_to_kitchen">voltar pra cozinha</span>
       </a>
       {slug !== 'todas' && (
         <a href="/categorias/todas/" class="alt-link">
-          <Icon name="ph:books-thin" /> ver todas as receitas
+          <Icon name="ph:books-thin" /> <span data-t="nav.see_all_recipes">ver todas as receitas</span>
         </a>
       )}
     </nav>
@@ -77,8 +77,8 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     <div class="title-block">
       <Icon name={icon} class="category-icon" width={32} height={32} />
       <div>
-        <h1 class="cat-title">{label}</h1>
-        <p class="cat-count">
+        <h1 class="cat-title" data-t={`category.${slug}`}>{label}</h1>
+        <p class="cat-count" data-cat-count={recipes.length}>
           {recipes.length} {recipes.length === 1 ? 'receita' : 'receitas'}
         </p>
       </div>
@@ -91,15 +91,16 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         type="search"
         id="search"
         placeholder={`buscar em ${label.toLowerCase()}...`}
+        data-search-category={label}
         autocomplete="off"
       />
     </div>
 
     {slug === 'todas' ? (
       <div class="filters filters-cats">
-        <span class="chip chip-active" data-cat="all">todas as categorias</span>
+        <span class="chip chip-active" data-cat="all" data-t="filter.all_categories">todas as categorias</span>
         {Object.entries(CATEGORY_META).map(([catSlug, meta]) => (
-          <span class="chip" data-cat={catSlug}>
+          <span class="chip" data-cat={catSlug} data-t={`category.${catSlug}`}>
             <Icon name={meta.icon} width={14} height={14} />
             {meta.label.toLowerCase()}
           </span>
@@ -107,7 +108,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       </div>
     ) : tags.length > 0 ? (
       <div class="filters">
-        <span class="chip chip-active" data-tag="all">todas</span>
+        <span class="chip chip-active" data-tag="all" data-t="filter.all">todas</span>
         {tags.map((tag) => (
           <span class="chip" data-tag={tag}>{tag}</span>
         ))}
@@ -117,10 +118,10 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     {recipes.length === 0 ? (
       <div class="empty">
         <Icon name="ph:bowl-food-thin" width={64} height={64} />
-        <h2 class="t-h2">ainda sem receitas por aqui</h2>
-        <p class="empty-sub">essa categoria está em construção. volte em breve, ou bisbilhote outras gavetas da cozinha.</p>
-        <a href="/" class="btn btn-ghost">
-          <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+        <h2 class="t-h2" data-t="meta.no_recipes_yet">ainda sem receitas por aqui</h2>
+        <p class="empty-sub" data-t="meta.category_empty_sub">essa categoria está em construção. volte em breve, ou bisbilhote outras gavetas da cozinha.</p>
+        <a href="/" class="btn btn-ghost" data-fade>
+          <Icon name="ph:arrow-left-thin" /> <span data-t="nav.back_to_kitchen">voltar pra cozinha</span>
         </a>
       </div>
     ) : (
@@ -137,15 +138,19 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
             data-cat={r.data.category}
           >
             <a href={`/receitas/${r.id}/`}>
-              <div class="thumb">foto</div>
+              <div class="thumb" data-t="recipe.photo">foto</div>
               <div class="info">
                 <h3 class="recipe-name">{r.data.title}</h3>
                 <p class="recipe-meta">
-                  <Icon name="ph:clock-thin" /> {r.data.time} min
+                  <Icon name="ph:clock-thin" /> {r.data.time} <span data-t="meta.minutes">min</span>
+                  {r.data.servings && (
+                    <>
+                      <span class="sep">·</span>
+                      <Icon name="ph:fork-knife-thin" /> {r.data.servings} <span data-t="meta.servings_other">porções</span>
+                    </>
+                  )}
                   <span class="sep">·</span>
-                  <Icon name="ph:fork-knife-thin" /> {r.data.servings} porções
-                  <span class="sep">·</span>
-                  <Icon name="ph:gauge-thin" /> {r.data.difficulty}
+                  <Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${r.data.difficulty === 'fácil' ? 'easy' : r.data.difficulty === 'difícil' ? 'hard' : 'medium'}`}>{r.data.difficulty}</span>
                 </p>
               </div>
               <Icon name="ph:caret-right-thin" class="row-arrow" width={20} height={20} />
@@ -157,7 +162,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
 
     <div class="no-results" id="no-results" hidden>
       <Icon name="ph:magnifying-glass-thin" width={48} height={48} />
-      <p>nenhuma receita encontrada</p>
+      <p data-t="search.no_results">nenhuma receita encontrada</p>
     </div>
   </main>
 
@@ -414,6 +419,30 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
   </style>
 
   <script>
+    // i18n — atualiza textos dinâmicos (count, placeholder search) baseado em window.__COZY_LANG
+    const T = (window as any).__cozyT || ((k: string) => k);
+    function syncI18n() {
+      const T_ = (window as any).__cozyT;
+      if (!T_) return;
+      // count "X receitas"
+      const countEl = document.querySelector('[data-cat-count]') as HTMLElement | null;
+      if (countEl) {
+        const n = Number(countEl.dataset.catCount || 0);
+        const key = n === 1 ? 'search.results_count_one' : 'search.results_count_other';
+        countEl.textContent = T_(key, { n });
+      }
+      // placeholder do search
+      const searchEl = document.getElementById('search') as HTMLInputElement | null;
+      if (searchEl && searchEl.dataset.searchCategory) {
+        // "buscar em {categoria}..."
+        const ph = (T_('search.placeholder_in') || 'buscar em {category}...')
+          .replace('{category}', searchEl.dataset.searchCategory.toLowerCase());
+        searchEl.placeholder = ph;
+      }
+    }
+    syncI18n();
+    document.addEventListener('cozy-lang-changed', syncI18n);
+
     // Dark mode
     document.getElementById('dark-toggle')?.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');

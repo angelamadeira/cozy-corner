@@ -24,6 +24,12 @@ const orderedMedia = coverIdx > 0
   ? [data.media[coverIdx], ...data.media.filter((_, i) => i !== coverIdx)]
   : data.media;
 
+// Converte URL do YouTube em URL de embed
+function youtubeEmbedUrl(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+}
+
 // Data de publicação em PT-BR ("13 de maio de 2026")
 const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
   day: 'numeric', month: 'long', year: 'numeric',
@@ -44,7 +50,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
   <main class="recipe">
     <a href={`/categorias/${data.category}`} class="back-link">
-      <Icon name="ph:arrow-left-thin" /> {category.label}
+      <Icon name="ph:arrow-left-thin" /> <span data-t={`category.${data.category}`}>{category.label}</span>
     </a>
 
     <!-- ============ CAROUSEL ============ -->
@@ -58,21 +64,31 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         )}
         <div class="carousel-viewport">
           <div class="carousel-track" id="carousel-track">
-            {orderedMedia.map((m) => (
-              <div class="media-slot" data-type={m.type}>
-                {m.type === 'video' ? (
-                  <span class="placeholder">
-                    <Icon name="ph:play-circle-thin" width={32} height={32} />
-                    vídeo · {m.alt ?? 'sem descrição'}
-                  </span>
-                ) : (
-                  <span class="placeholder">
-                    <Icon name="ph:image-thin" width={32} height={32} />
-                    foto · {m.alt ?? 'sem descrição'}
-                  </span>
-                )}
-              </div>
-            ))}
+            {orderedMedia.map((m) => {
+              const ytEmbed = m.type === 'video' && m.src ? youtubeEmbedUrl(m.src) : null;
+              return (
+                <div class="media-slot" data-type={m.type}>
+                  {!m.src ? (
+                    <span class="placeholder">
+                      <Icon name="ph:image-thin" width={32} height={32} />
+                      sem mídia
+                    </span>
+                  ) : m.type === 'video' && ytEmbed ? (
+                    <iframe
+                      src={ytEmbed}
+                      title={m.alt ?? 'vídeo'}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen
+                      loading="lazy"
+                    ></iframe>
+                  ) : m.type === 'video' ? (
+                    <video src={m.src} controls preload="metadata" aria-label={m.alt ?? 'vídeo'}></video>
+                  ) : (
+                    <img src={m.src} alt={m.alt ?? ''} loading="lazy" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
         {orderedMedia.length > 1 && (
@@ -103,20 +119,24 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       <h1 class="recipe-title">{data.title}</h1>
       <div class="meta-row">
         <p class="recipe-meta">
-          <Icon name="ph:clock-thin" /> {data.time} min
+          <Icon name="ph:clock-thin" /> {data.time} <span data-t="meta.minutes">min</span>
+          {data.servings && (
+            <>
+              <span class="sep">·</span>
+              <Icon name="ph:fork-knife-thin" /> <span id="meta-servings">{data.servings}</span> <span data-t="meta.servings_other">porções</span>
+            </>
+          )}
           <span class="sep">·</span>
-          <Icon name="ph:fork-knife-thin" /> <span id="meta-servings">{data.servings}</span> porções
-          <span class="sep">·</span>
-          <Icon name="ph:gauge-thin" /> {data.difficulty}
+          <Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${data.difficulty === 'fácil' ? 'easy' : data.difficulty === 'difícil' ? 'hard' : 'medium'}`}>{data.difficulty}</span>
           {data.tags.includes('vegetariana') && (
             <>
               <span class="sep">·</span>
-              <Icon name="ph:plant-thin" /> vegetariana
+              <Icon name="ph:plant-thin" /> <span data-t="meta.vegetarian">vegetariana</span>
             </>
           )}
         </p>
         <p class="recipe-added">
-          <Icon name="ph:calendar-thin" /> adicionada em <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
+          <Icon name="ph:calendar-thin" /> <span data-t="meta.added_on_prefix">adicionada em</span> <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
         </p>
       </div>
       {data.description && <p class="recipe-description">{data.description}</p>}
@@ -125,26 +145,28 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     <!-- ============ BODY ============ -->
     <section class="body">
       <aside class="ingredients-col">
-        <h2 class="section-title">Ingredientes</h2>
+        <h2 class="section-title" data-t="recipe.ingredients">Ingredientes</h2>
         <div class="unit-toggle" role="tablist" aria-label="Sistema de unidades">
-          <button class="unit-btn active" type="button" data-unit="metric" aria-selected="true">métrico</button>
-          <button class="unit-btn" type="button" data-unit="imperial" aria-selected="false">imperial</button>
+          <button class="unit-btn active" type="button" data-unit="metric" aria-selected="true" data-t="recipe.units_metric">métrico</button>
+          <button class="unit-btn" type="button" data-unit="imperial" aria-selected="false" data-t="recipe.units_imperial">imperial</button>
         </div>
 
-        <ul class="ingredient-list" id="ingredient-list" data-original-servings={data.servings}>
+        <ul class="ingredient-list" id="ingredient-list" data-original-servings={data.servings ?? ''}>
           {data.ingredients.map((ing) => <li data-source={ing}>{ing}</li>)}
         </ul>
 
+        {data.servings && (
         <div class="portion-slider">
           <label>
-            <span class="portion-label">ajustar porções: <strong id="portion-value">{data.servings}</strong></span>
+            <span class="portion-label"><span data-t="recipe.adjust_servings">ajustar porções</span>: <strong id="portion-value">{data.servings}</strong></span>
             <input type="range" min="1" max="12" value={data.servings} id="portion-range" />
           </label>
         </div>
+        )}
 
         {data.materials.length > 0 && (
           <>
-            <h2 class="section-title materials-title">Materiais</h2>
+            <h2 class="section-title materials-title" data-t="recipe.materials">Materiais</h2>
             <ul class="material-list">
               {data.materials.map((m) => (
                 <li>
@@ -159,9 +181,9 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
       <div class="steps-col">
         <div class="steps-header">
-          <h2 class="section-title">Modo de preparo</h2>
+          <h2 class="section-title" data-t="recipe.steps">Modo de preparo</h2>
           <button class="btn btn-primary cooking-mode" type="button" id="open-cooking-mode">
-            <Icon name="ph:cooking-pot-thin" /> Modo cozinha
+            <Icon name="ph:cooking-pot-thin" /> <span data-t="recipe.cooking_mode">Modo cozinha</span>
           </button>
         </div>
 
@@ -176,20 +198,20 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
         {data.notes && (
           <aside class="recipe-notes">
-            <h3 class="notes-title">Notas</h3>
+            <h3 class="notes-title" data-t="recipe.notes">Notas</h3>
             <p>{data.notes}</p>
           </aside>
         )}
 
         <div class="share">
           <button class="btn btn-ghost" type="button" id="share-whatsapp">
-            <Icon name="ph:whatsapp-logo-thin" /> Mandar pro WhatsApp
+            <Icon name="ph:whatsapp-logo-thin" /> <span data-t="recipe.share_whatsapp_full">Mandar pro WhatsApp</span>
           </button>
           <button class="btn btn-ghost" type="button" id="share-copy">
-            <Icon name="ph:link-thin" /> <span class="copy-label">Copiar link</span>
+            <Icon name="ph:link-thin" /> <span class="copy-label" data-t="recipe.copy_link">Copiar link</span>
           </button>
           <button class="btn btn-ghost" type="button" id="share-print">
-            <Icon name="ph:printer-thin" /> Imprimir
+            <Icon name="ph:printer-thin" /> <span data-t="recipe.print">Imprimir</span>
           </button>
         </div>
       </div>
@@ -199,7 +221,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
   <footer class="print-footer" aria-hidden="true">
     <span class="pf-credit">Cozy Corner · recipes by Angela Madeira</span>
     <span class="pf-sep">·</span>
-    <span class="pf-date">impresso em <span id="print-date"></span></span>
+    <span class="pf-date"><span data-t="recipe.printed_on">impresso em</span> <span id="print-date"></span></span>
   </footer>
 
   <CookingMode steps={data.steps} ingredients={data.ingredients} recipeTitle={data.title} />
@@ -215,7 +237,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     <!-- Painel (estado aberto) -->
     <div class="timer-panel" id="timer-panel" hidden role="dialog" aria-label="Cronômetro">
       <header class="timer-head">
-        <h3 class="timer-title">Cronômetro</h3>
+        <h3 class="timer-title" data-t="timer.title">Cronômetro</h3>
         <button class="timer-close" id="timer-close" type="button" aria-label="fechar">
           <Icon name="ph:x-thin" width={18} height={18} />
         </button>
@@ -226,28 +248,28 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       </div>
 
       <div class="timer-presets">
-        <button class="timer-preset" type="button" data-min="5">5 min</button>
-        <button class="timer-preset" type="button" data-min="10">10 min</button>
-        <button class="timer-preset" type="button" data-min="15">15 min</button>
-        <button class="timer-preset" type="button" data-min="20">20 min</button>
-        <button class="timer-preset" type="button" data-min="30">30 min</button>
-        <button class="timer-preset" type="button" data-min="60">60 min</button>
+        <button class="timer-preset" type="button" data-min="5">5 <span data-t="meta.minutes">min</span></button>
+        <button class="timer-preset" type="button" data-min="10">10 <span data-t="meta.minutes">min</span></button>
+        <button class="timer-preset" type="button" data-min="15">15 <span data-t="meta.minutes">min</span></button>
+        <button class="timer-preset" type="button" data-min="20">20 <span data-t="meta.minutes">min</span></button>
+        <button class="timer-preset" type="button" data-min="30">30 <span data-t="meta.minutes">min</span></button>
+        <button class="timer-preset" type="button" data-min="60">60 <span data-t="meta.minutes">min</span></button>
       </div>
 
       <label class="timer-custom">
-        <span>ou digite:</span>
+        <span data-t="timer.or_type">ou digite:</span>
         <input type="text" id="timer-custom" placeholder="00:00" inputmode="numeric" pattern="[0-9:]*" maxlength="5" aria-label="tempo em minutos e segundos" />
       </label>
 
       <div class="timer-controls">
         <button class="timer-btn timer-start" id="timer-start" type="button">
-          <Icon name="ph:play-thin" width={16} height={16} /> iniciar
+          <Icon name="ph:play-thin" width={16} height={16} /> <span data-t="timer.start_lower">iniciar</span>
         </button>
         <button class="timer-btn timer-pause" id="timer-pause" type="button" hidden>
-          <Icon name="ph:pause-thin" width={16} height={16} /> pausar
+          <Icon name="ph:pause-thin" width={16} height={16} /> <span data-t="timer.pause_lower">pausar</span>
         </button>
         <button class="timer-btn timer-reset" id="timer-reset" type="button">
-          <Icon name="ph:arrow-counter-clockwise-thin" width={16} height={16} /> zerar
+          <Icon name="ph:arrow-counter-clockwise-thin" width={16} height={16} /> <span data-t="timer.reset_lower">zerar</span>
         </button>
       </div>
     </div>
@@ -256,13 +278,13 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
   <!-- Confirm modal pra sair com timer ativo -->
   <div class="confirm-backdrop" id="confirm-backdrop" hidden></div>
   <div class="confirm-dialog" id="confirm-dialog" hidden role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-body">
-    <h2 id="confirm-title" class="confirm-title">Cronômetro rodando</h2>
-    <p id="confirm-body" class="confirm-body">
+    <h2 id="confirm-title" class="confirm-title" data-t="timer.confirm_title">Cronômetro rodando</h2>
+    <p id="confirm-body" class="confirm-body" data-t="timer.confirm_body">
       Se sair desta página agora, o cronômetro vai parar e você perde o tempo restante.
     </p>
     <div class="confirm-actions">
-      <button class="confirm-cancel" id="confirm-cancel" type="button">Cancelar</button>
-      <button class="confirm-leave" id="confirm-leave" type="button">Sair mesmo assim</button>
+      <button class="confirm-cancel" id="confirm-cancel" type="button" data-t="timer.confirm_cancel">Cancelar</button>
+      <button class="confirm-leave" id="confirm-leave" type="button" data-t="timer.confirm_leave">Sair mesmo assim</button>
     </div>
   </div>
 
@@ -367,7 +389,18 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
+    .media-slot img,
+    .media-slot video,
+    .media-slot iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: none;
+      display: block;
+    }
+    .media-slot iframe { aspect-ratio: 16 / 9; height: auto; max-height: 100%; }
     .placeholder {
       display: inline-flex;
       flex-direction: column;
@@ -814,7 +847,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     .timer-fab {
       position: fixed;
       bottom: 24px; right: 24px;
-      width: 56px; height: 56px;
+      width: 48px; height: 48px;
       border-radius: 999px;
       background: var(--ink);
       color: var(--bg);
@@ -867,11 +900,13 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       z-index: 1101;
     }
     /* No modo cozinha o nav do prev/próximo fica no fundo; sobe o FAB
-       pra não conflitar. Usa body.cm-open (toggled pelo CookingMode). */
+       pra alinhar com o X (cm-close) no header do modo cozinha.
+       Header tem padding var(--s-4)=16px (top) e var(--s-5)=24px (right).
+       Botões 48px. Gap entre timer e X: var(--s-4)=16px. */
     :global(body.cm-open) .timer-fab {
       bottom: auto;
-      top: 12px;
-      right: 76px; /* deixa espaço pro X do modo cozinha */
+      top: var(--s-4);                                  /* alinhado com o X */
+      right: calc(var(--s-5) + 48px + var(--s-4));      /* 24 + 48 + 16 = 88 */
     }
     :global(body.cm-open) .timer-panel {
       bottom: auto;

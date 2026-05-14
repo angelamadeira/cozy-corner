@@ -21,21 +21,21 @@ import { Icon } from 'astro-icon/components';
       <span class="nf-num">404</span>
     </div>
 
-    <h1 class="nf-title">essa página não está na cozinha</h1>
-    <p class="nf-sub">
+    <h1 class="nf-title" data-t="nf.title">essa página não está na cozinha</h1>
+    <p class="nf-sub" data-t="nf.sub">
       talvez tenha sido um link velho, ou um endereço digitado meio torto.
       sem stress — dá uma olhada por aqui:
     </p>
 
     <div class="nf-actions">
       <a href="/" class="btn btn-primary">
-        <Icon name="ph:arrow-left-thin" /> voltar pra cozinha
+        <Icon name="ph:arrow-left-thin" /> <span data-t="nav.back_to_kitchen">voltar pra cozinha</span>
       </a>
       <a href="/busca/" class="btn btn-ghost">
-        <Icon name="ph:magnifying-glass-thin" /> buscar uma receita
+        <Icon name="ph:magnifying-glass-thin" /> <span data-t="nf.search_recipe">buscar uma receita</span>
       </a>
       <a href="/categorias/todas/" class="btn btn-ghost">
-        <Icon name="ph:books-thin" /> ver todas
+        <Icon name="ph:books-thin" /> <span data-t="nf.see_all">ver todas</span>
       </a>
     </div>
   </main>

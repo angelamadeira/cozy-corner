@@ -13,15 +13,15 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
 
 <div class="cm-overlay" id="cooking-mode" hidden role="dialog" aria-modal="true" aria-label={`Modo cozinha — ${recipeTitle}`}>
   <header class="cm-header">
-    <button class="cm-icon-btn cm-ing-toggle-mobile" id="cm-ingredients-toggle" type="button" aria-label="mostrar ingredientes" aria-expanded="true">
+    <button class="cm-icon-btn cm-ing-toggle-mobile" id="cm-ingredients-toggle" type="button" aria-label="mostrar ingredientes" aria-expanded="true" data-t-attr="aria-label:cooking.show_ingredients">
       <Icon name="ph:list-bullets-thin" width={22} height={22} />
     </button>
     <div class="cm-progress">
       <span class="cm-step-num" id="cm-step-num">1</span>
-      <span class="cm-of">de</span>
+      <span class="cm-of" data-t="cooking.step_of">de</span>
       <span class="cm-step-total">{steps.length}</span>
     </div>
-    <button class="cm-icon-btn" id="cm-close" type="button" aria-label="sair do modo cozinha">
+    <button class="cm-icon-btn" id="cm-close" type="button" aria-label="sair do modo cozinha" data-t-attr="aria-label:cooking.exit">
       <Icon name="ph:x-thin" width={22} height={22} />
     </button>
   </header>
@@ -38,23 +38,23 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
 
       <div class="cm-end" id="cm-end" hidden>
         <Icon name="ph:fork-knife-thin" width={56} height={56} />
-        <h2 class="cm-end-title">Prontinho!</h2>
-        <p class="cm-end-sub">Itadakimasu :)</p>
+        <h2 class="cm-end-title" data-t="cooking.done_title">Prontinho!</h2>
+        <p class="cm-end-sub" data-t="cooking.done_subtitle">Itadakimasu :)</p>
         <button class="cm-restart" id="cm-restart" type="button">
           <svg class="cm-restart-icon" viewBox="0 0 256 256" width="16" height="16" aria-hidden="true">
             <path d="M220 128a92 92 0 0 1-90.77 92H128a91.47 91.47 0 0 1-63.13-25.1a4 4 0 1 1 5.5-5.82A84 84 0 1 0 68.6 68.57l-.13.12L34.3 100H72a4 4 0 0 1 0 8H24a4 4 0 0 1-4-4V56a4 4 0 0 1 8 0v38.89l35-32A92 92 0 0 1 220 128"/>
           </svg>
-          <span class="cm-restart-text">revisar do início</span>
+          <span class="cm-restart-text" data-t="cooking.restart">revisar do início</span>
         </button>
       </div>
 
       <footer class="cm-nav">
         <button class="cm-nav-btn cm-prev" id="cm-prev" type="button">
           <Icon name="ph:caret-left-thin" width={18} height={18} />
-          <span>anterior</span>
+          <span data-t="cooking.prev">anterior</span>
         </button>
         <button class="cm-nav-btn cm-next" id="cm-next" type="button">
-          <span id="cm-next-label">próximo</span>
+          <span id="cm-next-label" data-t="cooking.next">próximo</span>
           <Icon name="ph:caret-right-thin" width={18} height={18} />
         </button>
       </footer>
@@ -62,7 +62,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
 
     <aside class="cm-ingredients" id="cm-ingredients">
       <header class="cm-ing-header">
-        <h3>Ingredientes</h3>
+        <h3 data-t="recipe.ingredients">Ingredientes</h3>
       </header>
       <ul class="cm-ing-list">
         {ingredients.map((ing) => (
@@ -115,9 +115,17 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     }
   }
 
+  // Helper i18n — usa __cozyT do BaseLayout com fallback PT em runtime
+  const T = (key, fallback) => {
+    const fn = window.__cozyT;
+    return fn ? fn(key) : fallback;
+  };
+
   function render() {
     const total = steps.length;
     const atEnd = current >= total;
+    // Salva step atual pra sobreviver refresh
+    try { sessionStorage.setItem(STEP_KEY, String(current)); } catch (e) {}
 
     if (atEnd) {
       stage.setAttribute('hidden', '');
@@ -132,22 +140,39 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
       stepText.textContent = steps[current];
       stepNum.textContent = current + 1;
       progressFill.style.width = ((current + 1) / total) * 100 + '%';
-      nextLabel.textContent = current === total - 1 ? 'concluir' : 'próximo';
+      const isLast = current === total - 1;
+      nextLabel.textContent = isLast ? T('cooking.finish', 'concluir') : T('cooking.next', 'próximo');
+      // O data-t do <span> não pode bater contra esse texto dinâmico — remove
+      // pra evitar que o __cozyApplyI18n() do toggle de idioma sobrescreva.
+      nextLabel.removeAttribute('data-t');
     }
 
     prevBtn.disabled = current === 0;
     nextBtn.disabled = false;
   }
 
+  // Re-renderiza quando o user troca o idioma (atualiza "próximo"/"concluir")
+  document.addEventListener('cozy-lang-changed', () => {
+    if (!overlay.hasAttribute('hidden')) render();
+  });
+
+  // Chave do sessionStorage por receita (path inclui slug)
+  const STEP_KEY = 'cm-step:' + location.pathname;
+
   function open() {
     if (!overlay) return;
-    current = 0;
+    // Se está reabrindo após refresh, restaura step. Senão começa do 0.
+    const saved = sessionStorage.getItem(STEP_KEY);
+    current = saved !== null ? parseInt(saved, 10) || 0 : 0;
     overlay.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
     document.body.classList.add('cm-open');
+    // Hash na URL pra sobreviver refresh (replaceState não cria entrada no histórico)
+    if (location.hash !== '#cooking') {
+      history.replaceState(null, '', location.pathname + location.search + '#cooking');
+    }
     requestWakeLock();
     render();
-    // Re-request wakelock quando a aba volta a ficar visível
     document.addEventListener('visibilitychange', onVisibilityChange);
   }
 
@@ -156,6 +181,11 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     overlay.setAttribute('hidden', '');
     document.body.style.overflow = '';
     document.body.classList.remove('cm-open');
+    // Limpa hash e step salvo
+    if (location.hash === '#cooking') {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+    sessionStorage.removeItem(STEP_KEY);
     releaseWakeLock();
     document.removeEventListener('visibilitychange', onVisibilityChange);
   }
@@ -191,10 +221,24 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
   nextBtn?.addEventListener('click', next);
   restartBtn?.addEventListener('click', restart);
 
+  // Auto-abre o modo cozinha se a URL chega com #cooking (após refresh).
+  // Espera o DOM montar pro overlay/render funcionarem corretamente.
+  if (location.hash === '#cooking') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', open);
+    } else {
+      open();
+    }
+  }
+
   // Toggle ingredientes (só usado em mobile — em desktop fica sempre visível)
   ingredientsBtn?.addEventListener('click', () => {
     const collapsed = ingredientsPanel.classList.toggle('cm-ing-collapsed');
     ingredientsBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    // Atualiza data-t-attr pra refletir o estado atual (mostrar/esconder)
+    const key = collapsed ? 'cooking.show_ingredients' : 'cooking.hide_ingredients';
+    ingredientsBtn.setAttribute('data-t-attr', 'aria-label:' + key);
+    ingredientsBtn.setAttribute('aria-label', T(key, collapsed ? 'mostrar ingredientes' : 'esconder ingredientes'));
   });
 
   // Keyboard
@@ -262,7 +306,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     border-bottom: 1px solid var(--line-soft);
   }
   .cm-icon-btn {
-    width: 40px; height: 40px;
+    width: 48px; height: 48px;
     background: transparent;
     border: 1px solid var(--line);
     border-radius: var(--r-pill);
