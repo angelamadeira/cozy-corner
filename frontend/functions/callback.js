@@ -44,11 +44,13 @@ export async function onRequest(context) {
     provider: 'github',
   });
 
-  // HTML que roda no popup. O Decap faz um handshake:
-  //   1. popup sinaliza 'authorizing:github' pro opener
-  //   2. opener (Decap admin) responde com a mesma mensagem
-  //   3. ao receber a resposta, popup manda o token de fato
-  // Sem essa coreografia, o Decap ignora o token e o login parece "preso".
+  // HTML que roda no popup. Tenta vários caminhos pro Decap pegar o token:
+  //   1. Handshake clássico: popup sinaliza 'authorizing:github' pro opener,
+  //      opener responde, popup manda o token.
+  //   2. Listener: se o Decap mandar 'authorizing:' a qualquer momento,
+  //      respondemos com o token.
+  //   3. Defensivo: depois de 500ms manda o token direto algumas vezes pro
+  //      caso do Decap não fazer o handshake (versões variam).
   const html = `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -68,25 +70,58 @@ export async function onRequest(context) {
 <script>
   (function () {
     var msg = 'authorization:github:success:' + ${JSON.stringify(payload)};
+    var sent = false;
 
-    function authorize(e) {
+    function log() {
+      try { console.log.apply(console, ['[decap-oauth]'].concat([].slice.call(arguments))); } catch (e) {}
+    }
+
+    function sendToken(targetOrigin) {
+      if (!window.opener || window.opener.closed) {
+        log('opener missing, cannot send token');
+        return;
+      }
+      window.opener.postMessage(msg, targetOrigin || '*');
+      sent = true;
+      log('sent token to opener (origin=' + (targetOrigin || '*') + ')');
+    }
+
+    function handleMessage(e) {
+      log('received message from opener', { origin: e.origin, data: e.data });
       if (typeof e.data !== 'string') return;
-      if (e.data.indexOf('authorizing:') !== 0) return;
-      if (!window.opener) return;
-      // Responde com o token usando o origin que veio na mensagem.
-      window.opener.postMessage(msg, e.origin);
+      if (e.data.indexOf('authorizing:') === 0) {
+        sendToken(e.origin || '*');
+      }
     }
 
-    window.addEventListener('message', authorize, false);
+    window.addEventListener('message', handleMessage, false);
+    log('listener installed, opener exists:', !!window.opener);
 
-    // Sinaliza que tá pronto — Decap responde com 'authorizing:github'
-    // e aí cai no handler acima.
+    // Sinaliza pronto pro opener.
     if (window.opener) {
-      window.opener.postMessage('authorizing:github', '*');
+      try {
+        window.opener.postMessage('authorizing:github', '*');
+        log('sent authorizing:github to opener');
+      } catch (e) { log('error posting authorizing', e); }
     }
 
-    // Fecha o popup depois de 2s (tempo de fazer o handshake).
-    setTimeout(function () { window.close(); }, 2000);
+    // Defensivo: depois de 500ms começa a tentar mandar o token direto
+    // (em caso de versões do Decap que não fazem o handshake completo).
+    var attempts = 0;
+    var interval = setInterval(function () {
+      if (sent || attempts >= 8) {
+        clearInterval(interval);
+        return;
+      }
+      attempts++;
+      sendToken('*');
+    }, 500);
+
+    // Fecha o popup depois de 5s.
+    setTimeout(function () {
+      log('closing popup, sent=' + sent);
+      window.close();
+    }, 5000);
   })();
 </script>
 <p>Login bem-sucedido! Pode fechar essa janela. 💛</p>
