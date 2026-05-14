@@ -371,25 +371,19 @@ const countByCategory = Object.fromEntries(
        inverte em dark mode pra ficar cremoso no fundo navy. */
     body.dark-mode .kitchen-canvas .scene { filter: invert(1); }
 
-    /* Hotspots: rects transparentes posicionados em % do canvas */
+    /* Hotspots: áreas clicáveis transparentes posicionadas em % do canvas.
+       Sem bordas/destaque visual — só o tooltip indica o objeto no hover. */
     .kitchen-canvas .hs {
       position: absolute;
       background: transparent;
       border: none;
       padding: 0;
       cursor: pointer;
-      border-radius: 6px;
-      transition: background var(--dur-fast), transform var(--dur-fast);
     }
-    .kitchen-canvas .hs:hover {
-      background: rgba(197, 107, 74, 0.18);
-      transform: scale(1.03);
-    }
-    /* DEBUG: bordas tracejadas pra ver onde os hotspots estão.
-       Tira o body.hs-debug pra esconder. */
+    /* DEBUG opcional: aperta 'D' pra ver os retângulos quando precisar alinhar */
     body.hs-debug .kitchen-canvas .hs {
       background: rgba(197, 107, 74, 0.15);
-      border: 2px dashed var(--terracota);
+      outline: 2px dashed var(--terracota);
     }
     body.hs-debug .kitchen-canvas .hs::after {
       content: attr(data-label);
@@ -816,10 +810,9 @@ const countByCategory = Object.fromEntries(
       document.body.classList.add('intro-active');
     }
 
-    // DEBUG: visualiza hotspots da cozinha. Apertar 'D' tira/põe.
-    document.body.classList.add('hs-debug');
+    // DEBUG: aperta 'D' pra ver os retângulos clicáveis dos hotspots.
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'd' || e.key === 'D') {
+      if ((e.key === 'd' || e.key === 'D') && !['INPUT','TEXTAREA'].includes((document.activeElement?.tagName)||'')) {
         document.body.classList.toggle('hs-debug');
       }
     });
