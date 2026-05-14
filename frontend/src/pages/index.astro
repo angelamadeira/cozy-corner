@@ -512,6 +512,11 @@ const countByCategory = Object.fromEntries(
       transition: opacity var(--dur-base), visibility var(--dur-base);
       z-index: 150;
     }
+    /* No dark mode o overlay escuro some no fundo navy. Usa cream sutil
+       pra criar contraste visível por cima. */
+    body.dark-mode .drawer-backdrop {
+      background: rgba(245, 240, 229, 0.12);
+    }
     .drawer-backdrop.open { opacity: 1; visibility: visible; }
 
     .cat-drawer {
