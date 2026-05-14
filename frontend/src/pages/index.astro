@@ -62,7 +62,9 @@ const countByCategory = Object.fromEntries(
   <section id="flow-kitchen">
     <p class="kitchen-title">cozinha · clique em qualquer elemento</p>
     <div class="kitchen-canvas">
-      <svg class="scene" viewBox="0 0 998 801" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cozinha com elementos clicáveis">
+      <svg class="scene" viewBox="0 0 1500 1000" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cozinha com elementos clicáveis">
+        <!-- Conteúdo original 998x801, centralizado num canvas 1500x1000 -->
+        <g transform="translate(251 100)">
         <!-- Estrutura (não-clicável) -->
         <rect x="63.5" y="656.868" width="932" height="240" stroke="currentColor" stroke-width="5"/>
         <rect x="652.5" y="379.868" width="294" height="277" stroke="currentColor" stroke-width="5"/>
@@ -124,6 +126,7 @@ const countByCategory = Object.fromEntries(
         <g class="hs" data-action="akim" role="button" aria-label="Akim" tabindex="0">
           <path d="M77.9648 582.471C84.1218 587.599 88 595.06 88 603.368C88 604.737 87.892 606.083 87.6885 607.4C96.97 604.841 107.857 603.368 119.5 603.368C153.466 603.368 181 615.904 181 631.368C181 646.832 153.466 659.368 119.5 659.368C85.5345 659.368 58 646.832 58 631.368C41.4315 631.368 28 618.832 28 603.368C28 600.619 28.4257 597.963 29.2168 595.453L28.6846 595.961L23.0684 572.739L43.6201 578.789C47.8898 576.608 52.7897 575.368 58 575.368C58.3399 575.368 58.6785 575.374 59.0156 575.385L72.4629 561.938L77.9648 582.471ZM119.5 608.368C106.969 608.368 95.483 610.139 86.1494 613.066C82.4813 622.337 73.7073 629.298 63.0107 630.976C63.0038 631.108 63 631.238 63 631.368C63 635.938 67.295 641.703 78.085 646.616C88.4264 651.324 103.064 654.368 119.5 654.368C135.936 654.368 150.574 651.324 160.915 646.616C171.705 641.703 176 635.938 176 631.368C176 626.798 171.705 621.032 160.915 616.12C150.574 611.412 135.936 608.368 119.5 608.368ZM58 580.368C43.8624 580.368 33 590.985 33 603.368C33 615.751 43.8624 626.368 58 626.368C58.3306 626.368 58.6594 626.36 58.9863 626.348C61.7696 619.348 70.2692 613.254 82.2051 609.103C82.7236 607.26 83 605.336 83 603.368C83 590.985 72.1376 580.368 58 580.368ZM79.1152 615.662C78.7672 615.813 78.4239 615.966 78.085 616.12C71.6432 619.053 67.5173 622.29 65.2373 625.395C71.0915 623.776 75.9634 620.244 79.1152 615.662ZM31.5088 586.368L36.2676 581.837L29.9639 579.982L31.5088 586.368ZM65.2725 576.198C66.3213 576.442 67.3487 576.735 68.3506 577.079L71.5762 577.944L69.875 571.597L65.2725 576.198Z" fill="currentColor"/>
         </g>
+        </g><!-- /translate -->
       </svg>
     </div>
   </section>
@@ -407,7 +410,7 @@ const countByCategory = Object.fromEntries(
     .kitchen-canvas {
       position: relative;
       width: 70%;
-      aspect-ratio: 998 / 801;
+      aspect-ratio: 1500 / 1000;
       margin: 0 auto;
       color: var(--ink);
     }
