@@ -452,6 +452,19 @@ const countByCategory = Object.fromEntries(
         justify-content: flex-end;
         min-height: 100vh;
       }
+      /* Com a gaveta aberta, a cena usa toda a largura sobrando
+         (em vez dos 70% padrão), pra não ficar pequena demais. */
+      body.drawer-open .kitchen-canvas {
+        width: 100%;
+      }
+      /* Header também encolhe pra acompanhar — logo segue centrado
+         com o conteúdo, não com a viewport. */
+      body.drawer-open .site-header {
+        right: 520px;
+      }
+    }
+    .site-header {
+      transition: right 0.45s var(--ease-out);
     }
 
     /* Tooltip flutuante */
