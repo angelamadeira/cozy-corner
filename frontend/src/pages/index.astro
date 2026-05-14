@@ -61,69 +61,20 @@ const countByCategory = Object.fromEntries(
   <!-- ===================== COZINHA ===================== -->
   <section id="flow-kitchen">
     <div class="kitchen-canvas">
-      <svg class="scene" viewBox="0 0 1500 1000" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cozinha com elementos clicáveis">
-        <!-- Estrutura (não-clicável) -->
-        <rect x="128.048" y="859.93" width="1320.45" height="341.57" stroke="currentColor" stroke-width="5"/>
-        <rect x="969.717" y="468.094" width="417.956" height="393.909" stroke="currentColor" stroke-width="5"/>
-        <path d="M275.492 560.37H814.443" stroke="currentColor" stroke-width="5"/>
-        <path d="M967.217 472.667L1390.17 472.667" stroke="currentColor" stroke-width="5"/>
-
-        <!-- Para congelar (geladeira superior) -->
-        <g class="hs" data-action="cat" data-key="congelar" role="button" aria-label="Para congelar" data-label="para congelar" tabindex="0">
-          <rect x="969.717" y="264.396" width="417.956" height="205.771" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Pratos principais -->
-        <g class="hs" data-action="cat" data-key="principais" role="button" aria-label="Pratos principais" data-label="pratos principais" tabindex="0">
-          <rect x="419.449" y="765.154" width="221.331" height="96.8491" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Sobremesas -->
-        <g class="hs" data-action="cat" data-key="sobremesas" role="button" aria-label="Sobremesas" data-label="sobremesas" tabindex="0">
-          <rect x="732.069" y="765.154" width="137.872" height="96.8491" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Receitas rápidas (relógio) -->
-        <g class="hs" data-action="cat" data-key="rapidas" role="button" aria-label="Receitas rápidas" data-label="receitas rápidas" tabindex="0">
-          <circle cx="786.824" cy="221.347" r="83.7888" stroke="currentColor" stroke-width="5"/>
-          <path d="M786.824 166.179V223.505L817.944 253.883" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Vegetarianas (vaso + planta) -->
-        <g class="hs" data-action="cat" data-key="vegetarianas" role="button" aria-label="Vegetarianas" data-label="vegetarianas" tabindex="0">
-          <rect x="1201.71" y="169.62" width="136.457" height="96.8491" stroke="currentColor" stroke-width="5"/>
-          <path d="M1181.18 126.031L1236.53 168.907H1284.07V162.394H1410.38L1298.26 143.399L1333.75 113.549L1259.24 136.343L1236.53 78V136.343L1181.18 126.031Z" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Datas comemorativas (calendário) -->
-        <g class="hs" data-action="cat" data-key="datas" role="button" aria-label="Datas comemorativas" data-label="datas comemorativas" tabindex="0">
-          <rect x="1043.27" y="550.139" width="133.628" height="129.384" stroke="currentColor" stroke-width="5"/>
-          <rect x="1061.66" y="592.576" width="23.2914" height="20.4623" stroke="currentColor" stroke-width="5"/>
-          <rect x="1061.66" y="627.94" width="23.2914" height="20.4623" stroke="currentColor" stroke-width="5"/>
-          <rect x="1098.44" y="592.576" width="23.2914" height="20.4623" stroke="currentColor" stroke-width="5"/>
-          <rect x="1098.44" y="627.94" width="23.2914" height="20.4623" stroke="currentColor" stroke-width="5"/>
-          <rect x="1135.22" y="592.576" width="23.2914" height="20.4623" stroke="currentColor" stroke-width="5"/>
-          <rect x="1135.22" y="627.94" width="23.2914" height="20.4623" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Deixe seu recado (post-it) -->
-        <g class="hs" data-action="recado" role="button" aria-label="Deixe seu recado" data-label="deixe seu recado" tabindex="0">
-          <rect x="1278.15" y="529.925" width="79.279" height="76.699" transform="rotate(37.465 1278.15 529.925)" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Sobre mim (quadro) -->
-        <g class="hs" data-action="sobre" role="button" aria-label="Sobre mim" data-label="sobre mim" tabindex="0">
-          <rect x="343.062" y="397.365" width="146.359" height="163.334" stroke="currentColor" stroke-width="5"/>
-          <rect x="355.793" y="411.511" width="120.897" height="135.042" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Todas as receitas (livros) -->
-        <g class="hs" data-action="cat" data-key="todas" role="button" aria-label="Todas as receitas" data-label="todas as receitas" tabindex="0">
-          <rect x="577.881" y="509.117" width="156.261" height="27.5351" stroke="currentColor" stroke-width="5"/>
-          <rect x="577.881" y="534.579" width="156.261" height="26.1205" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Dark mode (interruptor) -->
-        <g class="hs" data-action="dark-mode" role="button" aria-label="Dark mode (liga/desliga)" data-label="dark mode" tabindex="0">
-          <rect x="50.2463" y="516.19" width="77.0451" height="96.8491" stroke="currentColor" stroke-width="5"/>
-          <rect x="72.8794" y="544.481" width="30.3643" height="38.8517" stroke="currentColor" stroke-width="5"/>
-        </g>
-        <!-- Akim (gato) -->
-        <g class="hs" data-action="akim" role="button" aria-label="Akim" tabindex="0">
-          <path d="M158.033 755.725C166.743 762.978 172.228 773.535 172.228 785.287L172.214 786.309C172.171 787.894 172.025 789.457 171.788 790.991C184.918 787.371 200.318 785.287 216.787 785.287L219.032 785.3C266.041 785.842 303.783 803.362 303.783 824.896L303.777 825.407C303.174 847.046 264.458 864.503 216.787 864.503L214.542 864.49C167.907 863.952 130.391 846.705 129.798 825.407L129.791 824.895L128.696 824.882C106.128 824.348 87.939 807.371 87.3674 786.309L87.3538 785.287C87.3538 781.398 87.9571 777.641 89.0764 774.09L88.3225 774.809L80.3782 741.961L109.448 750.52C115.489 747.434 122.42 745.679 129.791 745.679L130.886 745.691C131 745.694 131.115 745.7 131.229 745.703L150.251 726.682L158.033 755.725ZM216.787 790.287C199.547 790.287 183.637 792.632 170.478 796.572C165.729 811.508 151.801 822.755 134.794 824.619C134.792 824.711 134.791 824.804 134.791 824.896C134.792 832.671 141.941 841.339 157.344 848.352C172.299 855.16 193.311 859.503 216.787 859.503C240.264 859.503 261.275 855.16 276.231 848.352C291.634 841.339 298.783 832.671 298.783 824.896C298.783 817.12 291.635 808.452 276.231 801.438C261.275 794.63 240.264 790.287 216.787 790.287ZM127.071 750.77C107.384 752.065 92.354 767.313 92.3538 785.287C92.354 804.081 108.785 819.894 129.791 819.895C130.022 819.895 130.252 819.891 130.481 819.887C133.596 808.648 147.054 798.876 166.377 792.61C166.933 790.242 167.228 787.791 167.228 785.287C167.228 774.021 161.322 763.828 152.068 757.468L127.071 750.77ZM164.344 798.595C161.887 799.485 159.549 800.434 157.344 801.438C145.476 806.842 138.508 813.228 135.935 819.432C148.932 817.46 159.49 809.337 164.344 798.595ZM91.1467 765.216L103.078 753.855L87.2737 749.202L91.1467 765.216ZM137.645 746.358C142.697 747.241 147.434 748.958 151.685 751.353L147.663 736.34L137.645 746.358Z" fill="currentColor"/>
-        </g>
-      </svg>
+      <img class="scene" src="/kitchen/cozinha.svg?v=2" alt="" />
+      <!-- Hotspots transparentes posicionados em cima da ilustração.
+           Coordenadas em % do canvas (viewBox 1500x1000). -->
+      <button class="hs hs-congelar"    type="button" data-action="cat" data-key="congelar"    data-label="para congelar"        aria-label="Para congelar"></button>
+      <button class="hs hs-principais"  type="button" data-action="cat" data-key="principais"  data-label="pratos principais"    aria-label="Pratos principais"></button>
+      <button class="hs hs-sobremesas"  type="button" data-action="cat" data-key="sobremesas"  data-label="sobremesas"           aria-label="Sobremesas"></button>
+      <button class="hs hs-rapidas"     type="button" data-action="cat" data-key="rapidas"     data-label="receitas rápidas"     aria-label="Receitas rápidas"></button>
+      <button class="hs hs-vegetarianas" type="button" data-action="cat" data-key="vegetarianas" data-label="vegetarianas"        aria-label="Vegetarianas"></button>
+      <button class="hs hs-datas"       type="button" data-action="cat" data-key="datas"       data-label="datas comemorativas"  aria-label="Datas comemorativas"></button>
+      <button class="hs hs-recado"      type="button" data-action="recado"                     data-label="deixe seu recado"     aria-label="Deixe seu recado"></button>
+      <button class="hs hs-sobre"       type="button" data-action="sobre"                      data-label="sobre mim"            aria-label="Sobre mim"></button>
+      <button class="hs hs-todas"       type="button" data-action="cat" data-key="todas"       data-label="todas as receitas"    aria-label="Todas as receitas"></button>
+      <button class="hs hs-dark"        type="button" data-action="dark-mode"                  data-label="dark mode"            aria-label="Dark mode"></button>
+      <button class="hs hs-akim"        type="button" data-action="akim"                                                          aria-label="Akim"></button>
     </div>
   </section>
 
@@ -414,29 +365,43 @@ const countByCategory = Object.fromEntries(
       width: 100%;
       height: 100%;
       display: block;
+      pointer-events: none;
     }
-    /* Hotspots no SVG — área = bbox do grupo */
-    .kitchen-canvas .scene :global(.hs) {
+    /* SVG carregado via <img> tem currentColor preto por default;
+       inverte em dark mode pra ficar cremoso no fundo navy. */
+    body.dark-mode .kitchen-canvas .scene { filter: invert(1); }
+
+    /* Hotspots: rects transparentes posicionados em % do canvas */
+    .kitchen-canvas .hs {
+      position: absolute;
+      background: transparent;
+      border: none;
+      padding: 0;
       cursor: pointer;
-      pointer-events: bounding-box;
-      transition: transform 200ms ease;
-      transform-box: fill-box;
-      transform-origin: center;
+      border-radius: 6px;
+      transition: background var(--dur-fast), transform var(--dur-fast);
     }
-    .kitchen-canvas .scene :global(.hs:hover) { transform: scale(1.04); }
-    .kitchen-canvas .scene :global(.hs:hover > rect),
-    .kitchen-canvas .scene :global(.hs:hover > circle),
-    .kitchen-canvas .scene :global(.hs:hover > path) {
-      stroke: var(--terracota);
+    .kitchen-canvas .hs:hover {
+      background: rgba(197, 107, 74, 0.12);
+      transform: scale(1.03);
     }
-    .kitchen-canvas .scene :global(.hs:hover > path[fill="currentColor"]) {
-      fill: var(--terracota);
-    }
-    .kitchen-canvas .scene :global(.hs:focus) { outline: none; }
-    .kitchen-canvas .scene :global(.hs:focus-visible) {
+    .kitchen-canvas .hs:focus { outline: none; }
+    .kitchen-canvas .hs:focus-visible {
       outline: 2px solid var(--terracota);
       outline-offset: 4px;
     }
+    /* Posições aproximadas dos hotspots (% do canvas 1500x1000) */
+    .hs-congelar     { left: 64.6%; top: 26.4%; width: 27.9%; height: 20.6%; }
+    .hs-principais   { left: 28.0%; top: 76.5%; width: 14.8%; height: 9.7%;  }
+    .hs-sobremesas   { left: 48.8%; top: 76.5%; width: 9.2%;  height: 9.7%;  }
+    .hs-rapidas      { left: 46.9%; top: 13.8%; width: 11.2%; height: 16.8%; }
+    .hs-vegetarianas { left: 78.7%; top: 7.8%;  width: 15.3%; height: 18.8%; }
+    .hs-datas        { left: 69.6%; top: 55.0%; width: 8.9%;  height: 12.9%; }
+    .hs-recado       { left: 82.7%; top: 52.5%; width: 7.3%;  height: 11.0%; }
+    .hs-sobre        { left: 22.9%; top: 39.7%; width: 9.8%;  height: 16.3%; }
+    .hs-todas        { left: 38.5%; top: 50.9%; width: 10.4%; height: 5.2%;  }
+    .hs-dark         { left: 3.3%;  top: 51.6%; width: 5.1%;  height: 9.7%;  }
+    .hs-akim         { left: 1.9%;  top: 74.5%; width: 18.7%; height: 13.0%; }
 
     /* Quando um drawer abre, encolhe o body, alinha cena ao bottom */
     body {
@@ -1005,7 +970,7 @@ const countByCategory = Object.fromEntries(
     // Tooltip flutuante
     const tooltip = document.getElementById('kitchen-tooltip')!;
     let tooltipPinTimer: number | undefined;
-    function showTooltipAt(g: SVGGElement, text: string, pinMs = 0) {
+    function showTooltipAt(g: Element, text: string, pinMs = 0) {
       const rect = g.getBoundingClientRect();
       tooltip.textContent = text;
       tooltip.style.left = `${rect.left + rect.width / 2}px`;
@@ -1017,13 +982,13 @@ const countByCategory = Object.fromEntries(
         tooltipPinTimer = window.setTimeout(() => {
           delete tooltip.dataset.pinned;
           if (!g.matches(':hover')) tooltip.classList.remove('show');
-          else tooltip.textContent = g.dataset.label ?? '';
+          else tooltip.textContent = (g as HTMLElement).dataset?.label ?? '';
         }, pinMs);
       }
     }
 
-    // Hotspots (SVG groups)
-    document.querySelectorAll<SVGGElement>('.kitchen-canvas .hs').forEach((g) => {
+    // Hotspots (botões HTML posicionados sobre o SVG)
+    document.querySelectorAll<HTMLButtonElement>('.kitchen-canvas .hs').forEach((g) => {
       const fire = () => {
         const action = g.dataset.action;
         const key = g.dataset.key;
