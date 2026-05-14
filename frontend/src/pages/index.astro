@@ -382,8 +382,28 @@ const countByCategory = Object.fromEntries(
       transition: background var(--dur-fast), transform var(--dur-fast);
     }
     .kitchen-canvas .hs:hover {
-      background: rgba(197, 107, 74, 0.12);
+      background: rgba(197, 107, 74, 0.18);
       transform: scale(1.03);
+    }
+    /* DEBUG: bordas tracejadas pra ver onde os hotspots estão.
+       Tira o body.hs-debug pra esconder. */
+    body.hs-debug .kitchen-canvas .hs {
+      background: rgba(197, 107, 74, 0.15);
+      border: 2px dashed var(--terracota);
+    }
+    body.hs-debug .kitchen-canvas .hs::after {
+      content: attr(data-label);
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--terracota);
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 3px;
+      pointer-events: none;
+      white-space: nowrap;
     }
     .kitchen-canvas .hs:focus { outline: none; }
     .kitchen-canvas .hs:focus-visible {
@@ -795,6 +815,14 @@ const countByCategory = Object.fromEntries(
     } else {
       document.body.classList.add('intro-active');
     }
+
+    // DEBUG: visualiza hotspots da cozinha. Apertar 'D' tira/põe.
+    document.body.classList.add('hs-debug');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'd' || e.key === 'D') {
+        document.body.classList.toggle('hs-debug');
+      }
+    });
 
     // =============================================
     // TYPEWRITER + WIPE
