@@ -6,6 +6,11 @@ import { CATEGORY_META } from '../lib/categories';
 import introData from '../content/pages/intro.json';
 import cozinhaData from '../content/pages/cozinha.json';
 import recadoData from '../content/pages/recado.json';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+// SVG da cozinha inlined em build time (pra hotspots com hit-area exata)
+const kitchenSvg = readFileSync(resolve(process.cwd(), 'public/kitchen/cozinha.svg'), 'utf-8');
 
 const recipes = await getCollection('recipes', ({ data }) => data.published);
 
@@ -61,20 +66,7 @@ const countByCategory = Object.fromEntries(
   <!-- ===================== COZINHA ===================== -->
   <section id="flow-kitchen">
     <div class="kitchen-canvas">
-      <img class="scene" src="/kitchen/cozinha.svg?v=3" alt="" />
-      <!-- Hotspots transparentes posicionados em cima da ilustração.
-           Coordenadas em % do canvas (viewBox 1500x1000). -->
-      <button class="hs hs-congelar"    type="button" data-action="cat" data-key="congelar"    data-label="para congelar"        aria-label="Para congelar"></button>
-      <button class="hs hs-principais"  type="button" data-action="cat" data-key="principais"  data-label="pratos principais"    aria-label="Pratos principais"></button>
-      <button class="hs hs-sobremesas"  type="button" data-action="cat" data-key="sobremesas"  data-label="sobremesas"           aria-label="Sobremesas"></button>
-      <button class="hs hs-rapidas"     type="button" data-action="cat" data-key="rapidas"     data-label="receitas rápidas"     aria-label="Receitas rápidas"></button>
-      <button class="hs hs-vegetarianas" type="button" data-action="cat" data-key="vegetarianas" data-label="vegetarianas"        aria-label="Vegetarianas"></button>
-      <button class="hs hs-datas"       type="button" data-action="cat" data-key="datas"       data-label="datas comemorativas"  aria-label="Datas comemorativas"></button>
-      <button class="hs hs-recado"      type="button" data-action="recado"                     data-label="deixe seu recado"     aria-label="Deixe seu recado"></button>
-      <button class="hs hs-sobre"       type="button" data-action="sobre"                      data-label="sobre mim"            aria-label="Sobre mim"></button>
-      <button class="hs hs-todas"       type="button" data-action="cat" data-key="todas"       data-label="todas as receitas"    aria-label="Todas as receitas"></button>
-      <button class="hs hs-dark"        type="button" data-action="dark-mode"                  data-label="dark mode"            aria-label="Dark mode"></button>
-      <button class="hs hs-akim"        type="button" data-action="akim"                                                          aria-label="Akim"></button>
+      <Fragment set:html={kitchenSvg} />
     </div>
   </section>
 
@@ -361,61 +353,42 @@ const countByCategory = Object.fromEntries(
       margin: 0 auto;
       color: var(--ink);
     }
-    .kitchen-canvas .scene {
+    .kitchen-canvas svg {
       width: 100%;
       height: 100%;
       display: block;
-      pointer-events: none;
     }
-    /* SVG carregado via <img> tem currentColor preto por default;
-       inverte em dark mode pra ficar cremoso no fundo navy. */
-    body.dark-mode .kitchen-canvas .scene { filter: invert(1); }
+    body.dark-mode .kitchen-canvas svg { filter: invert(1); }
 
-    /* Hotspots: áreas clicáveis transparentes posicionadas em % do canvas.
-       Sem bordas/destaque visual — só o tooltip indica o objeto no hover. */
-    .kitchen-canvas .hs {
-      position: absolute;
-      background: transparent;
-      border: none;
-      padding: 0;
+    /* Hotspots no SVG — bounding-box do grupo é a área clicável.
+       Cobre tanto <g class='hs'> quanto <path class='hs'>. */
+    .kitchen-canvas :global(.hs) {
       cursor: pointer;
+      pointer-events: bounding-box;
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 200ms ease;
     }
-    /* DEBUG opcional: aperta 'D' pra ver os retângulos quando precisar alinhar */
-    body.hs-debug .kitchen-canvas .hs {
-      background: rgba(197, 107, 74, 0.15);
-      outline: 2px dashed var(--terracota);
+    .kitchen-canvas :global(.hs:hover) { transform: scale(1.03); }
+    /* Hover: pinta o stroke em terracota pra destacar */
+    .kitchen-canvas :global(.hs:hover) :global(*[stroke="currentColor"]),
+    .kitchen-canvas :global(.hs:hover[stroke="currentColor"]) {
+      stroke: var(--terracota);
     }
-    body.hs-debug .kitchen-canvas .hs::after {
-      content: attr(data-label);
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--terracota);
-      background: var(--bg);
-      padding: 2px 6px;
-      border-radius: 3px;
-      pointer-events: none;
-      white-space: nowrap;
+    .kitchen-canvas :global(.hs:hover) :global(*[fill="currentColor"]),
+    .kitchen-canvas :global(.hs:hover[fill="currentColor"]) {
+      fill: var(--terracota);
     }
-    .kitchen-canvas .hs:focus { outline: none; }
-    .kitchen-canvas .hs:focus-visible {
+    .kitchen-canvas :global(.hs:focus) { outline: none; }
+    .kitchen-canvas :global(.hs:focus-visible) {
       outline: 2px solid var(--terracota);
       outline-offset: 4px;
     }
-    /* Posições aproximadas dos hotspots (% do canvas 1500x1000) */
-    .hs-congelar     { left: 64.6%; top: 26.4%; width: 27.9%; height: 20.6%; }
-    .hs-principais   { left: 28.0%; top: 76.5%; width: 14.8%; height: 9.7%;  }
-    .hs-sobremesas   { left: 48.8%; top: 76.5%; width: 9.2%;  height: 9.7%;  }
-    .hs-rapidas      { left: 46.9%; top: 13.8%; width: 11.2%; height: 16.8%; }
-    .hs-vegetarianas { left: 78.7%; top: 7.8%;  width: 15.3%; height: 18.8%; }
-    .hs-datas        { left: 69.6%; top: 55.0%; width: 8.9%;  height: 12.9%; }
-    .hs-recado       { left: 82.7%; top: 52.5%; width: 7.3%;  height: 11.0%; }
-    .hs-sobre        { left: 22.9%; top: 39.7%; width: 9.8%;  height: 16.3%; }
-    .hs-todas        { left: 38.5%; top: 50.9%; width: 10.4%; height: 5.2%;  }
-    .hs-dark         { left: 3.3%;  top: 51.6%; width: 5.1%;  height: 9.7%;  }
-    .hs-akim         { left: 1.9%;  top: 74.5%; width: 18.7%; height: 13.0%; }
+    /* Debug opcional (D): pinta fundo dos bbox dos hotspots */
+    body.hs-debug .kitchen-canvas :global(.hs) :global(*[stroke="currentColor"]),
+    body.hs-debug .kitchen-canvas :global(.hs[stroke="currentColor"]) {
+      stroke: var(--terracota);
+    }
 
     /* Quando um drawer abre, encolhe o body, alinha cena ao bottom */
     body {
@@ -1008,11 +981,12 @@ const countByCategory = Object.fromEntries(
       }
     }
 
-    // Hotspots (botões HTML posicionados sobre o SVG)
-    document.querySelectorAll<HTMLButtonElement>('.kitchen-canvas .hs').forEach((g) => {
+    // Hotspots (elementos SVG <g>/<path> com class="hs" no inline SVG)
+    document.querySelectorAll<Element>('.kitchen-canvas .hs').forEach((g) => {
+      const ds = (g as HTMLElement | SVGElement).dataset;
       const fire = () => {
-        const action = g.dataset.action;
-        const key = g.dataset.key;
+        const action = ds.action;
+        const key = ds.key;
         if (action === 'cat' && key) openCategory(key);
         else if (action === 'recado') openRecado();
         else if (action === 'sobre') openSobre();
@@ -1026,12 +1000,13 @@ const countByCategory = Object.fromEntries(
         }
       };
       g.addEventListener('click', fire);
-      g.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(); }
+      g.addEventListener('keydown', (e: Event) => {
+        const k = (e as KeyboardEvent).key;
+        if (k === 'Enter' || k === ' ') { e.preventDefault(); fire(); }
       });
 
       // Tooltip hover (sem akim — gato é silencioso, só miau no clique)
-      const label = g.dataset.label;
+      const label = ds.label;
       if (label) {
         const show = () => { if (!tooltip.dataset.pinned) showTooltipAt(g, label); };
         const hide = () => { if (!tooltip.dataset.pinned) tooltip.classList.remove('show'); };
