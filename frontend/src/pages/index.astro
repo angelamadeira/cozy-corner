@@ -62,38 +62,69 @@ const countByCategory = Object.fromEntries(
   <section id="flow-kitchen">
     <p class="kitchen-title">cozinha · clique em qualquer elemento</p>
     <div class="kitchen-canvas">
-      <div class="ph-wall"></div>
-      <div class="ph-counter"></div>
-      <div class="ph-fridge"></div>
+      <svg class="scene" viewBox="0 0 998 801" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cozinha com elementos clicáveis">
+        <!-- Estrutura (não-clicável) -->
+        <rect x="63.5" y="656.868" width="932" height="240" stroke="currentColor" stroke-width="5"/>
+        <rect x="652.5" y="379.868" width="294" height="277" stroke="currentColor" stroke-width="5"/>
+        <path d="M650 382.368L949 382.368" stroke="currentColor" stroke-width="5"/>
+        <path d="M161 444.368H542" stroke="currentColor" stroke-width="5"/>
 
-      <button class="hotspot hs-vaso" data-action="cat" data-key="vegetarianas" type="button">
-        <span class="hs-label">{cozinhaData.labelVaso}</span>
-      </button>
-      <button class="hotspot hs-livros" data-action="cat" data-key="todas" type="button">
-        <span class="hs-label">{cozinhaData.labelLivros}</span>
-      </button>
-      <button class="hotspot hs-prato" data-action="cat" data-key="principais" type="button">
-        <span class="hs-label">{cozinhaData.labelPrato}</span>
-      </button>
-      <button class="hotspot hs-doce" data-action="cat" data-key="sobremesas" type="button">
-        <span class="hs-label">{cozinhaData.labelDoce}</span>
-      </button>
-      <button class="hotspot hs-relogio" data-action="cat" data-key="rapidas" type="button">
-        <span class="hs-label">{cozinhaData.labelRelogio}</span>
-      </button>
-      <button class="hotspot hs-freezer" data-action="cat" data-key="congelar" type="button">
-        <span class="hs-label">{cozinhaData.labelFreezer}</span>
-      </button>
-      <button class="hotspot hs-calendario" data-action="cat" data-key="datas" type="button">
-        <span class="hs-label">{cozinhaData.labelCalendario}</span>
-      </button>
-      <button class="hotspot hs-postit" data-action="recado" type="button">
-        <span class="hs-label">{cozinhaData.labelPostit}</span>
-      </button>
-      <button class="hotspot hs-switch" data-action="dark-mode" type="button" aria-label="liga/desliga a luz">
-        <Icon name="ph:lightbulb-thin" class="icon-light" width={18} height={18} />
-        <Icon name="ph:moon-thin" class="icon-dark" width={18} height={18} />
-      </button>
+        <!-- Para congelar -->
+        <g class="hs" data-action="cat" data-key="congelar" role="button" aria-label="Para congelar" data-label="para congelar" tabindex="0">
+          <rect x="652.5" y="235.868" width="294" height="144" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Pratos principais -->
+        <g class="hs" data-action="cat" data-key="principais" role="button" aria-label="Pratos principais" data-label="pratos principais" tabindex="0">
+          <rect x="263.5" y="589.868" width="155" height="67" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Sobremesas -->
+        <g class="hs" data-action="cat" data-key="sobremesas" role="button" aria-label="Sobremesas" data-label="sobremesas" tabindex="0">
+          <rect x="484.5" y="589.868" width="96" height="67" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Receitas rápidas (relógio) -->
+        <g class="hs" data-action="cat" data-key="rapidas" role="button" aria-label="Receitas rápidas" data-label="receitas rápidas" tabindex="0">
+          <circle cx="528" cy="142.368" r="58.5" stroke="currentColor" stroke-width="5"/>
+          <path d="M528 103.368V143.893L550 165.368" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Vegetarianas (vaso) -->
+        <g class="hs" data-action="cat" data-key="vegetarianas" role="button" aria-label="Vegetarianas" data-label="vegetarianas" tabindex="0">
+          <rect x="816.5" y="168.868" width="95" height="67" stroke="currentColor" stroke-width="5"/>
+          <path d="M801.5 88.8679L840.5 167.868H874V155.868H963L884 120.868L909 65.8679L856.5 107.868L840.5 0.36792V107.868L801.5 88.8679Z" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Datas comemorativas (calendário) -->
+        <g class="hs" data-action="cat" data-key="datas" role="button" aria-label="Datas comemorativas" data-label="datas comemorativas" tabindex="0">
+          <rect x="704.5" y="437.868" width="93" height="90" stroke="currentColor" stroke-width="5"/>
+          <rect x="717.5" y="467.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="717.5" y="492.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="743.5" y="467.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="743.5" y="492.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="769.5" y="467.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+          <rect x="769.5" y="492.868" width="15" height="13" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Deixe seu recado (post-it) -->
+        <g class="hs" data-action="recado" role="button" aria-label="Deixe seu recado" data-label="deixe seu recado" tabindex="0">
+          <rect x="869.943" y="423.873" width="54.5792" height="52.7554" transform="rotate(37.465 869.943 423.873)" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Sobre mim (quadro) -->
+        <g class="hs" data-action="sobre" role="button" aria-label="Sobre mim" data-label="sobre mim" tabindex="0">
+          <rect x="209.5" y="329.868" width="102" height="114" stroke="currentColor" stroke-width="5"/>
+          <rect x="218.5" y="339.868" width="84" height="94" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Todas as receitas (livros) -->
+        <g class="hs" data-action="cat" data-key="todas" role="button" aria-label="Todas as receitas" data-label="todas as receitas" tabindex="0">
+          <rect x="375.5" y="426.868" width="109" height="17" stroke="currentColor" stroke-width="5"/>
+          <rect x="375.5" y="408.868" width="109" height="18" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Dark mode (interruptor) -->
+        <g class="hs" data-action="dark-mode" role="button" aria-label="Dark mode (liga/desliga)" data-label="dark mode" tabindex="0">
+          <rect x="2.5" y="413.868" width="53" height="67" stroke="currentColor" stroke-width="5"/>
+          <rect x="18.5" y="433.868" width="20" height="26" stroke="currentColor" stroke-width="5"/>
+        </g>
+        <!-- Akim (gato) -->
+        <g class="hs" data-action="akim" role="button" aria-label="Akim" tabindex="0">
+          <path d="M77.9648 582.471C84.1218 587.599 88 595.06 88 603.368C88 604.737 87.892 606.083 87.6885 607.4C96.97 604.841 107.857 603.368 119.5 603.368C153.466 603.368 181 615.904 181 631.368C181 646.832 153.466 659.368 119.5 659.368C85.5345 659.368 58 646.832 58 631.368C41.4315 631.368 28 618.832 28 603.368C28 600.619 28.4257 597.963 29.2168 595.453L28.6846 595.961L23.0684 572.739L43.6201 578.789C47.8898 576.608 52.7897 575.368 58 575.368C58.3399 575.368 58.6785 575.374 59.0156 575.385L72.4629 561.938L77.9648 582.471ZM119.5 608.368C106.969 608.368 95.483 610.139 86.1494 613.066C82.4813 622.337 73.7073 629.298 63.0107 630.976C63.0038 631.108 63 631.238 63 631.368C63 635.938 67.295 641.703 78.085 646.616C88.4264 651.324 103.064 654.368 119.5 654.368C135.936 654.368 150.574 651.324 160.915 646.616C171.705 641.703 176 635.938 176 631.368C176 626.798 171.705 621.032 160.915 616.12C150.574 611.412 135.936 608.368 119.5 608.368ZM58 580.368C43.8624 580.368 33 590.985 33 603.368C33 615.751 43.8624 626.368 58 626.368C58.3306 626.368 58.6594 626.36 58.9863 626.348C61.7696 619.348 70.2692 613.254 82.2051 609.103C82.7236 607.26 83 605.336 83 603.368C83 590.985 72.1376 580.368 58 580.368ZM79.1152 615.662C78.7672 615.813 78.4239 615.966 78.085 616.12C71.6432 619.053 67.5173 622.29 65.2373 625.395C71.0915 623.776 75.9634 620.244 79.1152 615.662ZM31.5088 586.368L36.2676 581.837L29.9639 579.982L31.5088 586.368ZM65.2725 576.198C66.3213 576.442 67.3487 576.735 68.3506 577.079L71.5762 577.944L69.875 571.597L65.2725 576.198Z" fill="currentColor"/>
+        </g>
+      </svg>
     </div>
   </section>
 
@@ -125,6 +156,26 @@ const countByCategory = Object.fromEntries(
 
     <ul class="recipe-list" id="cat-results"></ul>
   </aside>
+
+  <!-- Sobre mim drawer -->
+  <aside class="cat-drawer" id="sobre-drawer" aria-hidden="true" aria-labelledby="sobre-title">
+    <button class="drawer-close" data-close type="button" aria-label="fechar">
+      <Icon name="ph:x-thin" width={20} height={20} />
+    </button>
+    <h2 id="sobre-title" class="drawer-title">Oi, sou a Gigi</h2>
+    <p class="drawer-prose">
+      Cozinhar é meu jeito de juntar gente. Esse cantinho é onde eu vou guardando
+      o que aprendi — receitas autorais, herdadas, adaptadas — pra ter sempre à
+      mão e pra dividir com quem aparece.
+    </p>
+    <p class="drawer-prose">
+      Mais sobre mim, sobre o blog e sobre as cozinhas que me inspiram em breve
+      por aqui. Por enquanto: fica à vontade pra bisbilhotar as gavetas. 💛
+    </p>
+  </aside>
+
+  <!-- Tooltip flutuante dos hotspots -->
+  <div class="kitchen-tooltip" id="kitchen-tooltip" role="tooltip"></div>
 
   <!-- Recado modal (post-it) -->
   <div class="recado-modal" id="recado-modal" aria-hidden="true" role="dialog" aria-labelledby="recado-title">
@@ -351,95 +402,91 @@ const countByCategory = Object.fromEntries(
     }
     .kitchen-canvas {
       position: relative;
-      max-width: var(--max-content);
+      width: 70%;
+      aspect-ratio: 998 / 801;
       margin: 0 auto;
-      aspect-ratio: 16/10;
-      background: var(--surface);
-      border: 1px dashed var(--line);
-      border-radius: var(--r-lg);
+      color: var(--ink);
     }
-    .kitchen-canvas .ph-wall {
-      position: absolute;
-      inset: 24px 24px 38% 24px;
-      background: var(--kitchen-wall);
-      border-radius: var(--r-sm);
+    .kitchen-canvas .scene {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
-    .kitchen-canvas .ph-counter {
-      position: absolute;
-      bottom: 24px; left: 24px; right: 24px;
-      height: 33%;
-      background: var(--kitchen-counter);
-      border-radius: var(--r-sm);
+    /* Hotspots no SVG — área = bbox do grupo */
+    .kitchen-canvas .scene :global(.hs) {
+      cursor: pointer;
+      pointer-events: bounding-box;
+      transition: transform 200ms ease;
+      transform-box: fill-box;
+      transform-origin: center;
     }
-    .kitchen-canvas .ph-fridge {
-      position: absolute;
-      top: 26%; right: 6%;
-      width: 22%; height: 60%;
-      background: var(--kitchen-fridge);
-      border: 1px solid var(--kitchen-fridge-border);
-      border-radius: var(--r-sm);
+    .kitchen-canvas .scene :global(.hs:hover) { transform: scale(1.04); }
+    .kitchen-canvas .scene :global(.hs:hover > rect),
+    .kitchen-canvas .scene :global(.hs:hover > circle),
+    .kitchen-canvas .scene :global(.hs:hover > path) {
+      stroke: var(--terracota);
+    }
+    .kitchen-canvas .scene :global(.hs:hover > path[fill="currentColor"]) {
+      fill: var(--terracota);
+    }
+    .kitchen-canvas .scene :global(.hs:focus) { outline: none; }
+    .kitchen-canvas .scene :global(.hs:focus-visible) {
+      outline: 2px solid var(--terracota);
+      outline-offset: 4px;
     }
 
-    /* Hotspots */
-    .kitchen-canvas .hotspot {
-      position: absolute;
-      background: transparent;
-      border: 1.5px dashed rgba(95, 168, 211, 0.55);
+    /* Quando um drawer abre, encolhe o body, alinha cena ao bottom */
+    body {
+      transition: padding-right 0.45s var(--ease-out);
+    }
+    @media (min-width: 960px) {
+      body.drawer-open {
+        padding-right: 520px;
+      }
+      body.drawer-open #flow-kitchen {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 100vh;
+      }
+    }
+
+    /* Tooltip flutuante */
+    .kitchen-tooltip {
+      position: fixed;
+      transform: translate(-50%, -100%) translateY(-18px);
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      letter-spacing: 0.02em;
+      padding: 8px 14px;
       border-radius: var(--r-sm);
-      cursor: pointer;
-      transition: background var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast);
-      z-index: 5;
-      padding: 4px;
-      color: var(--ink-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      box-shadow: var(--shadow-1);
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity var(--dur-fast);
+      z-index: 300;
     }
-    .kitchen-canvas .hotspot:hover {
-      background: rgba(197, 107, 74, 0.12);
-      border-color: var(--terracota);
-      transform: scale(1.04);
-      box-shadow: 0 0 0 3px rgba(197, 107, 74, 0.15);
-    }
-    .kitchen-canvas .hotspot::before {
+    .kitchen-tooltip::after {
       content: '';
       position: absolute;
-      inset: -4px;
-      border-radius: var(--r-sm);
-      border: 1.5px solid rgba(197, 107, 74, 0.3);
-      animation: pulse 2.8s ease-in-out infinite;
-      pointer-events: none;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--ink);
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0; transform: scale(0.95); }
-      50% { opacity: 1; transform: scale(1.05); }
-    }
-    .hotspot:nth-of-type(2)::before { animation-delay: 0.3s; }
-    .hotspot:nth-of-type(3)::before { animation-delay: 0.6s; }
-    .hotspot:nth-of-type(4)::before { animation-delay: 0.9s; }
-    .hotspot:nth-of-type(5)::before { animation-delay: 1.2s; }
-    .hotspot:nth-of-type(6)::before { animation-delay: 1.5s; }
-    .hotspot:nth-of-type(7)::before { animation-delay: 1.8s; }
-    .hotspot:nth-of-type(8)::before { animation-delay: 2.1s; }
-    .hotspot:nth-of-type(9)::before { animation-delay: 2.4s; }
+    .kitchen-tooltip.show { opacity: 1; }
 
-    .hs-label {
+    /* Drawer prose pra sobre mim */
+    .drawer-prose {
       font-family: var(--font-mono);
-      font-size: 10px;
-      text-align: center;
-      pointer-events: none;
+      font-size: var(--fs-body);
+      line-height: var(--lh-loose);
+      color: var(--ink-soft);
+      margin-bottom: var(--s-4);
     }
-
-    /* Posições dos 9 hotspots (8 ações + switch) */
-    .hs-vaso        { top: 50%; left: 6%;   width: 11%; height: 28%; }
-    .hs-livros      { top: 58%; left: 22%;  width: 9%;  height: 10%; }
-    .hs-prato       { top: 60%; left: 36%;  width: 12%; height: 8%;  }
-    .hs-doce        { top: 58%; left: 52%;  width: 10%; height: 10%; }
-    .hs-relogio     { top: 10%; right: 13%; width: 9%;  height: 14%; }
-    .hs-freezer     { top: 28%; right: 7%;  width: 20%; height: 14%; }
-    .hs-calendario  { top: 44%; right: 16%; width: 11%; height: 12%; }
-    .hs-postit      { top: 46%; right: 7%;  width: 8%;  height: 10%; }
-    .hs-switch      { top: 32%; left: 35%;  width: 3%;  height: 6%;  }
 
     /* ============ DRAWERS / MODAL ============ */
     .drawer-backdrop {
@@ -901,6 +948,8 @@ const countByCategory = Object.fromEntries(
       }
     }
 
+    const sobreDrawer = document.getElementById('sobre-drawer')!;
+
     function openCategory(key: string) {
       const label = key === 'todas' ? (RECIPES.catMetaTodas || 'Todas as receitas') : (RECIPES.catMeta[key] || key);
       catTitle.textContent = label;
@@ -909,36 +958,81 @@ const countByCategory = Object.fromEntries(
       renderRecipeList(key);
       catDrawer.classList.add('open');
       backdrop.classList.add('open');
+      document.body.classList.add('drawer-open');
     }
 
     function openRecado() {
       recadoModal.classList.add('open');
       backdrop.classList.add('open');
+      document.body.classList.add('drawer-open');
+    }
+
+    function openSobre() {
+      sobreDrawer.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.classList.add('drawer-open');
     }
 
     function closeAll() {
       catDrawer.classList.remove('open');
       recadoModal.classList.remove('open');
+      sobreDrawer.classList.remove('open');
       backdrop.classList.remove('open');
+      document.body.classList.remove('drawer-open');
     }
 
-    // Hotspots
-    document.querySelectorAll<HTMLElement>('.kitchen-canvas .hotspot').forEach(h => {
-      h.addEventListener('click', e => {
-        e.stopPropagation();
-        const action = h.dataset.action;
-        if (action === 'cat' && h.dataset.key) {
-          openCategory(h.dataset.key);
-        } else if (action === 'recado') {
-          openRecado();
-        } else if (action === 'dark-mode') {
+    // Tooltip flutuante
+    const tooltip = document.getElementById('kitchen-tooltip')!;
+    let tooltipPinTimer: number | undefined;
+    function showTooltipAt(g: SVGGElement, text: string, pinMs = 0) {
+      const rect = g.getBoundingClientRect();
+      tooltip.textContent = text;
+      tooltip.style.left = `${rect.left + rect.width / 2}px`;
+      tooltip.style.top = `${rect.top}px`;
+      tooltip.classList.add('show');
+      window.clearTimeout(tooltipPinTimer);
+      if (pinMs > 0) {
+        tooltip.dataset.pinned = '1';
+        tooltipPinTimer = window.setTimeout(() => {
+          delete tooltip.dataset.pinned;
+          if (!g.matches(':hover')) tooltip.classList.remove('show');
+          else tooltip.textContent = g.dataset.label ?? '';
+        }, pinMs);
+      }
+    }
+
+    // Hotspots (SVG groups)
+    document.querySelectorAll<SVGGElement>('.kitchen-canvas .hs').forEach((g) => {
+      const fire = () => {
+        const action = g.dataset.action;
+        const key = g.dataset.key;
+        if (action === 'cat' && key) openCategory(key);
+        else if (action === 'recado') openRecado();
+        else if (action === 'sobre') openSobre();
+        else if (action === 'akim') showTooltipAt(g, 'miau 🐱', 1400);
+        else if (action === 'dark-mode') {
           document.body.classList.toggle('dark-mode');
           try {
             localStorage.setItem('cozy-dark-mode',
               document.body.classList.contains('dark-mode') ? 'true' : 'false');
           } catch (err) {}
         }
+      };
+      g.addEventListener('click', fire);
+      g.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(); }
       });
+
+      // Tooltip hover (sem akim — gato é silencioso, só miau no clique)
+      const label = g.dataset.label;
+      if (label) {
+        const show = () => { if (!tooltip.dataset.pinned) showTooltipAt(g, label); };
+        const hide = () => { if (!tooltip.dataset.pinned) tooltip.classList.remove('show'); };
+        g.addEventListener('mouseenter', show);
+        g.addEventListener('mouseleave', hide);
+        g.addEventListener('focus', show);
+        g.addEventListener('blur', hide);
+      }
     });
 
     backdrop.addEventListener('click', closeAll);
