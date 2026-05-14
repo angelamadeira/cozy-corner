@@ -867,13 +867,13 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       z-index: 1101;
     }
     /* No modo cozinha o nav do prev/próximo fica no fundo; sobe o FAB
-       pra não conflitar. */
-    :global(body):has(:global(#cooking-mode):not([hidden])) .timer-fab {
+       pra não conflitar. Usa body.cm-open (toggled pelo CookingMode). */
+    :global(body.cm-open) .timer-fab {
       bottom: auto;
       top: 12px;
       right: 76px; /* deixa espaço pro X do modo cozinha */
     }
-    :global(body):has(:global(#cooking-mode):not([hidden])) .timer-panel {
+    :global(body.cm-open) .timer-panel {
       bottom: auto;
       top: 64px;
       right: 24px;

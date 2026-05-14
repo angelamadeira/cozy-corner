@@ -144,6 +144,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     current = 0;
     overlay.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('cm-open');
     requestWakeLock();
     render();
     // Re-request wakelock quando a aba volta a ficar visível
@@ -154,6 +155,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     if (!overlay) return;
     overlay.setAttribute('hidden', '');
     document.body.style.overflow = '';
+    document.body.classList.remove('cm-open');
     releaseWakeLock();
     document.removeEventListener('visibilitychange', onVisibilityChange);
   }
