@@ -235,8 +235,8 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       </div>
 
       <label class="timer-custom">
-        <span>ou em minutos:</span>
-        <input type="number" id="timer-custom" min="0.5" max="240" step="0.5" placeholder="ex: 1,5" inputmode="decimal" />
+        <span>ou digite:</span>
+        <input type="text" id="timer-custom" placeholder="00:00" inputmode="numeric" pattern="[0-9:]*" maxlength="5" aria-label="tempo em minutos e segundos" />
       </label>
 
       <div class="timer-controls">
@@ -1357,26 +1357,37 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       }
     }
 
-    // Aceita string com vírgula ou ponto como separador decimal
-    function parseMin(raw: string): number {
-      const n = parseFloat(raw.replace(',', '.'));
-      return isFinite(n) ? n : 0;
+    // Aceita 'MM:SS', 'MMSS' (sem :), ou só minutos. Retorna total em segundos.
+    function parseTimeInput(raw: string): number {
+      const trimmed = raw.trim();
+      if (!trimmed) return 0;
+      if (trimmed.includes(':')) {
+        const [mm, ss] = trimmed.split(':');
+        const m = parseInt(mm, 10) || 0;
+        const s = parseInt(ss, 10) || 0;
+        return m * 60 + s;
+      }
+      // Sem ':' — interpreta como minutos
+      const n = parseInt(trimmed, 10);
+      return isFinite(n) ? n * 60 : 0;
     }
 
-    function setDuration(min: number) {
-      // Arredonda pra segundo inteiro, mas aceita meio minuto etc
-      totalSec = Math.max(0, Math.round(min * 60));
+    function setDurationFromSec(sec: number) {
+      totalSec = Math.max(0, sec);
       remainingSec = totalSec;
       setState('idle');
       renderTimer();
     }
 
+    function setDuration(min: number) {
+      setDurationFromSec(Math.round(min * 60));
+    }
+
     function startTimer() {
-      // Se idle e display ainda 00:00, usa o input custom ou ignora
       if (remainingSec === 0) {
-        const m = parseMin(timerCustom.value);
-        if (m <= 0) return;
-        setDuration(m);
+        const sec = parseTimeInput(timerCustom.value);
+        if (sec <= 0) return;
+        setDurationFromSec(sec);
       }
       setState('running');
       intervalId = window.setInterval(tick, 1000);
@@ -1407,33 +1418,37 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       renderTimer();
     }
 
-    // Musiquinha estilo caixinha de música: 5 notas em dó maior com
-    // envelope tipo sino (ataque rápido, decay exponencial). Sem arquivo.
+    // Musiquinha curta tipo 'Brilha estrelinha' (Twinkle twinkle): Dó-Dó-Sol-Sol-Lá-Lá-Sol
+    // Triangle wave pra som mais quente, envelope com sustain (parece
+    // melodia, não percussão). Sem arquivo.
     function playAlarm() {
       try {
         const Ctx = window.AudioContext || (window as any).webkitAudioContext;
         const ctx = new Ctx();
         const start = ctx.currentTime;
-        // [frequência (Hz), tempo de início (s), duração (s), volume]
-        // Mi-Sol-Dó-Lá-Dó (ascendendo com voltinha — feliz e fofo)
-        const notes: Array<[number, number, number, number]> = [
-          [659.25,  0.00, 0.22, 0.22],  // E5
-          [783.99,  0.20, 0.22, 0.22],  // G5
-          [1046.50, 0.40, 0.30, 0.25],  // C6
-          [880.00,  0.72, 0.22, 0.20],  // A5
-          [1046.50, 0.94, 0.80, 0.28],  // C6 (final mais longo, ressonância)
+        // [freq Hz, tempo início (s), duração (s)]
+        const notes: Array<[number, number, number]> = [
+          [523.25, 0.00, 0.28],  // C5  ─┐
+          [523.25, 0.28, 0.28],  // C5   │ "brilha brilha"
+          [783.99, 0.56, 0.28],  // G5  ─┤
+          [783.99, 0.84, 0.28],  // G5   │ "estre-linha"
+          [880.00, 1.12, 0.28],  // A5  ─┤
+          [880.00, 1.40, 0.28],  // A5   │
+          [783.99, 1.68, 0.65],  // G5   └ "____" (final mais longo)
         ];
-        for (const [freq, t, dur, vol] of notes) {
+        const vol = 0.18;
+        for (const [freq, t, dur] of notes) {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'sine';
+          osc.type = 'triangle';
           osc.frequency.value = freq;
           osc.connect(gain);
           gain.connect(ctx.destination);
           const t0 = start + t;
-          // Envelope tipo sino: ataque em 15ms, decay exponencial até quase zero
+          // Envelope piano-like: ataque rápido, sustain a 70%, release no final
           gain.gain.setValueAtTime(0, t0);
-          gain.gain.linearRampToValueAtTime(vol, t0 + 0.015);
+          gain.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+          gain.gain.linearRampToValueAtTime(vol * 0.7, t0 + dur * 0.75);
           gain.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
           osc.start(t0);
           osc.stop(t0 + dur + 0.05);
@@ -1468,9 +1483,18 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       });
     });
 
+    // Auto-formata MM:SS conforme digita (insere ':' após 2 dígitos)
     timerCustom.addEventListener('input', () => {
-      const m = parseMin(timerCustom.value);
-      if (m > 0) setDuration(m);
+      const digits = timerCustom.value.replace(/[^0-9]/g, '').slice(0, 4);
+      let formatted = digits;
+      if (digits.length >= 3) {
+        formatted = digits.slice(0, digits.length - 2) + ':' + digits.slice(-2);
+      } else if (digits.length === 2 && timerCustom.value.endsWith(':')) {
+        formatted = digits + ':';
+      }
+      if (formatted !== timerCustom.value) timerCustom.value = formatted;
+      const sec = parseTimeInput(timerCustom.value);
+      if (sec > 0) setDurationFromSec(sec);
     });
 
     timerStartBtn.addEventListener('click', startTimer);
