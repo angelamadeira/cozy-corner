@@ -353,12 +353,12 @@ const countByCategory = Object.fromEntries(
       margin: 0 auto;
       color: var(--ink);
     }
-    .kitchen-canvas svg {
+    .kitchen-canvas :global(svg) {
       width: 100%;
       height: 100%;
       display: block;
     }
-    body.dark-mode .kitchen-canvas svg { filter: invert(1); }
+    body.dark-mode .kitchen-canvas :global(svg) { filter: invert(1); }
 
     /* Hotspots no SVG — bounding-box do grupo é a área clicável.
        Cobre tanto <g class='hs'> quanto <path class='hs'>. */
