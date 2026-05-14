@@ -236,7 +236,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
       <label class="timer-custom">
         <span>ou em minutos:</span>
-        <input type="number" id="timer-custom" min="1" max="240" placeholder="ex: 25" />
+        <input type="number" id="timer-custom" min="0.5" max="240" step="0.5" placeholder="ex: 1,5" inputmode="decimal" />
       </label>
 
       <div class="timer-controls">
@@ -1357,8 +1357,15 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       }
     }
 
+    // Aceita string com vírgula ou ponto como separador decimal
+    function parseMin(raw: string): number {
+      const n = parseFloat(raw.replace(',', '.'));
+      return isFinite(n) ? n : 0;
+    }
+
     function setDuration(min: number) {
-      totalSec = Math.max(0, min * 60);
+      // Arredonda pra segundo inteiro, mas aceita meio minuto etc
+      totalSec = Math.max(0, Math.round(min * 60));
       remainingSec = totalSec;
       setState('idle');
       renderTimer();
@@ -1367,8 +1374,8 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     function startTimer() {
       // Se idle e display ainda 00:00, usa o input custom ou ignora
       if (remainingSec === 0) {
-        const m = parseInt(timerCustom.value, 10);
-        if (!isFinite(m) || m <= 0) return;
+        const m = parseMin(timerCustom.value);
+        if (m <= 0) return;
         setDuration(m);
       }
       setState('running');
@@ -1462,8 +1469,8 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     });
 
     timerCustom.addEventListener('input', () => {
-      const m = parseInt(timerCustom.value, 10);
-      if (isFinite(m) && m > 0) setDuration(m);
+      const m = parseMin(timerCustom.value);
+      if (m > 0) setDuration(m);
     });
 
     timerStartBtn.addEventListener('click', startTimer);
