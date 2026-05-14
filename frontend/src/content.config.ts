@@ -20,7 +20,11 @@ const recipes = defineCollection({
     description: z.string().optional(),
     category: z.enum(CATEGORIES),
     time: z.number().int().positive(), // minutos
-    servings: z.number().int().positive().optional(),
+    // Decap salva campo number vazio como "" — pré-processa pra virar undefined
+    servings: z.preprocess(
+      (val) => (val === '' || val === null) ? undefined : val,
+      z.number().int().positive().optional()
+    ),
     difficulty: z.enum(['fácil', 'médio', 'difícil']).default('médio'),
     tags: z.array(z.string()).default([]),
     unitSystem: z.enum(['metric', 'imperial']).default('metric'),

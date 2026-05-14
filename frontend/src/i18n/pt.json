@@ -111,13 +111,15 @@
     "name_label": "seu nome",
     "message_label": "mensagem",
     "placeholder": "oi Gigi!",
-    "send": "enviar pelo WhatsApp",
-    "alt_prefix": "ou me escreve em"
+    "send": "enviar por email"
   },
   "sobre": {
-    "title": "Oi, sou a Gigi",
-    "p1": "Cozinhar é meu jeito de juntar gente. Esse cantinho é onde eu vou guardando o que aprendi — receitas autorais, herdadas, adaptadas — pra ter sempre à mão e pra dividir com quem aparece.",
-    "p2": "Mais sobre mim, sobre o blog e sobre as cozinhas que me inspiram em breve por aqui. Por enquanto: fica à vontade pra bisbilhotar as gavetas. 💛"
+    "title": "Oi, tudo bem?",
+    "photo_alt": "Foto da Gigi com o marido",
+    "p1": "Essa sou eu e meu marido e essa é a nossa cozinha. Sinta-se livre pra explorar e conhecer as receitas que fazem parte da nossa vida.",
+    "p2": "Criamos esse cantinho pra compartilhar um pouco daquilo que fazemos com tanto amor e carinho pra nossa família e amigos.",
+    "p3": "Ah! E esse na bancada pra quem não conhece é o Akim. Ele geralmente dorme o dia inteiro e só para pra ficar miando pela casa. Duvida? Vê o que acontece quando mexe com ele!",
+    "p4": "Fiquem à vontade, divirtam-se cozinhando e bom apetite =)"
   },
   "intro": {
     "hello": "olá!",

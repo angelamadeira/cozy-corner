@@ -1,37 +1,43 @@
 ---
-title: Risoto de cogumelos
-description: Um clássico italiano cremoso, com cogumelos paris dourados e parmesão.
-category: principais
-time: 40
-servings: 4
+title: Brownie perfeito
+description: Perfeito para vender, dar de presente ou fazer com antecedência,
+  fica fresco por até 3 dias sem precisar de geladeira. Sucesso!
+category: sobremesas
+time: 60
+servings: ""
 difficulty: médio
-tags: [vegetariana, italiana, comfort food]
 unitSystem: metric
+tags: []
 media:
-  - { type: image, src: /uploads/risoto-hero.jpg, alt: "Prato fundo com risoto de cogumelos polvilhado com parmesão", cover: true }
+  - type: image
+    src: ""
+    url: https://www.estadao.com.br/resizer/v2/IAXF2PJPAJFSXO5E65SZ2XX4MY.jpg?quality=80&auth=64c5439aa1a8788fbe107aad751a2816fc330f0b158660b4bbf6bae307d8a48e&width=720&height=410&focal=1493,987
 ingredients:
-  - 200g arroz arbóreo
-  - 500g cogumelos paris
-  - 1 cebola média
-  - 2 dentes de alho
-  - 100ml vinho branco
-  - 50g parmesão
-  - 1L caldo de legumes
-  - azeite, sal, pimenta-do-reino
+  - 175g de chocolate meio amargo em pedacinhos
+  - 150g de manteiga sem sal
+  - 30g de cacau em pó
+  - 3 ovos
+  - 250g de açúcar
+  - 140g de farinha de trigo
 materials:
-  - panela média de fundo grosso
-  - colher de pau
-  - frigideira antiaderente
-  - concha
-  - ralador (parmesão)
+  - forma 20x20
+  - papel manteiga
 steps:
-  - Aqueça o caldo de legumes e mantenha em fogo baixo. Refogue a cebola picada no azeite até ficar translúcida.
-  - Adicione o alho amassado e os cogumelos fatiados. Refogue por 5 minutos até dourar.
-  - Acrescente o arroz e mexa por 1 minuto. Despeje o vinho branco e mexa até evaporar.
-  - Vá adicionando o caldo quente, uma concha por vez, mexendo até absorver antes da próxima.
-  - Quando o arroz estiver al dente (cerca de 18-20 minutos), desligue o fogo, adicione o parmesão e finalize com pimenta-do-reino.
-notes: Pode trocar cogumelos paris por shitake ou portobello.
+  - Forre uma forma 20x20 com papel manteiga e reserve. Enquanto isso,
+    pre-aqueça o forno a 180 graus.
+  - Derreta o chocolate e a manteiga em banho maria ou a cada 30 segundos no
+    microondas até que derreta. Cuidado para não aquecer demais e o chocolate
+    queimar.
+  - Coloque os ovos com o açúcar em uma outra tigela e bata com fouet por 1
+    minutinho. Se gostar, nesta etapa pode acrescentar 5 g de extrato de
+    baunilha.
+  - "Acrescente a mistura de chocolate derretido, mexa até ficar homogêneo e
+    finalize com a farinha, mexendo rapidamente com uma espátula só até que a
+    farinha desapareça. "
+  - Transfira para a forma e leve ao forno pré-aquecido a 180 graus por
+    aproximadamente 35 minutos.
+notes: ""
 published: true
-publishedAt: 2026-05-13
+publishedAt: 2026-05-14T19:38:00.000-03:00
 lang: pt-br
 ---

@@ -143,9 +143,9 @@ collections:
         fields:
           - { name: title, label: Título, widget: string, default: "Deixe seu recado" }
           - { name: subtitle, label: Subtítulo, widget: string, default: "manda um oi, dúvida ou sugestão de receita 💌" }
-          - { name: whatsappNumber, label: "Número WhatsApp (com 55 + DDD)", widget: string, default: "55SEUNUMERO" }
-          - { name: whatsappTemplate, label: "Template da mensagem", widget: text, default: "Oi Gigi, sou {nome}.\n\n{mensagem}" }
-          - { name: emailFallback, label: Email fallback, widget: string, default: "angelmadeira@gmail.com" }
+          - { name: email, label: "Email pra onde os recados vão", widget: string, default: "angelmadeira@gmail.com" }
+          - { name: emailSubject, label: "Assunto padrão do email", widget: string, default: "Recado do Cozy Corner" }
+          - { name: emailTemplate, label: "Template do corpo do email", widget: text, default: "Oi Gigi, sou {nome}.\n\n{mensagem}", hint: "Use {nome} e {mensagem} pra inserir o que o visitante digitou." }
 
       - name: site
         label: ⚙️ Configuração geral

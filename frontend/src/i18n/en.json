@@ -111,13 +111,15 @@
     "name_label": "your name",
     "message_label": "message",
     "placeholder": "hi Gigi!",
-    "send": "send via WhatsApp",
-    "alt_prefix": "or email me at"
+    "send": "send via email"
   },
   "sobre": {
-    "title": "Hi, I'm Gigi",
-    "p1": "Cooking is my way of bringing people together. This little corner is where I keep what I've learned — original recipes, inherited ones, adapted ones — to always have on hand and to share with whoever drops by.",
-    "p2": "More about me, about the blog, and about the kitchens that inspire me coming here soon. For now: feel free to peek into the drawers. 💛"
+    "title": "Hi, how are you?",
+    "photo_alt": "Photo of Gigi and her husband",
+    "p1": "That's me and my husband, and this is our kitchen. Feel free to explore and get to know the recipes that are part of our life.",
+    "p2": "We made this little corner to share a bit of what we cook with so much love and care for our family and friends.",
+    "p3": "Oh! And that one on the counter — for those who haven't met him yet — is Akim. He usually sleeps all day and only stops to roam around meowing. Don't believe it? See what happens when you poke him!",
+    "p4": "Make yourselves at home, have fun cooking, and bon appétit =)"
   },
   "intro": {
     "hello": "hello!",
