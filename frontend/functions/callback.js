@@ -44,7 +44,11 @@ export async function onRequest(context) {
     provider: 'github',
   });
 
-  // HTML que roda no popup: manda postMessage pra janela pai e fecha.
+  // HTML que roda no popup. O Decap faz um handshake:
+  //   1. popup sinaliza 'authorizing:github' pro opener
+  //   2. opener (Decap admin) responde com a mesma mensagem
+  //   3. ao receber a resposta, popup manda o token de fato
+  // Sem essa coreografia, o Decap ignora o token e o login parece "preso".
   const html = `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -64,16 +68,25 @@ export async function onRequest(context) {
 <script>
   (function () {
     var msg = 'authorization:github:success:' + ${JSON.stringify(payload)};
-    function send() {
-      if (window.opener) {
-        window.opener.postMessage(msg, '*');
-      }
+
+    function authorize(e) {
+      if (typeof e.data !== 'string') return;
+      if (e.data.indexOf('authorizing:') !== 0) return;
+      if (!window.opener) return;
+      // Responde com o token usando o origin que veio na mensagem.
+      window.opener.postMessage(msg, e.origin);
     }
-    send();
-    // Reenvia depois de 100ms caso a janela pai ainda não esteja escutando.
-    setTimeout(send, 100);
-    // Fecha o popup depois de 1s.
-    setTimeout(function () { window.close(); }, 1000);
+
+    window.addEventListener('message', authorize, false);
+
+    // Sinaliza que tá pronto — Decap responde com 'authorizing:github'
+    // e aí cai no handler acima.
+    if (window.opener) {
+      window.opener.postMessage('authorizing:github', '*');
+    }
+
+    // Fecha o popup depois de 2s (tempo de fazer o handshake).
+    setTimeout(function () { window.close(); }, 2000);
   })();
 </script>
 <p>Login bem-sucedido! Pode fechar essa janela. 💛</p>
