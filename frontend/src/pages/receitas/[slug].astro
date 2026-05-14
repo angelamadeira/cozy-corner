@@ -204,6 +204,55 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
   <CookingMode steps={data.steps} ingredients={data.ingredients} recipeTitle={data.title} />
 
+  <!-- ============ CRONÔMETRO ============ -->
+  <div class="timer" id="timer" data-state="idle">
+    <!-- FAB (estado fechado) -->
+    <button class="timer-fab" id="timer-fab" type="button" aria-label="Cronômetro" aria-expanded="false">
+      <Icon name="ph:timer-thin" width={22} height={22} />
+      <span class="timer-fab-time" id="timer-fab-time" hidden></span>
+    </button>
+
+    <!-- Painel (estado aberto) -->
+    <div class="timer-panel" id="timer-panel" hidden role="dialog" aria-label="Cronômetro">
+      <header class="timer-head">
+        <h3 class="timer-title">Cronômetro</h3>
+        <button class="timer-close" id="timer-close" type="button" aria-label="fechar">
+          <Icon name="ph:x-thin" width={18} height={18} />
+        </button>
+      </header>
+
+      <div class="timer-display" id="timer-display">
+        <span id="timer-mm">00</span><span class="timer-sep">:</span><span id="timer-ss">00</span>
+      </div>
+
+      <div class="timer-presets">
+        <button class="timer-preset" type="button" data-min="5">5 min</button>
+        <button class="timer-preset" type="button" data-min="10">10 min</button>
+        <button class="timer-preset" type="button" data-min="15">15 min</button>
+        <button class="timer-preset" type="button" data-min="20">20 min</button>
+        <button class="timer-preset" type="button" data-min="30">30 min</button>
+        <button class="timer-preset" type="button" data-min="60">60 min</button>
+      </div>
+
+      <label class="timer-custom">
+        <span>ou em minutos:</span>
+        <input type="number" id="timer-custom" min="1" max="240" placeholder="ex: 25" />
+      </label>
+
+      <div class="timer-controls">
+        <button class="timer-btn timer-start" id="timer-start" type="button">
+          <Icon name="ph:play-thin" width={16} height={16} /> iniciar
+        </button>
+        <button class="timer-btn timer-pause" id="timer-pause" type="button" hidden>
+          <Icon name="ph:pause-thin" width={16} height={16} /> pausar
+        </button>
+        <button class="timer-btn timer-reset" id="timer-reset" type="button">
+          <Icon name="ph:arrow-counter-clockwise-thin" width={16} height={16} /> zerar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden>
     <Icon name="ph:check-circle-thin" width={18} height={18} />
     <span id="toast-msg">link copiado</span>
@@ -745,7 +794,193 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       }
       .pf-credit { font-style: italic; }
       .pf-sep { display: none; }
+      .timer { display: none !important; }  /* esconde no print */
     }
+
+    /* ============ CRONÔMETRO ============ */
+    .timer-fab {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      width: 56px; height: 56px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-2);
+      transition: transform var(--dur-fast), background var(--dur-fast);
+      z-index: 1100;
+    }
+    .timer-fab :global(svg) { fill: none; stroke: currentColor; }
+    .timer-fab:hover { transform: scale(1.05); }
+    /* Quando rodando, fab vira pílula com countdown */
+    .timer[data-state="running"] .timer-fab,
+    .timer[data-state="paused"] .timer-fab,
+    .timer[data-state="done"] .timer-fab {
+      width: auto;
+      padding: 0 18px;
+      gap: 8px;
+      background: var(--terracota);
+    }
+    .timer[data-state="running"] .timer-fab-time,
+    .timer[data-state="paused"] .timer-fab-time,
+    .timer[data-state="done"] .timer-fab-time {
+      display: inline-block !important;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      letter-spacing: 0.04em;
+    }
+    .timer[data-state="done"] .timer-fab {
+      animation: timer-pulse 0.6s ease-in-out 3;
+    }
+    @keyframes timer-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Painel */
+    .timer-panel {
+      position: fixed;
+      bottom: 96px; right: 24px;
+      width: 320px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-3);
+      padding: var(--s-5);
+      z-index: 1101;
+    }
+    /* No modo cozinha o nav do prev/próximo fica no fundo; sobe o FAB
+       pra não conflitar. */
+    :global(body):has(:global(#cooking-mode):not([hidden])) .timer-fab {
+      bottom: auto;
+      top: 12px;
+      right: 76px; /* deixa espaço pro X do modo cozinha */
+    }
+    :global(body):has(:global(#cooking-mode):not([hidden])) .timer-panel {
+      bottom: auto;
+      top: 64px;
+      right: 24px;
+    }
+    .timer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--s-3);
+    }
+    .timer-title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: var(--fs-h3);
+      color: var(--ink);
+    }
+    .timer-close {
+      width: 28px; height: 28px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+    }
+    .timer-close :global(svg) { fill: none; stroke: currentColor; }
+    .timer-close:hover { background: var(--surface); }
+
+    .timer-display {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 56px;
+      letter-spacing: -0.02em;
+      text-align: center;
+      color: var(--ink);
+      padding: var(--s-3) 0;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-sep { opacity: 0.4; margin: 0 4px; }
+    .timer[data-state="done"] .timer-display,
+    .timer[data-state="warning"] .timer-display {
+      color: var(--terracota);
+    }
+
+    .timer-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: var(--s-3);
+    }
+    .timer-preset {
+      padding: 8px 0;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all var(--dur-fast);
+    }
+    .timer-preset:hover {
+      border-color: var(--terracota);
+      color: var(--ink);
+    }
+
+    .timer-custom {
+      display: flex;
+      align-items: center;
+      gap: var(--s-2);
+      margin-bottom: var(--s-4);
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-soft);
+    }
+    .timer-custom input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .timer-custom input:focus { outline: none; border-color: var(--terracota); }
+
+    .timer-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-2);
+    }
+    .timer-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px;
+      border-radius: var(--r-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      cursor: pointer;
+      transition: all var(--dur-fast);
+    }
+    .timer-btn :global(svg) { fill: none; stroke: currentColor; }
+    .timer-start, .timer-pause {
+      background: var(--terracota);
+      color: white;
+      border: 1px solid var(--terracota);
+    }
+    .timer-start:hover, .timer-pause:hover { opacity: 0.92; }
+    .timer-reset {
+      background: transparent;
+      color: var(--ink-soft);
+      border: 1px solid var(--line);
+    }
+    .timer-reset:hover { border-color: var(--terracota); color: var(--terracota); }
   </style>
 
   <script>
@@ -1008,5 +1243,156 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         rebuild();
       });
     });
+
+    // ============ CRONÔMETRO ============
+    const timerEl = document.getElementById('timer')!;
+    const timerFab = document.getElementById('timer-fab') as HTMLButtonElement;
+    const timerPanel = document.getElementById('timer-panel') as HTMLDivElement;
+    const timerClose = document.getElementById('timer-close') as HTMLButtonElement;
+    const timerFabTime = document.getElementById('timer-fab-time')!;
+    const timerMm = document.getElementById('timer-mm')!;
+    const timerSs = document.getElementById('timer-ss')!;
+    const timerStartBtn = document.getElementById('timer-start') as HTMLButtonElement;
+    const timerPauseBtn = document.getElementById('timer-pause') as HTMLButtonElement;
+    const timerResetBtn = document.getElementById('timer-reset') as HTMLButtonElement;
+    const timerCustom = document.getElementById('timer-custom') as HTMLInputElement;
+    const timerPresets = document.querySelectorAll<HTMLButtonElement>('.timer-preset');
+
+    let totalSec = 0;
+    let remainingSec = 0;
+    let intervalId: number | undefined;
+    let timerState: 'idle' | 'running' | 'paused' | 'warning' | 'done' = 'idle';
+
+    function fmt(n: number) { return String(Math.max(0, n)).padStart(2, '0'); }
+
+    function setState(s: typeof timerState) {
+      timerState = s;
+      timerEl.dataset.state = s;
+      timerStartBtn.hidden = (s === 'running');
+      timerPauseBtn.hidden = (s !== 'running');
+    }
+
+    function renderTimer() {
+      const mm = Math.floor(remainingSec / 60);
+      const ss = remainingSec % 60;
+      timerMm.textContent = fmt(mm);
+      timerSs.textContent = fmt(ss);
+      timerFabTime.textContent = `${fmt(mm)}:${fmt(ss)}`;
+      // últimos 10s viram 'warning' (cor terracota)
+      if (timerState === 'running' && remainingSec <= 10 && remainingSec > 0) {
+        timerEl.dataset.state = 'warning';
+      }
+    }
+
+    function setDuration(min: number) {
+      totalSec = Math.max(0, min * 60);
+      remainingSec = totalSec;
+      setState('idle');
+      renderTimer();
+    }
+
+    function startTimer() {
+      // Se idle e display ainda 00:00, usa o input custom ou ignora
+      if (remainingSec === 0) {
+        const m = parseInt(timerCustom.value, 10);
+        if (!isFinite(m) || m <= 0) return;
+        setDuration(m);
+      }
+      setState('running');
+      intervalId = window.setInterval(tick, 1000);
+    }
+
+    function pauseTimer() {
+      window.clearInterval(intervalId);
+      setState('paused');
+    }
+
+    function resetTimer() {
+      window.clearInterval(intervalId);
+      totalSec = 0;
+      remainingSec = 0;
+      timerCustom.value = '';
+      setState('idle');
+      renderTimer();
+    }
+
+    function tick() {
+      remainingSec--;
+      if (remainingSec <= 0) {
+        remainingSec = 0;
+        window.clearInterval(intervalId);
+        setState('done');
+        playAlarm();
+      }
+      renderTimer();
+    }
+
+    // Toca 3 beeps com envelope decay (Web Audio — sem precisar de arquivo)
+    function playAlarm() {
+      try {
+        const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+        const ctx = new Ctx();
+        const start = ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 880;
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          const t0 = start + i * 0.45;
+          gain.gain.setValueAtTime(0, t0);
+          gain.gain.linearRampToValueAtTime(0.4, t0 + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.35);
+          osc.start(t0);
+          osc.stop(t0 + 0.4);
+        }
+      } catch (e) {
+        // sem áudio disponível, fallback silencioso
+      }
+    }
+
+    function openPanel() {
+      timerPanel.removeAttribute('hidden');
+      timerFab.setAttribute('aria-expanded', 'true');
+    }
+    function closePanel() {
+      timerPanel.setAttribute('hidden', '');
+      timerFab.setAttribute('aria-expanded', 'false');
+    }
+
+    timerFab.addEventListener('click', () => {
+      if (timerPanel.hasAttribute('hidden')) openPanel();
+      else closePanel();
+    });
+    timerClose.addEventListener('click', closePanel);
+
+    timerPresets.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const m = parseInt(btn.dataset.min || '0', 10);
+        if (m > 0) {
+          setDuration(m);
+          timerCustom.value = '';
+        }
+      });
+    });
+
+    timerCustom.addEventListener('input', () => {
+      const m = parseInt(timerCustom.value, 10);
+      if (isFinite(m) && m > 0) setDuration(m);
+    });
+
+    timerStartBtn.addEventListener('click', startTimer);
+    timerPauseBtn.addEventListener('click', pauseTimer);
+    timerResetBtn.addEventListener('click', resetTimer);
+
+    // Fecha o painel ao apertar Esc (quando não estiver no modo cozinha)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !timerPanel.hasAttribute('hidden')) {
+        closePanel();
+      }
+    });
+
+    renderTimer();
   </script>
 </BaseLayout>
