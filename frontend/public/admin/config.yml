@@ -5,6 +5,11 @@ backend:
   name: github
   repo: angelamadeira/cozy-corner
   branch: main
+  # OAuth proxy: Pages Functions na mesma origem (frontend/functions/auth.js
+  # e callback.js). Variáveis GITHUB_CLIENT_ID + GITHUB_CLIENT_SECRET ficam
+  # no Cloudflare Pages → Settings → Variables and Secrets.
+  base_url: https://cozy-corner.pages.dev
+  auth_endpoint: auth
 
 # Permite rodar Decap localmente com `npx decap-server`
 local_backend: true
