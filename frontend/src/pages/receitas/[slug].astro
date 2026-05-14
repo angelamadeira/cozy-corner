@@ -1393,6 +1393,19 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       }
     });
 
+    // Pergunta de confirmação antes de sair da página com timer ativo.
+    // O navegador mostra um diálogo nativo (mensagem fixa, não dá pra
+    // customizar por questões de segurança).
+    function isTimerActive() {
+      return timerState === 'running' || timerState === 'paused' || timerState === 'warning';
+    }
+    window.addEventListener('beforeunload', (e) => {
+      if (isTimerActive()) {
+        e.preventDefault();
+        e.returnValue = ''; // necessário pra Chrome disparar o diálogo
+      }
+    });
+
     renderTimer();
   </script>
 </BaseLayout>
