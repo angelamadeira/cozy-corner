@@ -272,8 +272,11 @@ const categoryLabels: Record<string, string> = {
 
     .kitchen {
       position: relative;
-      width: 100%;
+      /* Limita pela altura disponível: viewport menos header e cabeçalho
+         da página (~280px). Mantém aspect-ratio então width é derivado. */
+      width: min(100%, calc((100vh - 280px) * 998 / 801));
       aspect-ratio: 998 / 801;
+      margin: 0 auto;
       color: var(--ink);
     }
     .scene {
