@@ -732,6 +732,11 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       .steps-header { flex-direction: column; align-items: flex-start; }
       .cooking-mode { width: 100%; justify-content: center; }
     }
+    /* Em phones: encosta header mais nas bordas (32→16) pra que os
+       toggles fiquem mais próximos da margem da tela. */
+    @media (max-width: 600px) {
+      .site-header { padding: 0 var(--s-4); }
+    }
 
     /* ============ PRINT ============ */
     @media print {

@@ -442,6 +442,11 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       .recipe-item a { grid-template-columns: 72px 1fr 20px; }
       .cat-title { font-size: 32px; }
     }
+    /* Em phones: encosta header mais nas bordas (32→16) pra que os
+       toggles fiquem mais próximos da margem da tela. */
+    @media (max-width: 600px) {
+      .site-header { padding: 0 var(--s-4); }
+    }
   </style>
 
   <script>

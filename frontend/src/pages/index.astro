@@ -115,13 +115,6 @@ const countByCategory = Object.fromEntries(
       <input class="search-input" type="search" placeholder="buscar nesta categoria..." data-t-attr="placeholder:search.placeholder" />
     </div>
 
-    <div class="drawer-filters">
-      <span class="chip chip-active" data-t="filter.all">todas</span>
-      <span class="chip" data-t="filter.quick">até 30 min</span>
-      <span class="chip" data-t="filter.vegetarian">vegetariana</span>
-      <span class="chip" data-t="filter.gluten_free">sem glúten</span>
-    </div>
-
     <ul class="recipe-list" id="cat-results"></ul>
   </aside>
 
@@ -842,30 +835,6 @@ const countByCategory = Object.fromEntries(
       color: var(--ink);
     }
     .drawer-search .search-input::placeholder { color: var(--ink-mute); }
-
-    .drawer-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s-2);
-      margin-bottom: var(--s-5);
-    }
-    .chip {
-      padding: 4px 12px;
-      border: 1px solid var(--line);
-      border-radius: var(--r-pill);
-      font-family: var(--font-mono);
-      font-size: var(--fs-caption);
-      cursor: pointer;
-      background: var(--bg);
-      color: var(--ink-soft);
-      transition: all var(--dur-fast);
-    }
-    .chip:hover { border-color: var(--terracota); color: var(--ink); }
-    .chip-active, .chip-active:hover {
-      background: var(--ink);
-      color: var(--bg);
-      border-color: var(--ink);
-    }
 
     /* recipe-list é populada via JS innerHTML — precisa ser :global pra
        o CSS do Astro alcançar os elementos dinâmicos */

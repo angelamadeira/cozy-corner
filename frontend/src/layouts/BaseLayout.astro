@@ -385,9 +385,11 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
       @media (max-width: 600px) {
         .lang-toggle { right: 12px; padding: 0 12px; font-size: 11px; }
         /* Mantém 36px de height (alinhado com .dark-toggle) e top 10px
-           (centrado no header de 56px). */
+           (centrado no header de 56px).
+           Em mobile o header tem padding reduzido pra var(--s-4)=16px
+           (override nos arquivos das páginas com .dark-toggle). */
         body:has(.dark-toggle) .lang-toggle {
-          right: calc(var(--s-6) + 36px + 12px);  /* header padding (32) + dark-toggle (36) + gap (12) = 80px */
+          right: calc(var(--s-4) + 36px + 12px);  /* header padding (16) + dark-toggle (36) + gap (12) = 64px */
         }
       }
       /* Esconde durante intro, drawer aberto, cooking mode e print.
