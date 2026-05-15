@@ -7,19 +7,24 @@ import { CATEGORY_META } from '../lib/categories';
 const allRecipes = await getCollection('recipes', ({ data }) => data.published);
 
 // Index pré-computado — só os campos que a busca precisa, serializado pro client
-const index = allRecipes.map((r) => ({
-  id: r.id,
-  title: r.data.title,
-  description: r.data.description ?? '',
-  // Categoria principal (primeira da lista). UI mostra só uma pra não poluir.
-  category: r.data.category[0],
-  categoryLabel: CATEGORY_META[r.data.category[0]]?.label ?? r.data.category[0],
-  time: r.data.time,
-  servings: r.data.servings,
-  difficulty: r.data.difficulty,
-  tags: r.data.tags,
-  ingredients: r.data.ingredients,
-}));
+const index = allRecipes.map((r) => {
+  const coverMedia = r.data.media.find((m) => m.cover) || r.data.media[0];
+  return {
+    id: r.id,
+    title: r.data.title,
+    description: r.data.description ?? '',
+    // Categoria principal (primeira da lista). UI mostra só uma pra não poluir.
+    category: r.data.category[0],
+    categoryLabel: CATEGORY_META[r.data.category[0]]?.label ?? r.data.category[0],
+    time: r.data.time,
+    servings: r.data.servings,
+    difficulty: r.data.difficulty,
+    tags: r.data.tags,
+    ingredients: r.data.ingredients,
+    cover: coverMedia?.src || '',
+    coverAlt: coverMedia?.alt || r.data.title,
+  };
+});
 
 // Tags populares — pra mostrar sugestões quando o input está vazio
 const tagCount = new Map<string, number>();
@@ -223,9 +228,15 @@ const popularTags = [...tagCount.entries()]
         // Categoria traduzida via chave (doc.category é o slug)
         const catLabel = T('category.' + doc.category, doc.categoryLabel);
 
+        // Capa: usa <img> se a receita tiver mídia, senão fallback "foto"
+        const escapeAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const thumb = doc.cover
+          ? '<div class="thumb has-img"><img src="' + escapeAttr(doc.cover) + '" alt="' + escapeAttr(doc.coverAlt || doc.title) + '" loading="lazy" /></div>'
+          : '<div class="thumb">' + T('recipe.photo', 'foto') + '</div>';
+
         li.innerHTML =
           '<a href="/receitas/' + doc.id + '/">' +
-            '<div class="thumb">' + T('recipe.photo', 'foto') + '</div>' +
+            thumb +
             '<div class="info">' +
               '<h3 class="recipe-name">' + highlight(doc.title, q) + '</h3>' +
               '<p class="recipe-meta">' +
@@ -490,6 +501,17 @@ const popularTags = [...tagCount.entries()]
       font-family: var(--font-mono);
       font-size: 11px;
       color: var(--ink-mute);
+      overflow: hidden;
+    }
+    .results :global(.thumb.has-img) {
+      border: none;
+      background: transparent;
+    }
+    .results :global(.thumb img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .results :global(.recipe-name) {
       font-family: var(--font-display);

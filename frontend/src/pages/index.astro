@@ -130,6 +130,9 @@ const countByCategory = Object.fromEntries(
     <button class="drawer-close" data-close type="button" aria-label="fechar">
       <Icon name="ph:x-thin" width={20} height={20} />
     </button>
+    <button class="drawer-crumb" data-close type="button">
+      <Icon name="ph:arrow-left-thin" /> <span data-t="nav.back_to_kitchen">voltar pra cozinha</span>
+    </button>
     <figure class="sobre-photo">
       <img
         src="/sobre/foto.jpg"
@@ -181,13 +184,18 @@ const countByCategory = Object.fromEntries(
     byCategory: Object.fromEntries(
       Object.entries(recipesByCategory).map(([k, v]) => [
         k,
-        v.map(r => ({
-          id: r.id,
-          title: r.data.title,
-          time: r.data.time,
-          servings: r.data.servings,
-          difficulty: r.data.difficulty,
-        }))
+        v.map(r => {
+          const coverMedia = r.data.media.find(m => m.cover) || r.data.media[0];
+          return {
+            id: r.id,
+            title: r.data.title,
+            time: r.data.time,
+            servings: r.data.servings,
+            difficulty: r.data.difficulty,
+            cover: coverMedia?.src || '',
+            coverAlt: coverMedia?.alt || r.data.title,
+          };
+        })
       ])
     ),
     counts: countByCategory,
@@ -514,9 +522,10 @@ const countByCategory = Object.fromEntries(
         transform: translateX(-16px);
       }
       /* Botão de navegação: setinha clicável que alterna entre as duas partes.
-         Fixed pra ficar sempre acessível enquanto o usuário rola pela cozinha. */
+         Position absolute (não fixed) pra ficar dentro do wrap, que já usa
+         --vh-real e portanto fica acima da barra de URL do iOS Safari. */
       .mobile-swipe-hint {
-        position: fixed;
+        position: absolute;
         right: var(--s-3);
         left: auto;
         bottom: var(--s-5);
@@ -699,9 +708,10 @@ const countByCategory = Object.fromEntries(
     .kitchen-tooltip.show { opacity: 1; }
     /* Em dispositivos sem hover (touch — celular/tablet), esconde o tooltip.
        Hover não dispara naturalmente em touch, e o "click pra ver" não é UX
-       intuitiva nesse contexto. */
+       intuitiva nesse contexto. .is-welcome escapa da regra pra o balão de
+       boas-vindas funcionar mesmo em mobile. */
     @media (hover: none), (pointer: coarse) {
-      .kitchen-tooltip { display: none !important; }
+      .kitchen-tooltip:not(.is-welcome) { display: none !important; }
     }
 
     /* Drawer prose pra sobre mim */
@@ -726,7 +736,6 @@ const countByCategory = Object.fromEntries(
       height: 100%;
       object-fit: cover;
       display: block;
-      filter: grayscale(1) contrast(1.02);
     }
 
     /* ============ DRAWERS / MODAL ============ */
@@ -879,6 +888,17 @@ const countByCategory = Object.fromEntries(
       font-family: var(--font-mono);
       font-size: 10px;
       color: var(--ink-mute);
+      overflow: hidden;
+    }
+    .recipe-list :global(.recipe-thumb.has-img) {
+      border: none;
+      background: transparent;
+    }
+    .recipe-list :global(.recipe-thumb img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .recipe-list :global(.recipe-row-title) {
       font-family: var(--font-display);
@@ -1032,6 +1052,7 @@ const countByCategory = Object.fromEntries(
     function lockKitchen() {
       if (kitchenLocked) return;
       kitchenLocked = true;
+      const wasFirstTime = !kitchenReachedBefore;
       try { localStorage.setItem(KITCHEN_REACHED_KEY, 'true'); } catch (e) {}
       // Cozinha vira o topo da página — esconde intro e transição.
       sceneIntro.style.display = 'none';
@@ -1042,6 +1063,29 @@ const countByCategory = Object.fromEntries(
       headerLogo.style.opacity = '1';
       // Snap pro topo (que agora é a cozinha) sem scroll animado.
       window.scrollTo(0, 0);
+      // Primeira vez chegando na cozinha → mostra balão "Oi, tudo bem?"
+      // em cima do hotspot Nossa cozinha (sobre).
+      if (wasFirstTime) {
+        window.setTimeout(showWelcomeBalloon, 1200);
+      }
+    }
+
+    function showWelcomeBalloon() {
+      // Encontra o hotspot 'sobre' atualmente visível (desktop/tablet/mobile-1).
+      const candidates = document.querySelectorAll<Element>('.kitchen-canvas .hs[data-action="sobre"]');
+      let target: Element | null = null;
+      candidates.forEach((el) => {
+        if (target) return;
+        const rect = (el as SVGGraphicsElement).getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) target = el;
+      });
+      if (!target) return;
+      const text = ((window as any).__cozyT?.('sobre.title')) || 'Oi, tudo bem?';
+      // Marca como welcome pra escapar da regra que esconde tooltips em touch
+      tooltip.classList.add('is-welcome');
+      // ttl 5s — balão aparece, fica pinned, depois some
+      showTooltipAt(target, text, 5000);
+      window.setTimeout(() => tooltip.classList.remove('is-welcome'), 5400);
     }
 
     if (kitchenReachedBefore) {
@@ -1203,17 +1247,23 @@ const countByCategory = Object.fromEntries(
     // =============================================
     function renderRecipeList(category: string) {
       const recipes = RECIPES.byCategory[category] || [];
-      catResults.innerHTML = recipes.map((r: any) => `
+      const escapeAttr = (s: string) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      catResults.innerHTML = recipes.map((r: any) => {
+        const thumb = r.cover
+          ? `<div class="recipe-thumb has-img"><img src="${escapeAttr(r.cover)}" alt="${escapeAttr(r.coverAlt || r.title)}" loading="lazy" /></div>`
+          : `<div class="recipe-thumb">foto</div>`;
+        return `
         <li>
           <a href="/receitas/${r.id}/">
-            <div class="recipe-thumb">foto</div>
+            ${thumb}
             <div>
               <div class="recipe-row-title">${r.title}</div>
               <div class="recipe-row-meta">${[`${r.time} min`, r.servings ? `${r.servings} porções` : null, r.difficulty].filter(Boolean).join(' · ')}</div>
             </div>
           </a>
         </li>
-      `).join('');
+      `;
+      }).join('');
       if (recipes.length === 0) {
         const emptyMsg = T('meta.no_recipes_yet') || 'ainda sem receitas por aqui...';
         catResults.innerHTML = `<li style="padding: 24px 0; color: var(--ink-mute); font-family: var(--font-mono); font-size: 14px;">${emptyMsg}</li>`;
@@ -1377,6 +1427,8 @@ const countByCategory = Object.fromEntries(
     const mobileScroll = document.getElementById('kitchen-mobile-scroll');
     const swipeHint = document.getElementById('mobile-swipe-hint');
     if (mobileScroll && swipeHint) {
+      const SCROLL_KEY = 'cozy-mobile-scroll';
+
       function updateHintDirection() {
         // Se já passou da metade, a seta aponta pra esquerda (voltar pra parte 1)
         const half = mobileScroll.scrollWidth / 2;
@@ -1390,8 +1442,29 @@ const countByCategory = Object.fromEntries(
           behavior: 'smooth',
         });
       });
-      // Atualiza direção da seta quando scrolla (manual via swipe ou click)
-      mobileScroll.addEventListener('scroll', updateHintDirection, { passive: true });
+
+      // Restaura tela em que o user estava (snap pra primeira ou segunda parte)
+      // depois de um refresh. Usa sessionStorage pra durar só na sessão.
+      try {
+        const saved = sessionStorage.getItem(SCROLL_KEY);
+        if (saved === 'second') {
+          // Espera o layout estabilizar antes de pular pra segunda parte
+          requestAnimationFrame(() => {
+            mobileScroll.scrollLeft = mobileScroll.scrollWidth;
+            updateHintDirection();
+          });
+        }
+      } catch (e) {}
+
+      // Atualiza direção da seta E salva qual parte tá ativa pro refresh
+      mobileScroll.addEventListener('scroll', () => {
+        updateHintDirection();
+        try {
+          const half = mobileScroll.scrollWidth / 2;
+          const isAtSecond = mobileScroll.scrollLeft > half * 0.5;
+          sessionStorage.setItem(SCROLL_KEY, isAtSecond ? 'second' : 'first');
+        } catch (e) {}
+      }, { passive: true });
     }
 
     backdrop.addEventListener('click', closeAll);
