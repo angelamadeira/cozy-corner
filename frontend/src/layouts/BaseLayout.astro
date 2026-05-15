@@ -351,15 +351,15 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
         box-sizing: border-box;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        padding: 0 14px;
+        gap: 2px;
+        padding: 0 4px;     /* tighter — as pílulas internas têm padding próprio */
         background: transparent;
         border: 1px solid var(--line);
         border-radius: 999px;
         font-family: var(--font-mono);
-        font-size: 14px;
+        font-size: 13px;
         letter-spacing: 0.04em;
-        color: var(--ink-soft);
+        color: var(--ink-mute);
         cursor: pointer;
         opacity: 1;
         pointer-events: auto;
@@ -368,12 +368,38 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
                     border-color 150ms,
                     color 150ms;
       }
-      .lang-toggle:hover { border-color: var(--ink); color: var(--ink); }
-      .lang-toggle .lang-pt { color: var(--ink); font-weight: 500; }
-      .lang-toggle .lang-en { color: var(--ink-soft); }
-      .lang-toggle.is-en .lang-pt { color: var(--ink-soft); font-weight: 400; }
-      .lang-toggle.is-en .lang-en { color: var(--ink); font-weight: 500; }
-      .lang-toggle .lang-sep { color: var(--ink-mute); opacity: 0.5; }
+      .lang-toggle:hover { border-color: var(--ink-soft); }
+      /* Cada idioma vira uma pílula interna; a ativa preenche com --ink
+         e texto em --bg (cream). Padrão de "switch segmentado" — não
+         deixa dúvida sobre qual está selecionado. */
+      .lang-toggle .lang-pt,
+      .lang-toggle .lang-en {
+        display: inline-flex;
+        align-items: center;
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 999px;
+        font-weight: 500;
+        background: transparent;
+        color: var(--ink-mute);
+        transition: color 150ms, background 150ms;
+      }
+      /* Default (sem .is-en): PT é o ativo */
+      .lang-toggle .lang-pt {
+        background: var(--ink);
+        color: var(--bg);
+      }
+      /* Com .is-en: troca a pílula preenchida pro EN */
+      .lang-toggle.is-en .lang-pt {
+        background: transparent;
+        color: var(--ink-mute);
+      }
+      .lang-toggle.is-en .lang-en {
+        background: var(--ink);
+        color: var(--bg);
+      }
+      /* Separador deixou de fazer sentido — as pílulas dão a separação */
+      .lang-toggle .lang-sep { display: none; }
       /* Quando a página tem dark-toggle no header (receita, categoria, busca),
          desloca o lang-toggle pra esquerda pra não sobrepor.
          Dark-toggle: right edge a 24px (header padding s-6), width 36 →
