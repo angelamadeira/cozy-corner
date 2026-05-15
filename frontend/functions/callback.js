@@ -59,72 +59,109 @@ export async function onRequest(context) {
   <style>
     body {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      padding: 40px;
+      padding: 24px;
       color: #1a1a1a;
       background: #faf6ee;
-      line-height: 1.6;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    h1 { font-size: 16px; margin: 0 0 12px; }
+    #log {
+      background: #1a1a1a;
+      color: #b8e986;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .ok { color: #b8e986; }
+    .info { color: #87ceeb; }
+    .warn { color: #ffd700; }
+    .err { color: #ff7575; }
+    button {
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: #1a1a1a;
+      color: #faf6ee;
+      border: 0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
+<h1>Login bem-sucedido 💛</h1>
+<p>Veja o status da comunicação com o Decap abaixo. (Auto-close desabilitado pra debug.)</p>
+<div id="log"></div>
+<button onclick="window.close()">Fechar janela</button>
 <script>
   (function () {
     var msg = 'authorization:github:success:' + ${JSON.stringify(payload)};
     var sent = false;
+    var logEl = document.getElementById('log');
 
-    function log() {
-      try { console.log.apply(console, ['[decap-oauth]'].concat([].slice.call(arguments))); } catch (e) {}
+    function log(level) {
+      var args = [].slice.call(arguments, 1);
+      var line = '[' + new Date().toISOString().slice(11, 19) + '] ' + args.map(function (a) {
+        return (typeof a === 'object') ? JSON.stringify(a) : String(a);
+      }).join(' ');
+      var div = document.createElement('div');
+      div.className = level;
+      div.textContent = line;
+      logEl.appendChild(div);
+      try { console.log.apply(console, ['[decap-oauth]'].concat(args)); } catch (e) {}
     }
 
     function sendToken(targetOrigin) {
       if (!window.opener || window.opener.closed) {
-        log('opener missing, cannot send token');
+        log('err', 'opener ausente — não posso mandar token (popup foi aberto direto?)');
         return;
       }
       window.opener.postMessage(msg, targetOrigin || '*');
       sent = true;
-      log('sent token to opener (origin=' + (targetOrigin || '*') + ')');
+      log('ok', 'token enviado pro opener (origin=' + (targetOrigin || '*') + ')');
     }
 
     function handleMessage(e) {
-      log('received message from opener', { origin: e.origin, data: e.data });
+      log('info', 'mensagem recebida do opener:', { origin: e.origin, data: String(e.data).slice(0, 80) });
       if (typeof e.data !== 'string') return;
       if (e.data.indexOf('authorizing:') === 0) {
+        log('info', '→ é authorizing, respondendo com token');
         sendToken(e.origin || '*');
       }
     }
 
     window.addEventListener('message', handleMessage, false);
-    log('listener installed, opener exists:', !!window.opener);
+    log('info', 'listener instalado. opener existe: ' + !!window.opener);
+    log('info', 'window.opener.location (se acessível): ' + (function () {
+      try { return window.opener && window.opener.location.origin; } catch (e) { return 'inacessível (cross-origin?)'; }
+    })());
 
-    // Sinaliza pronto pro opener.
     if (window.opener) {
       try {
         window.opener.postMessage('authorizing:github', '*');
-        log('sent authorizing:github to opener');
-      } catch (e) { log('error posting authorizing', e); }
+        log('info', "enviou 'authorizing:github' pro opener");
+      } catch (e) { log('err', 'erro ao postar authorizing:', e.message); }
     }
 
-    // Defensivo: depois de 500ms começa a tentar mandar o token direto
-    // (em caso de versões do Decap que não fazem o handshake completo).
     var attempts = 0;
     var interval = setInterval(function () {
-      if (sent || attempts >= 8) {
+      if (sent || attempts >= 10) {
         clearInterval(interval);
+        if (!sent) log('warn', 'desistiu após ' + attempts + ' tentativas sem confirmar envio');
         return;
       }
       attempts++;
+      log('info', 'tentativa defensiva #' + attempts + ' de enviar token direto');
       sendToken('*');
     }, 500);
-
-    // Fecha o popup depois de 5s.
-    setTimeout(function () {
-      log('closing popup, sent=' + sent);
-      window.close();
-    }, 5000);
   })();
 </script>
-<p>Login bem-sucedido! Pode fechar essa janela. 💛</p>
 </body>
 </html>`;
 
