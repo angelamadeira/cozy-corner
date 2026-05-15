@@ -44,13 +44,11 @@ export async function onRequest(context) {
     provider: 'github',
   });
 
-  // HTML que roda no popup. Tenta vários caminhos pro Decap pegar o token:
-  //   1. Handshake clássico: popup sinaliza 'authorizing:github' pro opener,
-  //      opener responde, popup manda o token.
-  //   2. Listener: se o Decap mandar 'authorizing:' a qualquer momento,
-  //      respondemos com o token.
-  //   3. Defensivo: depois de 500ms manda o token direto algumas vezes pro
-  //      caso do Decap não fazer o handshake (versões variam).
+  // Popup escreve o token em localStorage IMEDIATAMENTE (mais confiável que
+  // postMessage — funciona mesmo se a janela popup perdeu o opener por COOP
+  // ou foi fechada rápido). O admin/index.html injeta um script que escuta
+  // mudanças em localStorage e dispara um MessageEvent simulado pro Decap.
+  // Também tenta postMessage pelo opener como fallback.
   const html = `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -98,12 +96,11 @@ export async function onRequest(context) {
 <h1>Login bem-sucedido 💛</h1>
 <p>Veja o status da comunicação com o Decap abaixo. (Auto-close desabilitado pra debug.)</p>
 <div id="log"></div>
-<button onclick="window.__sendNow && window.__sendNow()">Enviar agora (manual)</button>
 <button onclick="window.close()">Fechar janela</button>
 <script>
   (function () {
-    var msg = 'authorization:github:success:' + ${JSON.stringify(payload)};
-    var sent = false;
+    var payload = ${JSON.stringify(payload)};
+    var msg = 'authorization:github:success:' + payload;
     var logEl = document.getElementById('log');
 
     function log(level) {
@@ -118,80 +115,47 @@ export async function onRequest(context) {
       try { console.log.apply(console, ['[decap-oauth]'].concat(args)); } catch (e) {}
     }
 
-    function sendToken(targetOrigin) {
-      if (!window.opener || window.opener.closed) {
-        log('err', 'opener ausente — não posso mandar token (popup foi aberto direto?)');
-        return;
-      }
-      window.opener.postMessage(msg, targetOrigin || '*');
-      sent = true;
-      log('ok', 'token enviado pro opener (origin=' + (targetOrigin || '*') + ')');
+    // 1) PRINCIPAL: localStorage. Dispara storage event no admin abre,
+    //    funciona mesmo sem window.opener.
+    try {
+      localStorage.setItem('cozy-decap-oauth-token', payload);
+      // Apaga depois de 30s pra não vazar o token em armazenamento de longo prazo
+      setTimeout(function () { localStorage.removeItem('cozy-decap-oauth-token'); }, 30000);
+      log('ok', '✓ token salvo em localStorage (cozy-decap-oauth-token)');
+    } catch (e) {
+      log('err', 'falha ao escrever localStorage: ' + e.message);
     }
 
-    function handleMessage(e) {
-      log('info', 'mensagem recebida do opener:', { origin: e.origin, data: String(e.data).slice(0, 80) });
-      if (typeof e.data !== 'string') return;
-      if (e.data.indexOf('authorizing:') === 0) {
-        log('info', '→ é authorizing, respondendo com token');
-        sendToken(e.origin || '*');
-      }
-    }
-
-    window.addEventListener('message', handleMessage, false);
-    log('info', 'listener instalado. opener existe: ' + !!window.opener);
-    log('info', 'opener.location (se acessível): ' + (function () {
-      try { return window.opener && window.opener.location.origin; } catch (e) { return 'BLOQUEADO cross-origin: ' + e.message; }
-    })());
-    log('info', 'window.name: "' + window.name + '"');
-    log('info', 'document.referrer: "' + document.referrer + '"');
-
+    // 2) FALLBACK: postMessage clássico, caso window.opener exista
+    log('info', 'opener existe: ' + !!window.opener);
     if (window.opener) {
+      function handleMessage(e) {
+        if (typeof e.data !== 'string') return;
+        if (e.data.indexOf('authorizing:') === 0) {
+          window.opener.postMessage(msg, e.origin || '*');
+          log('ok', '✓ token enviado pro opener via postMessage');
+        }
+      }
+      window.addEventListener('message', handleMessage, false);
       try {
         window.opener.postMessage('authorizing:github', '*');
-        log('info', "enviou 'authorizing:github' pro opener");
-      } catch (e) { log('err', 'erro ao postar authorizing:', e.message); }
-    }
-
-    // Auto-send com DELAY de 8 segundos pra dar tempo de inspecionar.
-    // (botão manual abaixo também envia.)
-    var attempts = 0;
-    var maxAttempts = 6;
-    var started = false;
-
-    function startDefensiveSending() {
-      if (started) return;
-      started = true;
-      log('warn', '== começando envios defensivos (5s atrás) ==');
-      var interval = setInterval(function () {
-        if (sent || attempts >= maxAttempts) {
-          clearInterval(interval);
-          if (!sent) log('warn', 'desistiu após ' + attempts + ' tentativas');
-          return;
-        }
-        attempts++;
-        log('info', 'tentativa #' + attempts + ' de enviar token');
-        sendToken('*');
-      }, 500);
-    }
-
-    // Conta regressiva de 8s antes de começar
-    var countdown = 8;
-    log('warn', '⏳ aguardando ' + countdown + 's antes de enviar token (inspecione AGORA)');
-    var ticker = setInterval(function () {
-      countdown--;
-      if (countdown <= 0) {
-        clearInterval(ticker);
-        startDefensiveSending();
-      } else if (countdown <= 3) {
-        log('warn', '⏳ ' + countdown + 's...');
+        log('info', "→ handshake 'authorizing:github' enviado pro opener");
+        // Também envia direto após 200ms
+        setTimeout(function () {
+          try {
+            window.opener.postMessage(msg, '*');
+            log('ok', '✓ token enviado direto pro opener (fallback)');
+          } catch (e) { log('err', 'falha no fallback: ' + e.message); }
+        }, 200);
+      } catch (e) {
+        log('err', 'erro no handshake: ' + e.message);
       }
-    }, 1000);
+    } else {
+      log('warn', 'sem opener — confiando só no localStorage');
+    }
 
-    // Botão manual também
-    window.__sendNow = function () {
-      log('info', '== envio manual disparado ==');
-      startDefensiveSending();
-    };
+    log('ok', '✓ pronto. O admin deve receber o token automaticamente.');
+    log('info', 'Pode fechar essa janela manualmente se ela não fechar sozinha.');
   })();
 </script>
 </body>

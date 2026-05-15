@@ -137,6 +137,57 @@
   </style>
 </head>
 <body>
+  <!-- Ponte OAuth: pega o token que o popup salvou em localStorage e simula
+       o postMessage que o Decap está esperando. Necessário porque o
+       window.opener entre popup e admin pode quebrar por COOP/cross-origin
+       depois do redirect via GitHub. -->
+  <script>
+    (function () {
+      var KEY = 'cozy-decap-oauth-token';
+
+      function deliverToken(payloadStr) {
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        var msg = 'authorization:github:success:' + payloadStr;
+        console.log('[oauth-bridge] entregando token pro Decap');
+        // Dispara MessageEvent que o handler do Decap escuta
+        var event = new MessageEvent('message', {
+          data: msg,
+          origin: window.location.origin,
+          source: window,
+        });
+        window.dispatchEvent(event);
+      }
+
+      // 1) Escuta evento de localStorage (dispara em todas as abas/janelas
+      //    do mesmo origin quando outra escreve)
+      window.addEventListener('storage', function (e) {
+        if (e.key === KEY && e.newValue) {
+          console.log('[oauth-bridge] storage event recebido');
+          deliverToken(e.newValue);
+        }
+      });
+
+      // 2) Polling de fallback: confere a cada 200ms se o token já tá lá.
+      //    Storage event não dispara na MESMA janela que escreveu — mas a
+      //    popup é uma janela separada, então deveria disparar. Polling
+      //    cobre casos de timing.
+      var pollCount = 0;
+      var poller = setInterval(function () {
+        pollCount++;
+        var val;
+        try { val = localStorage.getItem(KEY); } catch (e) {}
+        if (val) {
+          clearInterval(poller);
+          console.log('[oauth-bridge] polling encontrou token');
+          deliverToken(val);
+        } else if (pollCount > 600) {
+          // Para depois de 2 minutos (200ms * 600)
+          clearInterval(poller);
+        }
+      }, 200);
+    })();
+  </script>
+
   <!-- Decap CMS injeta a UI aqui -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
