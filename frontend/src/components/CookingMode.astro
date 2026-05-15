@@ -535,10 +535,45 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     transition: background var(--dur-fast);
   }
   .cm-ing-list label:hover { background: var(--bg); }
+  /* Checkbox custom: appearance:none desliga o render nativo do browser
+     (que varia entre OS/versão), e desenhamos o quadrado + check via CSS.
+     Garante consistência visual entre todos os items da lista. */
   .cm-ing-list input[type="checkbox"] {
-    width: 18px; height: 18px;
-    accent-color: var(--terracota);
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex: none;
+    position: relative;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
     cursor: pointer;
+    transition: border-color var(--dur-fast), background var(--dur-fast);
+  }
+  .cm-ing-list label:hover input[type="checkbox"] {
+    border-color: var(--terracota);
+  }
+  .cm-ing-list input[type="checkbox"]:checked {
+    background: var(--terracota);
+    border-color: var(--terracota);
+  }
+  /* Checkmark desenhado via ::after — duas bordas formando o tique */
+  .cm-ing-list input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 4px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .cm-ing-list input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--terracota);
+    outline-offset: 2px;
   }
   .cm-ing-list input:checked + span {
     text-decoration: line-through;
