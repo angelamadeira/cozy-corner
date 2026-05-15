@@ -1405,6 +1405,12 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       timerEl.dataset.state = s;
       timerStartBtn.hidden = (s === 'running');
       timerPauseBtn.hidden = (s !== 'running');
+      // Mostra/esconde o countdown no FAB conforme o estado. Sem isso o
+      // atributo HTML [hidden] do span vence a CSS conditional pelo
+      // [hidden]{display:none!important} global, e o tempo fica invisível
+      // mesmo com timer rodando ao fechar o painel.
+      const showFabTime = (s === 'running' || s === 'paused' || s === 'done');
+      timerFabTime.hidden = !showFabTime;
     }
 
     function renderTimer() {
