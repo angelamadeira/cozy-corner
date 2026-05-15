@@ -280,6 +280,9 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     display: grid;
     grid-template-rows: auto auto 1fr;
     overflow: hidden;
+    /* Trava largura ao viewport — defesa contra grid items que ainda
+       conseguem expandir além disso por algum conteúdo intrínseco. */
+    max-width: 100vw;
   }
   body.dark-mode .cm-overlay { background: var(--bg); }
 
@@ -289,6 +292,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     grid-template-columns: 1fr 340px;
     overflow: hidden;
     min-height: 0;
+    min-width: 0;
   }
   /* Quando o painel de ingredientes está escondido (tela "All done!"),
      colapsa a coluna direita pra cozinha ocupar toda a largura — conteúdo
@@ -296,12 +300,16 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
   .cm-body:has(.cm-ingredients[hidden]) {
     grid-template-columns: 1fr;
   }
-  /* Coluna esquerda: stage (cresce) + nav (auto) embaixo */
+  /* Coluna esquerda: stage (cresce) + nav (auto) embaixo.
+     min-width: 0 (grid item quirk): sem isso a coluna do grid expande
+     pra acomodar conteúdo "intrínseco" — passos longos ou botões com
+     muito texto empurravam a coluna além do viewport. */
   .cm-main {
     display: grid;
     grid-template-rows: 1fr auto;
     overflow: hidden;
     min-height: 0;
+    min-width: 0;
   }
   /* Botão de toggle só aparece em mobile (em desktop ingredientes é fixo) */
   .cm-ing-toggle-mobile { visibility: hidden; }
@@ -371,6 +379,8 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     justify-content: center;
     padding: var(--s-8) var(--s-6);
     overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
     user-select: none;
   }
   .cm-step-text {
@@ -379,9 +389,16 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     font-size: clamp(24px, 4vw, 40px);
     line-height: 1.4;
     color: var(--ink);
-    max-width: 720px;
+    max-width: 100%;
+    width: 100%;
+    max-inline-size: 720px;
     text-align: center;
     letter-spacing: -0.01em;
+    /* Quebra palavras longas (URLs, palavras compostas) pra não estourar
+       lateral em viewports estreitos. */
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
   }
 
   /* ============ END SCREEN ============ */
@@ -465,6 +482,11 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     color: var(--ink);
     cursor: pointer;
     transition: background var(--dur-fast);
+    /* Permite que o botão encolha em viewports estreitos sem empurrar
+       a grid pra fora do viewport. */
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .cm-nav-btn:hover:not(:disabled) { background: var(--surface); }
   .cm-nav-btn:disabled {
@@ -525,26 +547,54 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
 
   /* ============ MOBILE ============ */
   @media (max-width: 760px) {
+    /* cm-body em 2 rows: stage cresce, ingredientes ficam no fundo
+       com max-height de 40vh quando abertos. */
     .cm-body {
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: 1fr auto;
+      /* Reserva espaço pro nav fixo na base (incluindo safe-area do
+         iOS) — sem isso o conteúdo final ficava embaixo dos botões. */
+      padding-bottom: calc(var(--cm-nav-h, 56px) + env(safe-area-inset-bottom, 0px));
     }
     .cm-ingredients {
       border-left: none;
-      border-bottom: 1px solid var(--line-soft);
+      border-top: 1px solid var(--line-soft);
+      border-bottom: none;
       max-height: 40vh;
       transition: max-height var(--dur-base) var(--ease-out, ease), opacity var(--dur-base);
     }
     .cm-ingredients.cm-ing-collapsed {
       max-height: 0;
       opacity: 0;
-      border-bottom-width: 0;
+      border-top-width: 0;
       pointer-events: none;
     }
     .cm-ing-toggle-mobile { visibility: visible; }
     .cm-header { padding: var(--s-3) var(--s-4); }
     .cm-step-num { font-size: 22px; }
     .cm-stage { padding: var(--s-6) var(--s-4); }
+    /* Em viewports estreitos o clamp 4vw resolve OK até ~600px. Em
+       phones pequenos (≤420px) força um teto menor pra evitar que a
+       palavra "pre-aqueça" / números longos estourem a linha. */
+    .cm-step-text { font-size: clamp(20px, 5.5vw, 28px); }
     .cm-nav-btn { padding: var(--s-4) var(--s-3); font-size: var(--fs-small); }
+    /* Nav preso no fundo da viewport em mobile. Sai do grid layout do
+       cm-main (pra não empurrar cm-stage) e gruda na base. Padding-bottom
+       respeita o safe-area do iOS (botão home / barra inferior). */
+    .cm-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 5;
+      background: var(--bg);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      border-top: 1px solid var(--line-soft);
+    }
+  }
+  @media (max-width: 420px) {
+    .cm-step-text { font-size: 20px; line-height: 1.35; }
+    .cm-stage { padding: var(--s-5) var(--s-3); }
+    .cm-icon-btn { width: 40px; height: 40px; }
   }
 </style>
