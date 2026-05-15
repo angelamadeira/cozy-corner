@@ -176,6 +176,24 @@ img, video { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 button { font: inherit; cursor: pointer; }
 
+/* Scrollbar estilizada pra combinar com light/dark. Usa var(--ink-mute)
+   que adapta entre os modos (#A89F8E em light, #7A7361 em dark) — fica
+   suave em qualquer bg. Track transparente deixa o bg do container
+   passar (cream em --bg, navy em dark, surface em painéis).
+   Quando algum elemento quer scrollbar invisível (ex.: kitchen-mobile-
+   scroll horizontal snap), sobrescreve com `scrollbar-width: none`. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-mute) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--ink-mute);
+  border-radius: var(--r-pill);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--ink-soft); }
+
 /* Focus visível e acessível */
 :focus-visible {
   outline: 2px solid var(--terracota);
