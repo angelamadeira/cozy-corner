@@ -746,6 +746,15 @@ const countByCategory = Object.fromEntries(
     body.welcome-pending .mobile-swipe-hint {
       pointer-events: none;
     }
+    /* Em mobile, também trava o scroll horizontal entre painel 1 e 2
+       (swipe pra ver o resto da cozinha) e o scroll vertical da página.
+       Touch-action: none impede gesto de pan no track snap-scroll. */
+    body.welcome-pending .kitchen-mobile-scroll {
+      overflow-x: hidden;
+      touch-action: none;
+      pointer-events: none;
+    }
+    body.welcome-pending { overflow: hidden; }
 
     /* Drawer prose pra sobre mim */
     .drawer-prose {
