@@ -1,7 +1,11 @@
 // Cloudflare Pages Function — recebe o callback do GitHub depois do login.
 //
-// Troca o `code` por um access_token, depois devolve o token pro Decap CMS
-// via postMessage na janela pai (que ficou aguardando o popup fechar).
+// Troca o `code` por um access_token e salva em localStorage. O admin
+// (admin/index.html) tem uma ponte que detecta essa escrita e entrega o
+// token pro Decap simulando o postMessage que ele espera.
+//
+// Também tenta postMessage clássico via window.opener como fallback —
+// alguns navegadores preservam o opener entre redirects, outros não (COOP).
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
@@ -38,17 +42,13 @@ export async function onRequest(context) {
     );
   }
 
-  // Decap espera mensagem no formato: 'authorization:github:success:<json>'
   const payload = JSON.stringify({
     token: data.access_token,
     provider: 'github',
   });
 
-  // Popup escreve o token em localStorage IMEDIATAMENTE (mais confiável que
-  // postMessage — funciona mesmo se a janela popup perdeu o opener por COOP
-  // ou foi fechada rápido). O admin/index.html injeta um script que escuta
-  // mudanças em localStorage e dispara um MessageEvent simulado pro Decap.
-  // Também tenta postMessage pelo opener como fallback.
+  // Popup escreve token em localStorage (canal same-origin) e também tenta
+  // postMessage como fallback. Auto-fecha em 2s.
   const html = `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -57,105 +57,45 @@ export async function onRequest(context) {
   <style>
     body {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      padding: 24px;
+      padding: 40px;
       color: #1a1a1a;
       background: #faf6ee;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-    h1 { font-size: 16px; margin: 0 0 12px; }
-    #log {
-      background: #1a1a1a;
-      color: #b8e986;
-      padding: 12px;
-      border-radius: 4px;
-      font-size: 11px;
-      white-space: pre-wrap;
-      word-break: break-all;
-      max-height: 380px;
-      overflow-y: auto;
-    }
-    .ok { color: #b8e986; }
-    .info { color: #87ceeb; }
-    .warn { color: #ffd700; }
-    .err { color: #ff7575; }
-    button {
-      margin-top: 12px;
-      padding: 6px 14px;
-      background: #1a1a1a;
-      color: #faf6ee;
-      border: 0;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-<h1>Login bem-sucedido 💛</h1>
-<p>Veja o status da comunicação com o Decap abaixo. (Auto-close desabilitado pra debug.)</p>
-<div id="log"></div>
-<button onclick="window.close()">Fechar janela</button>
+<p>Login bem-sucedido! 💛</p>
+<p>Pode fechar essa janela.</p>
 <script>
   (function () {
     var payload = ${JSON.stringify(payload)};
     var msg = 'authorization:github:success:' + payload;
-    var logEl = document.getElementById('log');
 
-    function log(level) {
-      var args = [].slice.call(arguments, 1);
-      var line = '[' + new Date().toISOString().slice(11, 19) + '] ' + args.map(function (a) {
-        return (typeof a === 'object') ? JSON.stringify(a) : String(a);
-      }).join(' ');
-      var div = document.createElement('div');
-      div.className = level;
-      div.textContent = line;
-      logEl.appendChild(div);
-      try { console.log.apply(console, ['[decap-oauth]'].concat(args)); } catch (e) {}
-    }
-
-    // 1) PRINCIPAL: localStorage. Dispara storage event no admin abre,
-    //    funciona mesmo sem window.opener.
+    // 1) localStorage — same-origin, sobrevive mesmo se opener foi severado
     try {
       localStorage.setItem('cozy-decap-oauth-token', payload);
-      // Apaga depois de 30s pra não vazar o token em armazenamento de longo prazo
       setTimeout(function () { localStorage.removeItem('cozy-decap-oauth-token'); }, 30000);
-      log('ok', '✓ token salvo em localStorage (cozy-decap-oauth-token)');
-    } catch (e) {
-      log('err', 'falha ao escrever localStorage: ' + e.message);
-    }
+    } catch (e) {}
 
-    // 2) FALLBACK: postMessage clássico, caso window.opener exista
-    log('info', 'opener existe: ' + !!window.opener);
+    // 2) postMessage clássico como fallback
     if (window.opener) {
-      function handleMessage(e) {
-        if (typeof e.data !== 'string') return;
-        if (e.data.indexOf('authorizing:') === 0) {
-          window.opener.postMessage(msg, e.origin || '*');
-          log('ok', '✓ token enviado pro opener via postMessage');
-        }
-      }
-      window.addEventListener('message', handleMessage, false);
       try {
+        function reply(e) {
+          if (typeof e.data === 'string' && e.data.indexOf('authorizing:') === 0) {
+            window.opener.postMessage(msg, e.origin || '*');
+          }
+        }
+        window.addEventListener('message', reply, false);
         window.opener.postMessage('authorizing:github', '*');
-        log('info', "→ handshake 'authorizing:github' enviado pro opener");
-        // Também envia direto após 200ms
         setTimeout(function () {
-          try {
-            window.opener.postMessage(msg, '*');
-            log('ok', '✓ token enviado direto pro opener (fallback)');
-          } catch (e) { log('err', 'falha no fallback: ' + e.message); }
+          try { window.opener.postMessage(msg, '*'); } catch (e) {}
         }, 200);
-      } catch (e) {
-        log('err', 'erro no handshake: ' + e.message);
-      }
-    } else {
-      log('warn', 'sem opener — confiando só no localStorage');
+      } catch (e) {}
     }
 
-    log('ok', '✓ pronto. O admin deve receber o token automaticamente.');
-    log('info', 'Pode fechar essa janela manualmente se ela não fechar sozinha.');
+    setTimeout(function () { window.close(); }, 2000);
   })();
 </script>
 </body>
