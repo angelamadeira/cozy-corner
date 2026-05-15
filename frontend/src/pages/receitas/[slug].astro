@@ -330,7 +330,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     }
     .logo-by {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       color: var(--ink-soft);
       margin-top: 1px;
     }
@@ -729,11 +729,39 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
     /* ============ MOBILE ============ */
     @media (max-width: 768px) {
-      .recipe { padding: calc(var(--header-h) + var(--s-5)) var(--s-4) var(--s-7); }
+      /* padding-bottom maior pra reservar espaço pro CTA fixo do modo
+         cozinha (60 + s-4 + safe-area). */
+      .recipe {
+        padding:
+          calc(var(--header-h) + var(--s-5))
+          var(--s-4)
+          calc(60px + var(--s-5) + env(safe-area-inset-bottom, 0px));
+      }
       .body { grid-template-columns: 1fr; gap: var(--s-5); }
       .ingredients-col { position: static; }
       .steps-header { flex-direction: column; align-items: flex-start; }
-      .cooking-mode { width: 100%; justify-content: center; }
+      /* CTA "Modo cozinha" vira barra fixa full-width na base do
+         viewport — fica sempre acessível enquanto o user rola pelos
+         ingredientes/passos. Respeita safe-area do iOS. */
+      .cooking-mode {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+        margin: 0;
+        border-radius: 0;
+        padding: var(--s-4) var(--s-5);
+        padding-bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+        z-index: 90;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      }
+      /* Timer FAB posicionado mais abaixo é tratado em outro @media
+         abaixo da declaração default — sem isso a cascata CSS faz
+         a regra default vencer por estar depois no source. */
     }
     /* Em phones: encosta header mais nas bordas (32→16) pra que os
        toggles fiquem mais próximos da margem da tela. */
@@ -880,6 +908,7 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       padding: 0 18px;
       gap: 8px;
       background: var(--terracota);
+      color: #fff;
     }
     .timer[data-state="running"] .timer-fab-time,
     .timer[data-state="paused"] .timer-fab-time,
@@ -908,6 +937,20 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       box-shadow: var(--shadow-3);
       padding: var(--s-5);
       z-index: 1101;
+    }
+
+    /* Em mobile, FAB do cronômetro fica acima da barra fixa do "Modo
+       cozinha" — mesma altura que ele tem dentro do modo cozinha
+       (bottom: 80+safe). */
+    @media (max-width: 768px) {
+      .timer-fab {
+        right: var(--s-4);
+        bottom: calc(var(--s-8) + var(--s-4) + env(safe-area-inset-bottom, 0px));
+      }
+      .timer-panel {
+        right: var(--s-4);
+        bottom: calc(var(--s-8) + var(--s-4) + 48px + var(--s-4) + env(safe-area-inset-bottom, 0px));
+      }
     }
     /* No modo cozinha o nav do prev/próximo fica no fundo; sobe o FAB
        pra alinhar com o X (cm-close) no header do modo cozinha.

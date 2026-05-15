@@ -90,6 +90,8 @@
   },
   "cooking": {
     "exit": "exit cooking mode",
+    "exit_short": "exit",
+    "back": "back",
     "show_ingredients": "show ingredients",
     "hide_ingredients": "hide ingredients",
     "prev": "previous",

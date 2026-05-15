@@ -50,8 +50,16 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
 
       <footer class="cm-nav">
         <button class="cm-nav-btn cm-prev" id="cm-prev" type="button">
-          <Icon name="ph:caret-left-thin" width={18} height={18} />
-          <span data-t="cooking.prev">anterior</span>
+          <!-- "Anterior" (passos 2+) — visível por default -->
+          <span class="cm-prev-inner cm-prev-default">
+            <Icon name="ph:caret-left-thin" width={18} height={18} />
+            <span data-t="cooking.prev">anterior</span>
+          </span>
+          <!-- "Voltar" (passo 1) — visível quando .cm-prev.is-exit; fecha o modo cozinha -->
+          <span class="cm-prev-inner cm-prev-exit">
+            <Icon name="ph:caret-left-thin" width={18} height={18} />
+            <span data-t="cooking.back">voltar</span>
+          </span>
         </button>
         <button class="cm-nav-btn cm-next" id="cm-next" type="button">
           <span id="cm-next-label" data-t="cooking.next">próximo</span>
@@ -150,7 +158,13 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
       nextLabel.removeAttribute('data-t');
     }
 
-    prevBtn.disabled = current === 0;
+    // No passo 1, o botão "anterior" vira "sair" (fecha o cooking mode).
+    // Em vez de esconder ou desabilitar — dá uma ação útil ao slot.
+    if (current === 0) {
+      prevBtn.classList.add('is-exit');
+    } else {
+      prevBtn.classList.remove('is-exit');
+    }
     nextBtn.disabled = false;
   }
 
@@ -220,7 +234,12 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
 
   trigger?.addEventListener('click', open);
   closeBtn?.addEventListener('click', close);
-  prevBtn?.addEventListener('click', prev);
+  // No passo 1, o "anterior" muda pra "sair" (classe .is-exit) — então
+  // o click fecha o cooking mode em vez de chamar prev().
+  prevBtn?.addEventListener('click', () => {
+    if (prevBtn.classList.contains('is-exit')) close();
+    else prev();
+  });
   nextBtn?.addEventListener('click', next);
   restartBtn?.addEventListener('click', restart);
 
@@ -372,6 +391,16 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
   /* stage e end ocupam a mesma célula do grid (row 1); o nav vai pra row 2 */
   .cm-stage, .cm-end { grid-row: 1; }
   .cm-nav { grid-row: 2; }
+  /* Toggle entre "anterior" (default) e "sair" (passo 1). O botão prev
+     tem dois spans filhos — mostramos um por vez baseado em .is-exit. */
+  .cm-prev-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .cm-prev .cm-prev-exit { display: none; }
+  .cm-prev.is-exit .cm-prev-default { display: none; }
+  .cm-prev.is-exit .cm-prev-exit { display: inline-flex; }
 
   .cm-stage {
     display: flex;
@@ -478,23 +507,42 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     padding: var(--s-5) var(--s-4);
     font: inherit;
     font-family: var(--font-mono);
-    font-size: var(--fs-body);
+    /* Maior + weight 500 pra dar presença visual (ação principal do
+       modo cozinha, deve ser facilmente clicável de longe). */
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     color: var(--ink);
     cursor: pointer;
-    transition: background var(--dur-fast);
+    transition: background var(--dur-fast), color var(--dur-fast);
     /* Permite que o botão encolha em viewports estreitos sem empurrar
        a grid pra fora do viewport. */
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
+    /* Desabilita o highlight azul/cinza padrão do browser em mobile —
+       o feedback de press vem do :active (background mais escuro). */
+    -webkit-tap-highlight-color: transparent;
   }
   .cm-nav-btn:hover:not(:disabled) { background: var(--surface); }
+  .cm-nav-btn:active:not(:disabled) { background: var(--surface); }
   .cm-nav-btn:disabled {
     color: var(--ink-soft);
     cursor: default;
+    opacity: 0.5;
   }
-  .cm-next { color: var(--terracota); font-weight: 500; }
-  .cm-nav-btn :global(svg) { fill: none; stroke: currentColor; }
+  /* "Próximo" como CTA principal — preenchido com terracota e texto
+     branco pra destacar do "anterior" (text-only) e do fundo da nav. */
+  .cm-next {
+    background: var(--terracota);
+    color: #fff;
+  }
+  .cm-next:hover:not(:disabled),
+  .cm-next:active:not(:disabled) {
+    background: var(--terracota);
+    filter: brightness(0.92);
+  }
+  .cm-nav-btn :global(svg) { fill: none; stroke: currentColor; width: 22px; height: 22px; }
 
   /* ============ INGREDIENTS PANEL ============ */
   .cm-ingredients {
@@ -527,9 +575,11 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     display: flex;
     align-items: center;
     gap: var(--s-3);
-    padding: var(--s-3) var(--s-5);
+    padding: var(--s-4) var(--s-5);
     font-family: var(--font-mono);
-    font-size: var(--fs-small);
+    /* Maior que fs-small porque o user lê de longe / com mãos sujas
+       enquanto cozinha — vai pro tamanho de body pra ficar legível. */
+    font-size: var(--fs-body);
     color: var(--ink);
     cursor: pointer;
     transition: background var(--dur-fast);
@@ -618,7 +668,7 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
        phones pequenos (≤420px) força um teto menor pra evitar que a
        palavra "pre-aqueça" / números longos estourem a linha. */
     .cm-step-text { font-size: clamp(20px, 5.5vw, 28px); }
-    .cm-nav-btn { padding: var(--s-4) var(--s-3); font-size: var(--fs-small); }
+    .cm-nav-btn { padding: var(--s-4) var(--s-3); font-size: 16px; }
     /* Nav preso no fundo da viewport em mobile. Sai do grid layout do
        cm-main (pra não empurrar cm-stage) e gruda na base. Padding-bottom
        respeita o safe-area do iOS (botão home / barra inferior). */

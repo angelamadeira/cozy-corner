@@ -324,7 +324,7 @@ const countByCategory = Object.fromEntries(
     }
     .logo-by {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       opacity: 0.55;
       margin-top: 1px;
     }
@@ -908,7 +908,7 @@ const countByCategory = Object.fromEntries(
       align-items: center;
       justify-content: center;
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       color: var(--ink-soft);
       overflow: hidden;
     }
@@ -1616,6 +1616,33 @@ const countByCategory = Object.fromEntries(
     backdrop.addEventListener('click', closeAll);
     document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeAll));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+    // Swipe-to-close em drawers (mobile). Os drawers entram da direita,
+    // então swipe pra direita = fecha. Threshold: 80px de deslocamento
+    // horizontal OU 25% da largura do drawer (o que for menor), e gesto
+    // predominantemente horizontal (deltaX > deltaY).
+    function attachSwipeClose(el: HTMLElement) {
+      let startX = 0, startY = 0, tracking = false;
+      el.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+      el.addEventListener('touchend', (e) => {
+        if (!tracking) return;
+        tracking = false;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        const threshold = Math.min(80, el.offsetWidth * 0.25);
+        // Só fecha se swipe foi pra direita, magnitude suficiente,
+        // e mais horizontal que vertical (evita confundir com scroll).
+        if (dx > threshold && Math.abs(dx) > Math.abs(dy)) closeAll();
+      }, { passive: true });
+    }
+    attachSwipeClose(catDrawer);
+    attachSwipeClose(sobreDrawer);
 
     // Recado → POST pra /recados (Cloudflare Function salva em KV).
     // Gigi consulta os recados em /admin-recados/.

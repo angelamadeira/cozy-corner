@@ -90,6 +90,8 @@
   },
   "cooking": {
     "exit": "sair do modo cozinha",
+    "exit_short": "sair",
+    "back": "voltar",
     "show_ingredients": "mostrar ingredientes",
     "hide_ingredients": "esconder ingredientes",
     "prev": "anterior",
