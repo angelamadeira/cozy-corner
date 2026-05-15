@@ -6,6 +6,7 @@ category:
   - principais
   - datas
   - congelar
+  - vegetarianas
 time: 120
 servings: 1
 difficulty: médio
