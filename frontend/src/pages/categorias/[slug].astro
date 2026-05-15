@@ -278,7 +278,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     .cat-count {
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       margin-top: 4px;
     }
 
@@ -304,7 +304,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       outline: none;
       color: var(--ink);
     }
-    .search-input::placeholder { color: var(--ink-mute); }
+    .search-input::placeholder { color: var(--ink-soft); }
 
     /* ============ FILTERS ============ */
     .filters {
@@ -369,7 +369,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       justify-content: center;
       font-family: var(--font-mono);
       font-size: 11px;
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       overflow: hidden;
     }
     .thumb.has-img {
@@ -396,7 +396,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       gap: 6px;
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
     }
     .recipe-meta svg { vertical-align: -0.15em; margin-right: 2px; }
     .recipe-meta .sep { opacity: 0.4; }
@@ -420,7 +420,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       border-radius: 2px;
     }
     .row-arrow {
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       transition: transform var(--dur-fast);
     }
 
@@ -428,13 +428,13 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     .empty, .no-results {
       text-align: center;
       padding: var(--s-8) var(--s-5);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
     }
     /* Filho direto só — pra não pegar SVGs dentro de botões/links aninhados. */
     .empty > svg, .no-results > svg {
       display: block;
       margin: 0 auto var(--s-4);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
     }
     .t-h2 {
       font-family: var(--font-display);

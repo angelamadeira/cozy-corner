@@ -424,7 +424,7 @@ const countByCategory = Object.fromEntries(
       margin: 0 auto var(--s-3);
       font-family: var(--font-mono);
       font-size: var(--fs-caption);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       text-transform: lowercase;
       letter-spacing: 0.05em;
     }
@@ -855,7 +855,7 @@ const countByCategory = Object.fromEntries(
     .drawer-count {
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       margin-bottom: var(--s-5);
     }
 
@@ -881,7 +881,7 @@ const countByCategory = Object.fromEntries(
       outline: none;
       color: var(--ink);
     }
-    .drawer-search .search-input::placeholder { color: var(--ink-mute); }
+    .drawer-search .search-input::placeholder { color: var(--ink-soft); }
 
     /* recipe-list é populada via JS innerHTML — precisa ser :global pra
        o CSS do Astro alcançar os elementos dinâmicos */
@@ -909,7 +909,7 @@ const countByCategory = Object.fromEntries(
       justify-content: center;
       font-family: var(--font-mono);
       font-size: 10px;
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       overflow: hidden;
     }
     .recipe-list :global(.recipe-thumb.has-img) {
@@ -932,7 +932,7 @@ const countByCategory = Object.fromEntries(
     .recipe-list :global(.recipe-row-meta) {
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
     }
     /* Linha "em <ingrediente>" que aparece quando a busca casou num
        ingrediente / tag em vez do título — dá contexto pro usuário
@@ -1028,7 +1028,7 @@ const countByCategory = Object.fromEntries(
       text-align: center;
       font-family: var(--font-mono);
       font-size: var(--fs-caption);
-      color: var(--ink-mute);
+      color: var(--ink-soft);
       margin-top: var(--s-4);
     }
     .recado-alt a {
@@ -1394,7 +1394,7 @@ const countByCategory = Object.fromEntries(
         const emptyMsg = q
           ? (T('search.no_results') || 'nenhuma receita encontrada')
           : (T('meta.no_recipes_yet') || 'ainda sem receitas por aqui...');
-        catResults.innerHTML = `<li style="padding: 24px 0; color: var(--ink-mute); font-family: var(--font-mono); font-size: 14px;">${emptyMsg}</li>`;
+        catResults.innerHTML = `<li style="padding: 24px 0; color: var(--ink-soft); font-family: var(--font-mono); font-size: 14px;">${emptyMsg}</li>`;
       }
     }
 
