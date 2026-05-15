@@ -156,7 +156,14 @@ body.dark-mode {
 /* Honra o atributo `hidden` mesmo quando uma classe define `display: ...`.
    Sem isso, regras tipo `display: grid` sobrescrevem o UA stylesheet do hidden. */
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* Remove a caixa azul/cinza que o browser desenha em qualquer elemento
+     clicável no mobile (links, botões, divs com onclick, etc.). Aplicado
+     globalmente porque o feedback de toque do site já é coberto pelos
+     :active e estados específicos de cada componente. */
+  -webkit-tap-highlight-color: transparent;
+}
 body {
   font-family: var(--font-sans);
   font-size: var(--fs-body);
