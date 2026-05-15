@@ -621,6 +621,12 @@ const countByCategory = Object.fromEntries(
         fill: var(--terracota);
       }
     }
+    /* Mobile: desabilita o highlight padrão do browser (azul/cinza
+       translúcido em iOS/Android) pra que só o terracota da classe
+       .hs-pressed apareça no tap. */
+    .kitchen-canvas :global(.hs) {
+      -webkit-tap-highlight-color: transparent;
+    }
     /* Feedback visual de tap: JS adiciona .hs-pressed por ~280ms quando
        o user clica. Funciona melhor que :active em touch (que pode ser
        brevíssimo demais). */
