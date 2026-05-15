@@ -111,7 +111,11 @@
     "name_label": "seu nome",
     "message_label": "mensagem",
     "placeholder": "oi Gigi!",
-    "send": "enviar por email"
+    "send": "enviar",
+    "sending": "enviando...",
+    "sent": "obrigada pelo recado! 💛",
+    "empty": "escreve a mensagem antes de enviar :)",
+    "error": "ops, algo deu errado"
   },
   "sobre": {
     "title": "Oi, tudo bem?",

@@ -135,6 +135,11 @@ body {
   line-height: var(--lh-base);
   -webkit-font-smoothing: antialiased;
   transition: background var(--dur-slow) var(--ease-out), color var(--dur-slow) var(--ease-out);
+  /* Garante que o body sempre cobre o viewport — senão o html bg
+     (cream em light, fica visível embaixo do conteúdo se body for menor).
+     No dark mode evita aparecer faixa cream abaixo de páginas curtas. */
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 img, video { max-width: 100%; height: auto; display: block; }

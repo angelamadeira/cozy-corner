@@ -131,12 +131,15 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
       stage.setAttribute('hidden', '');
       endScreen.removeAttribute('hidden');
       navEl?.setAttribute('hidden', '');
+      // Esconde ingredientes — na tela "Prontinho!" não fazem sentido.
+      ingredientsPanel?.setAttribute('hidden', '');
       stepNum.textContent = total;
       progressFill.style.width = '100%';
     } else {
       stage.removeAttribute('hidden');
       endScreen.setAttribute('hidden', '');
       navEl?.removeAttribute('hidden');
+      ingredientsPanel?.removeAttribute('hidden');
       stepText.textContent = steps[current];
       stepNum.textContent = current + 1;
       progressFill.style.width = ((current + 1) / total) * 100 + '%';

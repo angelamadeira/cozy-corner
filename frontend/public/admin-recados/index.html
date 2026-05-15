@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Cozy Corner · Recados</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Cutive+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #FAF6EE;
+      --ink: #1A1A1A;
+      --ink-soft: #4F4F4F;
+      --ink-mute: #888;
+      --line: #DDD7C8;
+      --line-soft: #EFE8D9;
+      --surface: #F1ECDF;
+      --terracota: #C56B4A;
+      --accent: #D7F5FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    h1 {
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-family: 'Cutive Mono', monospace;
+      color: var(--ink-soft);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+    /* ============ LOGIN ============ */
+    .login {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 420px;
+    }
+    .login label {
+      display: block;
+      font-family: 'Cutive Mono', monospace;
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin-bottom: 8px;
+    }
+    .login input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--bg);
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .login input:focus { outline: 2px solid var(--terracota); outline-offset: 1px; }
+    .login button, .recados-actions button {
+      padding: 8px 16px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--bg);
+      border-radius: 4px;
+      font-family: 'Cutive Mono', monospace;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .login button:hover, .recados-actions button:hover {
+      background: var(--terracota);
+      border-color: var(--terracota);
+    }
+    .error {
+      color: var(--terracota);
+      font-family: 'Cutive Mono', monospace;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    /* ============ LISTA ============ */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-family: 'Cutive Mono', monospace;
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+    .toolbar button {
+      padding: 4px 10px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+    .toolbar button:hover { color: var(--terracota); border-color: var(--terracota); }
+    .recado-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: opacity 200ms;
+    }
+    .recado-card.read { opacity: 0.55; }
+    .recado-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .recado-name {
+      font-weight: 500;
+      font-size: 15px;
+    }
+    .recado-date {
+      font-family: 'Cutive Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-mute);
+      white-space: nowrap;
+    }
+    .recado-message {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 12px;
+    }
+    .recados-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .recados-actions button {
+      padding: 4px 12px;
+      font-size: 11px;
+      background: transparent;
+      color: var(--ink-soft);
+      border-color: var(--line);
+    }
+    .recados-actions button:hover {
+      background: transparent;
+      color: var(--terracota);
+      border-color: var(--terracota);
+    }
+    .empty {
+      text-align: center;
+      padding: 48px 0;
+      color: var(--ink-mute);
+      font-family: 'Cutive Mono', monospace;
+      font-size: 13px;
+    }
+    .hidden { display: none !important; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 16px;
+      font-family: 'Cutive Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-mute);
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--terracota); }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back-link" href="/">← voltar pra cozinha</a>
+    <h1>Recados</h1>
+    <p class="subtitle">mensagens deixadas no site</p>
+
+    <section id="login-screen" class="login">
+      <label for="token-input">Token de acesso</label>
+      <input id="token-input" type="password" autocomplete="current-password" />
+      <button id="login-btn" type="button">Entrar</button>
+      <p id="login-error" class="error hidden"></p>
+    </section>
+
+    <section id="recados-screen" class="hidden">
+      <div class="toolbar">
+        <span id="recados-count">0 recados</span>
+        <button id="logout-btn" type="button">sair</button>
+      </div>
+      <div id="recados-list"></div>
+    </section>
+  </main>
+
+  <script>
+    const TOKEN_KEY = 'cozy-recados-token';
+    const loginScreen = document.getElementById('login-screen');
+    const recadosScreen = document.getElementById('recados-screen');
+    const tokenInput = document.getElementById('token-input');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+    const recadosList = document.getElementById('recados-list');
+    const recadosCount = document.getElementById('recados-count');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    function getToken() {
+      try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+    }
+    function setToken(t) { try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {} }
+    function clearToken() { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatDate(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+      } catch (e) { return iso; }
+    }
+
+    async function fetchRecados(token) {
+      const resp = await fetch('/recados', {
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Erro ' + resp.status);
+      }
+      return resp.json();
+    }
+
+    async function patchRecado(token, id, body) {
+      const resp = await fetch('/recados/' + id, {
+        method: 'PATCH',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) throw new Error('Erro ' + resp.status);
+      return resp.json();
+    }
+
+    async function deleteRecado(token, id) {
+      const resp = await fetch('/recados/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!resp.ok) throw new Error('Erro ' + resp.status);
+      return resp.json();
+    }
+
+    function renderRecados(recados) {
+      const unreadCount = recados.filter(r => !r.read).length;
+      recadosCount.textContent = recados.length
+        ? recados.length + ' ' + (recados.length === 1 ? 'recado' : 'recados') +
+          (unreadCount ? ' · ' + unreadCount + ' não lido' + (unreadCount > 1 ? 's' : '') : '')
+        : 'sem recados ainda';
+
+      if (!recados.length) {
+        recadosList.innerHTML = '<div class="empty">nada por aqui ainda. quando alguém mandar uma mensagem pelo site, vai aparecer aqui.</div>';
+        return;
+      }
+
+      recadosList.innerHTML = recados.map(r => `
+        <div class="recado-card${r.read ? ' read' : ''}" data-id="${escapeHtml(r.id)}">
+          <div class="recado-header">
+            <div class="recado-name">${escapeHtml(r.name || 'Anônimo')}</div>
+            <div class="recado-date">${escapeHtml(formatDate(r.createdAt))}</div>
+          </div>
+          <div class="recado-message">${escapeHtml(r.message)}</div>
+          <div class="recados-actions">
+            <button data-action="toggle-read" data-read="${r.read ? '0' : '1'}">
+              ${r.read ? 'marcar como não lido' : 'marcar como lido'}
+            </button>
+            <button data-action="delete">deletar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadAndRender() {
+      try {
+        const data = await fetchRecados(getToken());
+        renderRecados(data.recados || []);
+      } catch (e) {
+        // Token inválido ou erro
+        clearToken();
+        showLogin(e.message || 'Erro ao carregar');
+      }
+    }
+
+    function showLogin(errMsg) {
+      loginScreen.classList.remove('hidden');
+      recadosScreen.classList.add('hidden');
+      if (errMsg) {
+        loginError.textContent = errMsg;
+        loginError.classList.remove('hidden');
+      } else {
+        loginError.classList.add('hidden');
+      }
+      setTimeout(() => tokenInput.focus(), 50);
+    }
+
+    function showRecados() {
+      loginScreen.classList.add('hidden');
+      recadosScreen.classList.remove('hidden');
+      loadAndRender();
+    }
+
+    loginBtn.addEventListener('click', async () => {
+      const token = tokenInput.value.trim();
+      if (!token) return;
+      setToken(token);
+      try {
+        await fetchRecados(token);
+        loginError.classList.add('hidden');
+        showRecados();
+      } catch (e) {
+        clearToken();
+        loginError.textContent = e.message || 'Token inválido';
+        loginError.classList.remove('hidden');
+      }
+    });
+
+    tokenInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      clearToken();
+      tokenInput.value = '';
+      showLogin();
+    });
+
+    recadosList.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const card = btn.closest('.recado-card');
+      const id = card.dataset.id;
+      const action = btn.dataset.action;
+      const token = getToken();
+
+      if (action === 'toggle-read') {
+        const newRead = btn.dataset.read === '1';
+        try {
+          await patchRecado(token, id, { read: newRead });
+          loadAndRender();
+        } catch (err) { alert('Erro: ' + err.message); }
+      } else if (action === 'delete') {
+        if (!confirm('Deletar esse recado?')) return;
+        try {
+          await deleteRecado(token, id);
+          loadAndRender();
+        } catch (err) { alert('Erro: ' + err.message); }
+      }
+    });
+
+    // Boot: se já tem token salvo, tenta listar; senão pede login.
+    (async function () {
+      if (!getToken()) return showLogin();
+      try {
+        await fetchRecados(getToken());
+        showRecados();
+      } catch (e) {
+        clearToken();
+        showLogin(e.message || 'Token inválido');
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -915,6 +915,23 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       top: 64px;
       right: 24px;
     }
+    /* Mobile no modo cozinha: header é estreito demais pro timer caber
+       junto. Manda o FAB pro canto inferior direito, acima da barra do
+       nav prev/próximo. Painel também desce. */
+    @media (max-width: 600px) {
+      :global(body.cm-open) .timer-fab {
+        top: auto;
+        right: var(--s-4);
+        bottom: calc(var(--s-7) + env(safe-area-inset-bottom, 0px));
+      }
+      :global(body.cm-open) .timer-panel {
+        top: auto;
+        right: var(--s-4);
+        left: var(--s-4);
+        bottom: calc(var(--s-7) + 56px + env(safe-area-inset-bottom, 0px));
+        width: auto;
+      }
+    }
     .timer-head {
       display: flex;
       align-items: center;

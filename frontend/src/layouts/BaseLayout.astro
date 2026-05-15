@@ -352,15 +352,17 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
       /* Quando a página tem dark-toggle no header (receita, categoria, busca),
          desloca o lang-toggle pra esquerda pra não sobrepor.
          Dark-toggle: right edge a 24px (header padding s-6), width 36 →
-         left edge a 60px. Lang-toggle right edge = 60 + 24 (gap) = 84px. */
+         left edge a 60px. Lang-toggle right edge = 60 + 40 (gap) = 100px. */
       body:has(.dark-toggle) .lang-toggle {
-        right: 84px;
+        right: 100px;
       }
       /* Em mobile e no intro/loading, esconde */
       @media (max-width: 600px) {
-        .lang-toggle { top: 8px; right: 12px; height: 32px; padding: 0 12px; font-size: 11px; }
+        .lang-toggle { right: 12px; padding: 0 12px; font-size: 11px; }
+        /* Mantém 36px de height (alinhado com .dark-toggle) e top 10px
+           (centrado no header de 56px). */
         body:has(.dark-toggle) .lang-toggle {
-          right: calc(16px + 32px + 24px);  /* 16 header padding + 32 dark + 24 gap */
+          right: calc(16px + 36px + 24px);  /* header padding + dark-toggle + gap */
         }
       }
       /* Esconde durante intro, drawer aberto, cooking mode e print.

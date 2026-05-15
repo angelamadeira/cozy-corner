@@ -111,7 +111,11 @@
     "name_label": "your name",
     "message_label": "message",
     "placeholder": "hi Gigi!",
-    "send": "send via email"
+    "send": "send",
+    "sending": "sending...",
+    "sent": "thanks for the note! 💛",
+    "empty": "type a message before sending :)",
+    "error": "oops, something went wrong"
   },
   "sobre": {
     "title": "Hi, how are you?",

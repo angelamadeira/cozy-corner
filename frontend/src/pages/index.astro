@@ -174,9 +174,13 @@ const countByCategory = Object.fromEntries(
     <input class="field-input" id="r-name" type="text" />
     <label class="field-label" data-t="recado.message_label">mensagem</label>
     <textarea class="field-input" id="r-msg" placeholder="oi Gigi!" data-t-attr="placeholder:recado.placeholder"></textarea>
+    {/* Honeypot — campo invisível pra confundir bots. Humanos não preenchem. */}
+    <input type="text" id="r-website" name="website" tabindex="-1" autocomplete="off"
+           style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" aria-hidden="true" />
     <button class="btn btn-primary recado-send" id="r-send" type="button">
-      <Icon name="ph:envelope-thin" /> <span data-t="recado.send">enviar por email</span>
+      <Icon name="ph:paper-plane-tilt-thin" /> <span data-t="recado.send" id="r-send-label">enviar</span>
     </button>
+    <p class="recado-status" id="r-status" hidden></p>
   </div>
 
   <!-- Recipes data pra o drawer (renderizado via JS) -->
@@ -977,6 +981,13 @@ const countByCategory = Object.fromEntries(
     }
     textarea.field-input { min-height: 90px; resize: vertical; }
     .recado-send { margin-top: var(--s-5); width: 100%; justify-content: center; }
+    .recado-status {
+      margin-top: var(--s-3);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-soft);
+    }
     .recado-alt {
       text-align: center;
       font-family: var(--font-mono);
@@ -1471,19 +1482,57 @@ const countByCategory = Object.fromEntries(
     document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeAll));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
 
-    // Recado → email (abre o cliente de email padrão com tudo preenchido)
-    document.getElementById('r-send')?.addEventListener('click', () => {
-      const nome = (document.getElementById('r-name') as HTMLInputElement).value.trim();
-      const msg = (document.getElementById('r-msg') as HTMLTextAreaElement).value.trim();
-      const tpl = RECIPES.emailTemplate || 'Oi Gigi, sou {nome}.\n\n{mensagem}';
-      const body = tpl
-        .replace('{nome}', nome || 'um visitante')
-        .replace('{mensagem}', msg || 'vim do seu Cozy Corner!');
-      const subject = RECIPES.emailSubject || 'Recado do Cozy Corner';
-      const url = `mailto:${RECIPES.email}`
-        + `?subject=${encodeURIComponent(subject)}`
-        + `&body=${encodeURIComponent(body)}`;
-      window.location.href = url;
+    // Recado → POST pra /recados (Cloudflare Function salva em KV).
+    // Gigi consulta os recados em /admin-recados/.
+    document.getElementById('r-send')?.addEventListener('click', async () => {
+      const sendBtn = document.getElementById('r-send') as HTMLButtonElement;
+      const sendLabel = document.getElementById('r-send-label')!;
+      const status = document.getElementById('r-status')!;
+      const nameInput = document.getElementById('r-name') as HTMLInputElement;
+      const msgInput = document.getElementById('r-msg') as HTMLTextAreaElement;
+      const honeypot = (document.getElementById('r-website') as HTMLInputElement | null);
+
+      const name = nameInput.value.trim();
+      const message = msgInput.value.trim();
+
+      if (!message) {
+        status.textContent = (window as any).__cozyT?.('recado.empty') || 'escreve a mensagem antes de enviar :)';
+        status.hidden = false;
+        msgInput.focus();
+        return;
+      }
+
+      const originalLabel = sendLabel.textContent;
+      sendBtn.disabled = true;
+      sendLabel.textContent = (window as any).__cozyT?.('recado.sending') || 'enviando...';
+      status.hidden = true;
+
+      try {
+        const resp = await fetch('/recados', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            message,
+            website: honeypot?.value || '',
+          }),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || 'Erro ' + resp.status);
+        }
+        // Sucesso
+        status.textContent = (window as any).__cozyT?.('recado.sent') || 'obrigada pelo recado! 💛';
+        status.hidden = false;
+        nameInput.value = '';
+        msgInput.value = '';
+      } catch (e: any) {
+        status.textContent = ((window as any).__cozyT?.('recado.error') || 'ops, algo deu errado') + ' (' + (e?.message || 'erro') + ')';
+        status.hidden = false;
+      } finally {
+        sendBtn.disabled = false;
+        sendLabel.textContent = originalLabel || 'enviar';
+      }
     });
   </script>
 </BaseLayout>
