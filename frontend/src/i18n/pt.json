@@ -109,12 +109,14 @@
     "title": "Deixa um recado",
     "subtitle": "ou só um oi mesmo",
     "name_label": "seu nome",
+    "email_label": "seu email",
     "message_label": "mensagem",
     "placeholder": "oi Gigi!",
     "send": "enviar",
     "sending": "enviando...",
     "sent": "obrigada pelo recado! 💛",
     "empty": "escreve a mensagem antes de enviar :)",
+    "email_invalid": "coloca um email válido pra eu poder responder :)",
     "error": "ops, algo deu errado"
   },
   "sobre": {

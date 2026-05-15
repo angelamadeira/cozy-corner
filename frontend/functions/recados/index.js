@@ -49,8 +49,13 @@ export async function onRequestPost(context) {
   if (body.website) return json({ ok: true });
 
   const name = String(body.name || '').trim().slice(0, 100);
+  const email = String(body.email || '').trim().toLowerCase().slice(0, 200);
   const message = String(body.message || '').trim().slice(0, 2000);
 
+  // Email é obrigatório (pra Gigi poder responder).
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    return json({ error: 'Email inválido' }, 400);
+  }
   if (!message) return json({ error: 'Mensagem vazia' }, 400);
 
   const id = crypto.randomUUID();
@@ -58,6 +63,7 @@ export async function onRequestPost(context) {
   const recado = {
     id,
     name: name || 'Anônimo',
+    email,
     message,
     createdAt: now,
     read: false,

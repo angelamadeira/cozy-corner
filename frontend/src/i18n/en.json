@@ -109,12 +109,14 @@
     "title": "Leave a note",
     "subtitle": "or just say hi",
     "name_label": "your name",
+    "email_label": "your email",
     "message_label": "message",
     "placeholder": "hi Gigi!",
     "send": "send",
     "sending": "sending...",
     "sent": "thanks for the note! 💛",
     "empty": "type a message before sending :)",
+    "email_invalid": "drop a valid email so I can reply :)",
     "error": "oops, something went wrong"
   },
   "sobre": {

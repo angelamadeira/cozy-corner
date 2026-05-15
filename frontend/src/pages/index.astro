@@ -172,6 +172,8 @@ const countByCategory = Object.fromEntries(
     <p class="recado-sub" data-t="recado.subtitle">{recadoData.subtitle}</p>
     <label class="field-label" data-t="recado.name_label">seu nome</label>
     <input class="field-input" id="r-name" type="text" />
+    <label class="field-label" data-t="recado.email_label">seu email</label>
+    <input class="field-input" id="r-email" type="email" required />
     <label class="field-label" data-t="recado.message_label">mensagem</label>
     <textarea class="field-input" id="r-msg" placeholder="oi Gigi!" data-t-attr="placeholder:recado.placeholder"></textarea>
     {/* Honeypot — campo invisível pra confundir bots. Humanos não preenchem. */}
@@ -1489,12 +1491,20 @@ const countByCategory = Object.fromEntries(
       const sendLabel = document.getElementById('r-send-label')!;
       const status = document.getElementById('r-status')!;
       const nameInput = document.getElementById('r-name') as HTMLInputElement;
+      const emailInput = document.getElementById('r-email') as HTMLInputElement;
       const msgInput = document.getElementById('r-msg') as HTMLTextAreaElement;
       const honeypot = (document.getElementById('r-website') as HTMLInputElement | null);
 
       const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
       const message = msgInput.value.trim();
 
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        status.textContent = (window as any).__cozyT?.('recado.email_invalid') || 'coloca um email válido pra eu poder responder :)';
+        status.hidden = false;
+        emailInput.focus();
+        return;
+      }
       if (!message) {
         status.textContent = (window as any).__cozyT?.('recado.empty') || 'escreve a mensagem antes de enviar :)';
         status.hidden = false;
@@ -1513,6 +1523,7 @@ const countByCategory = Object.fromEntries(
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name,
+            email,
             message,
             website: honeypot?.value || '',
           }),
@@ -1525,6 +1536,7 @@ const countByCategory = Object.fromEntries(
         status.textContent = (window as any).__cozyT?.('recado.sent') || 'obrigada pelo recado! 💛';
         status.hidden = false;
         nameInput.value = '';
+        emailInput.value = '';
         msgInput.value = '';
       } catch (e: any) {
         status.textContent = ((window as any).__cozyT?.('recado.error') || 'ops, algo deu errado') + ' (' + (e?.message || 'erro') + ')';
