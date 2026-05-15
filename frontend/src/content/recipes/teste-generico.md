@@ -20,6 +20,7 @@ ingredients:
   - 12g de fermento em pó
 materials:
   - Forma redonda de 20cm de diâmetro e 10cm de altura
+  - Batedeira
 steps:
   - Unte a assadeira com óleo e farinha ou forre com papel manteiga. Pré-aqueça
     o forno a 180 graus.
