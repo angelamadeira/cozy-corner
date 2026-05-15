@@ -97,8 +97,8 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         class="search-input"
         type="search"
         id="search"
-        placeholder={`buscar em ${label.toLowerCase()}...`}
-        data-search-category={label}
+        placeholder="título, ingrediente ou tag..."
+        data-t-attr="placeholder:search.placeholder_full"
         autocomplete="off"
       />
     </div>
@@ -133,16 +133,28 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       </div>
     ) : (
       <ul class="recipe-list" id="recipe-list">
-        {recipes.map((r) => (
+        {recipes.map((r) => {
+          // Inclui traduções nos haystacks de busca quando o schema tiver
+          // campos *En/_en (ex.: titleEn, ingredientsEn). Hoje retornam
+          // undefined e o filter remove. Quando rolar tradução de receitas
+          // via Decap, isso passa a indexar PT + EN sem mais código.
+          const d: any = r.data;
+          const allTitles = [d.title, d.titleEn, d.title_en].filter(Boolean);
+          const allDescs = [d.description, d.descriptionEn, d.description_en].filter(Boolean);
+          const allIngredients = [...(d.ingredients || []), ...(d.ingredientsEn || []), ...(d.ingredients_en || [])];
+          const allTags = [...(d.tags || []), ...(d.tagsEn || []), ...(d.tags_en || [])];
+          return (
           <li
             class="recipe-item"
-            data-title={r.data.title.toLowerCase()}
-            data-ingredients={r.data.ingredients.join(' ').toLowerCase()}
-            data-tags={r.data.tags.join(' ').toLowerCase()}
-            data-tag-list={r.data.tags.join('|')}
+            data-title={allTitles.join(' ').toLowerCase()}
+            data-description={allDescs.join(' ').toLowerCase()}
+            data-ingredients={allIngredients.join(' ').toLowerCase()}
+            data-tags={allTags.join(' ').toLowerCase()}
+            data-tag-list={allTags.join('|')}
             data-time={r.data.time}
             data-difficulty={r.data.difficulty}
             data-cat={r.data.category.join('|')}
+            data-ingredients-list={JSON.stringify(allIngredients)}
           >
             <a href={`/receitas/${recipeSlug(r)}/`}>
               {(() => {
@@ -166,11 +178,13 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
                   <span class="sep">·</span>
                   <Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${r.data.difficulty === 'fácil' ? 'easy' : r.data.difficulty === 'difícil' ? 'hard' : 'medium'}`}>{r.data.difficulty}</span>
                 </p>
+                <p class="recipe-row-match" hidden></p>
               </div>
               <Icon name="ph:caret-right-thin" class="row-arrow" width={20} height={20} />
             </a>
           </li>
-        ))}
+          );
+        })}
       </ul>
     )}
 
@@ -386,6 +400,25 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     }
     .recipe-meta svg { vertical-align: -0.15em; margin-right: 2px; }
     .recipe-meta .sep { opacity: 0.4; }
+    /* Linha "em <ingrediente>" mostrada quando a busca casou num
+       ingrediente/tag em vez do título. O conteúdo é injetado via JS
+       (innerHTML), então as classes filhas (.recipe-match-hl no <mark>)
+       precisam de :global() pra escapar do scope hash do Astro —
+       senão o <mark> cai no estilo padrão amarelo do browser. */
+    .recipe-row-match {
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+    .recipe-row-match :global(.recipe-match-hl),
+    :global(mark.recipe-match-hl) {
+      background: rgba(197, 107, 74, 0.15);
+      color: var(--terracota);
+      font-weight: 500;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
     .row-arrow {
       color: var(--ink-mute);
       transition: transform var(--dur-fast);
@@ -463,14 +496,9 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         const key = n === 1 ? 'search.results_count_one' : 'search.results_count_other';
         countEl.textContent = T_(key, { n });
       }
-      // placeholder do search
-      const searchEl = document.getElementById('search') as HTMLInputElement | null;
-      if (searchEl && searchEl.dataset.searchCategory) {
-        // "buscar em {categoria}..."
-        const ph = (T_('search.placeholder_in') || 'buscar em {category}...')
-          .replace('{category}', searchEl.dataset.searchCategory.toLowerCase());
-        searchEl.placeholder = ph;
-      }
+      // placeholder do search agora vem via data-t-attr=placeholder:search.placeholder_full
+      // (resolvido pelo runtime de i18n do BaseLayout). Não precisa mais
+      // setar dinamicamente aqui.
     }
     syncI18n();
     document.addEventListener('cozy-lang-changed', syncI18n);
@@ -493,24 +521,95 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     let activeTag = 'all';
     let activeCat = 'all';
 
+    function normalizeSearch(s: string): string {
+      return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    }
+    const escHtml = (s: string) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    function highlightMatch(text: string, q: string): string {
+      if (!q) return escHtml(text);
+      const idx = normalizeSearch(text).indexOf(q);
+      if (idx < 0) return escHtml(text);
+      const before = text.slice(0, idx);
+      const match  = text.slice(idx, idx + q.length);
+      const after  = text.slice(idx + q.length);
+      return `${escHtml(before)}<mark class="recipe-match-hl">${escHtml(match)}</mark>${escHtml(after)}`;
+    }
+
     function applyFilters() {
-      const q = searchInput.value.trim().toLowerCase();
+      const qRaw = searchInput.value.trim();
+      const q = normalizeSearch(qRaw);
       let visible = 0;
       items.forEach((item) => {
         const title = item.dataset.title || '';
+        const description = item.dataset.description || '';
         const ingredients = item.dataset.ingredients || '';
         const tagsStr = item.dataset.tags || '';
         const tagList = (item.dataset.tagList || '').split('|').filter(Boolean);
         // data-cat agora é "principais|datas" — uma receita pode ter N categorias.
         const catList = (item.dataset.cat || '').split('|').filter(Boolean);
 
-        const matchesSearch = !q || title.includes(q) || ingredients.includes(q) || tagsStr.includes(q);
+        // Match acento-insensible. Os data-attrs já vêm com PT + EN
+        // concatenados (quando schema tiver tradução).
+        const titleN = normalizeSearch(title);
+        const descN = normalizeSearch(description);
+        const ingN = normalizeSearch(ingredients);
+        const tagsN = normalizeSearch(tagsStr);
+        const matchesSearch = !q || titleN.includes(q) || descN.includes(q) || ingN.includes(q) || tagsN.includes(q);
         const matchesTag = activeTag === 'all' || tagList.includes(activeTag);
         const matchesCat = activeCat === 'all' || catList.includes(activeCat);
 
         const show = matchesSearch && matchesTag && matchesCat;
         item.style.display = show ? '' : 'none';
         if (show) visible++;
+
+        // Destaca o trecho do TÍTULO que casa com a busca (igual o
+        // drawer da home). Cache do título original em dataset.original
+        // pra restaurar quando limpar a busca.
+        const recipeNameEl = item.querySelector<HTMLElement>('.recipe-name');
+        if (recipeNameEl) {
+          if (!recipeNameEl.dataset.original) {
+            recipeNameEl.dataset.original = recipeNameEl.textContent || '';
+          }
+          const originalTitle = recipeNameEl.dataset.original;
+          if (show && q && titleN.includes(q)) {
+            recipeNameEl.innerHTML = highlightMatch(originalTitle, q);
+          } else {
+            recipeNameEl.textContent = originalTitle;
+          }
+        }
+
+        // Atualiza match-line: se a busca casou no título, não mostra
+        // contexto extra. Se casou em ingrediente/tag, encontra o
+        // primeiro match e mostra "em <ingrediente>".
+        const matchLine = item.querySelector<HTMLElement>('.recipe-row-match');
+        if (matchLine) {
+          if (show && q && !titleN.includes(q)) {
+            const ingList: string[] = (() => {
+              try { return JSON.parse(item.dataset.ingredientsList || '[]'); } catch { return []; }
+            })();
+            let ctx: { kind: string, text: string } | null = null;
+            for (const ing of ingList) {
+              if (normalizeSearch(ing).includes(q)) { ctx = { kind: 'ingredient', text: ing }; break; }
+            }
+            if (!ctx) {
+              for (const tag of tagList) {
+                if (normalizeSearch(tag).includes(q)) { ctx = { kind: 'tag', text: tag }; break; }
+              }
+            }
+            if (ctx) {
+              const T_ = (window as any).__cozyT;
+              const inLabel = ctx.kind === 'tag'
+                ? (T_ ? T_('search.match_in_tag') : 'tag')
+                : (T_ ? T_('search.match_in') : 'em');
+              matchLine.innerHTML = `${escHtml(inLabel)} ${highlightMatch(ctx.text, q)}`;
+              matchLine.removeAttribute('hidden');
+            } else {
+              matchLine.setAttribute('hidden', '');
+            }
+          } else {
+            matchLine.setAttribute('hidden', '');
+          }
+        }
       });
 
       if (noResults) {

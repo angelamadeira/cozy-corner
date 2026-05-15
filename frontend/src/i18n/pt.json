@@ -147,6 +147,7 @@
     "no_results_hint_link": "categoria",
     "no_results_hint_suffix": ".",
     "match_in": "em",
+    "match_in_tag": "tag",
     "results_count_one": "{n} receita",
     "results_count_other": "{n} receitas",
     "result_one": "{n} resultado",

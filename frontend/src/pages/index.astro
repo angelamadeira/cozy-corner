@@ -113,7 +113,7 @@ const countByCategory = Object.fromEntries(
 
     <div class="drawer-search">
       <Icon name="ph:magnifying-glass-thin" width={16} height={16} />
-      <input class="search-input" type="search" placeholder="buscar nesta categoria..." data-t-attr="placeholder:search.placeholder" />
+      <input class="search-input" type="search" placeholder="título, ingrediente ou tag..." data-t-attr="placeholder:search.placeholder_full" />
     </div>
 
     <ul class="recipe-list" id="cat-results"></ul>
@@ -186,6 +186,15 @@ const countByCategory = Object.fromEntries(
         k,
         v.map(r => {
           const coverMedia = r.data.media.find(m => m.cover) || r.data.media[0];
+          const d: any = r.data;
+          // Quando o schema ganhar campos de tradução (titleEn, descriptionEn,
+          // ingredientsEn, tagsEn — ou title_en/etc), eles entram no haystack
+          // da busca automaticamente. Por enquanto retornam undefined e são
+          // ignorados pelo join/filter.
+          const allTitles = [d.title, d.titleEn, d.title_en].filter(Boolean);
+          const allDescriptions = [d.description, d.descriptionEn, d.description_en].filter(Boolean);
+          const allIngredients = [...(d.ingredients || []), ...(d.ingredientsEn || []), ...(d.ingredients_en || [])];
+          const allTags = [...(d.tags || []), ...(d.tagsEn || []), ...(d.tags_en || [])];
           return {
             id: r.id,                  // mantido por compat — não usado em URLs
             slug: recipeSlug(r),       // URL slug derivado do título (ver lib/slug.ts)
@@ -193,9 +202,16 @@ const countByCategory = Object.fromEntries(
             // Campos pré-normalizados (lowercase) usados pela busca dentro
             // do drawer da cozinha. Manter aqui evita ter que normalizar
             // toda string no client a cada keystroke.
-            searchTitle: r.data.title.toLowerCase(),
-            searchIngredients: r.data.ingredients.join(' ').toLowerCase(),
-            searchTags: r.data.tags.join(' ').toLowerCase(),
+            // Concatena PT + EN (se existirem) pra busca casar em qualquer idioma.
+            searchTitle: allTitles.join(' ').toLowerCase(),
+            searchDescription: allDescriptions.join(' ').toLowerCase(),
+            searchIngredients: allIngredients.join(' ').toLowerCase(),
+            searchTags: allTags.join(' ').toLowerCase(),
+            // Listas originais — usadas pra mostrar qual item matchou
+            // ("em chocolate meio amargo"). Inclui idiomas extras quando
+            // existirem.
+            ingredients: allIngredients,
+            tags: allTags,
             time: r.data.time,
             servings: r.data.servings,
             difficulty: r.data.difficulty,
@@ -905,6 +921,24 @@ const countByCategory = Object.fromEntries(
       font-size: var(--fs-meta);
       color: var(--ink-mute);
     }
+    /* Linha "em <ingrediente>" que aparece quando a busca casou num
+       ingrediente / tag em vez do título — dá contexto pro usuário
+       entender por que a receita apareceu no resultado. */
+    .recipe-list :global(.recipe-row-match) {
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+    /* Destaque de match no texto (mark padrão tem bg amarelo do
+       browser; sobrescrevemos pra terracota suave no nosso tom). */
+    .recipe-list :global(.recipe-match-hl) {
+      background: rgba(197, 107, 74, 0.15);
+      color: var(--terracota);
+      font-weight: 500;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
 
     /* Recado modal */
     .recado-modal {
@@ -1259,30 +1293,80 @@ const countByCategory = Object.fromEntries(
       return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
     }
 
+    // Escape HTML pra valores que vão dentro de innerHTML
+    const escAttr = (s: string) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escHtml = (s: string) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // Acha o primeiro ingrediente (ou tag) que casa com a query.
+    // Retorna { kind: 'ingredient'|'tag', text: '...' } ou null se nada bater.
+    function findMatchContext(r: any, q: string): { kind: string, text: string } | null {
+      if (!q) return null;
+      for (const ing of (r.ingredients || [])) {
+        if (normalizeSearch(ing).includes(q)) return { kind: 'ingredient', text: ing };
+      }
+      for (const tag of (r.tags || [])) {
+        if (normalizeSearch(tag).includes(q)) return { kind: 'tag', text: tag };
+      }
+      return null;
+    }
+
+    // Destaca o trecho da string que bate com a query (case/acento-insensible).
+    function highlightMatch(text: string, q: string): string {
+      if (!q) return escHtml(text);
+      const normText = normalizeSearch(text);
+      const idx = normText.indexOf(q);
+      if (idx < 0) return escHtml(text);
+      // Como normalize NFD preserva o length de chars latinos comuns, dá pra
+      // mapear o índice de volta pro texto original.
+      const before = text.slice(0, idx);
+      const match  = text.slice(idx, idx + q.length);
+      const after  = text.slice(idx + q.length);
+      return `${escHtml(before)}<mark class="recipe-match-hl">${escHtml(match)}</mark>${escHtml(after)}`;
+    }
+
     function renderRecipeList(category: string, query = '') {
       const all = RECIPES.byCategory[category] || [];
-      const escapeAttr = (s: string) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       // Filtra por título / ingredientes / tags (já lowercase no JSON)
       const q = normalizeSearch(query.trim());
       const recipes = q
         ? all.filter((r: any) => {
+            // Campos searchTitle/searchDescription/searchIngredients/searchTags
+            // já vêm concatenados com versões em todos os idiomas disponíveis
+            // (PT + EN) e em lowercase. Aqui só normaliza acentos e procura.
             const t = normalizeSearch(r.searchTitle || '');
+            const d = normalizeSearch(r.searchDescription || '');
             const i = normalizeSearch(r.searchIngredients || '');
             const g = normalizeSearch(r.searchTags || '');
-            return t.includes(q) || i.includes(q) || g.includes(q);
+            return t.includes(q) || d.includes(q) || i.includes(q) || g.includes(q);
           })
         : all;
       catResults.innerHTML = recipes.map((r: any) => {
         const thumb = r.cover
-          ? `<div class="recipe-thumb has-img"><img src="${escapeAttr(r.cover)}" alt="${escapeAttr(r.coverAlt || r.title)}" loading="lazy" /></div>`
+          ? `<div class="recipe-thumb has-img"><img src="${escAttr(r.cover)}" alt="${escAttr(r.coverAlt || r.title)}" loading="lazy" /></div>`
           : `<div class="recipe-thumb">foto</div>`;
+        // Se a busca casou no título, só destaca o título. Senão mostra
+        // ingrediente/tag que bateu numa linha extra abaixo do meta.
+        const titleHit = q && normalizeSearch(r.searchTitle || '').includes(q);
+        const titleHtml = titleHit ? highlightMatch(r.title, q) : escHtml(r.title);
+        let matchLine = '';
+        if (q && !titleHit) {
+          const ctx = findMatchContext(r, q);
+          if (ctx) {
+            const inLabel = ctx.kind === 'tag'
+              ? (T('search.match_in_tag') || 'tag')
+              : (T('search.match_in') || 'em');
+            matchLine = `<div class="recipe-row-match">${escHtml(inLabel)} ${highlightMatch(ctx.text, q)}</div>`;
+          }
+        }
+        const meta = [`${r.time} min`, r.servings ? `${r.servings} porções` : null, r.difficulty].filter(Boolean).join(' · ');
         return `
         <li>
           <a href="/receitas/${r.slug}/">
             ${thumb}
             <div>
-              <div class="recipe-row-title">${r.title}</div>
-              <div class="recipe-row-meta">${[`${r.time} min`, r.servings ? `${r.servings} porções` : null, r.difficulty].filter(Boolean).join(' · ')}</div>
+              <div class="recipe-row-title">${titleHtml}</div>
+              <div class="recipe-row-meta">${meta}</div>
+              ${matchLine}
             </div>
           </a>
         </li>

@@ -147,6 +147,7 @@
     "no_results_hint_link": "category",
     "no_results_hint_suffix": ".",
     "match_in": "in",
+    "match_in_tag": "tag",
     "results_count_one": "{n} recipe",
     "results_count_other": "{n} recipes",
     "result_one": "{n} result",
