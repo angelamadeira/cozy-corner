@@ -28,11 +28,17 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Cutive+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
+    <!-- Cor da barra de navegação no iOS Safari + Chrome mobile.
+         Default cream — script abaixo ajusta pra navy se dark mode tá on. -->
+    <meta name="theme-color" id="theme-color-meta" content="#FAF6EE" />
     <!-- Aplica dark mode ANTES do body renderizar pra evitar flash -->
     <script is:inline>
       try {
-        if (localStorage.getItem('cozy-dark-mode') === 'true') {
+        var isDark = localStorage.getItem('cozy-dark-mode') === 'true';
+        if (isDark) {
           document.documentElement.classList.add('pre-dark');
+          var m = document.getElementById('theme-color-meta');
+          if (m) m.setAttribute('content', '#0F1A2A');
         }
       } catch (e) {}
     </script>
@@ -60,6 +66,25 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
         setVH();
         window.addEventListener('resize', setVH);
         window.addEventListener('orientationchange', setVH);
+      })();
+    </script>
+
+    <!-- Sincroniza theme-color quando o dark mode é alternado em runtime
+         (observer na class do body). Mantém a barra do iOS sempre na
+         mesma cor que o fundo da página. -->
+    <script is:inline>
+      (function () {
+        function syncThemeColor() {
+          var m = document.getElementById('theme-color-meta');
+          if (!m) return;
+          var isDark = document.body.classList.contains('dark-mode');
+          m.setAttribute('content', isDark ? '#0F1A2A' : '#FAF6EE');
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+          syncThemeColor();
+          var obs = new MutationObserver(syncThemeColor);
+          obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        });
       })();
     </script>
 

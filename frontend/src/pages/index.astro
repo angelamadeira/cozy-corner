@@ -474,6 +474,12 @@ const countByCategory = Object.fromEntries(
         height: 100%;
         display: block;
       }
+      /* Esconde os detalhes do counter-paneling (lonas verticais de madeira
+         abaixo da bancada) no mobile. A bancada vira o "rodapé" da cozinha
+         e cola na base do viewport, sem detalhes cortados pela barra do iOS. */
+      .kitchen-mobile-part :global(#counter-paneling) {
+        display: none;
+      }
       /* Empurra o conteúdo da PRIMEIRA tela mobile 2px pra esquerda,
          menos a bancada e o paneling (que ficam fixos no lugar). */
       .kitchen-mobile-part:first-child :global(svg > g) {
