@@ -714,6 +714,16 @@ const countByCategory = Object.fromEntries(
     @media (hover: none), (pointer: coarse) {
       .kitchen-tooltip:not(.is-welcome) { display: none !important; }
     }
+    /* Trava cliques durante a janela do welcome (de lockKitchen até o
+       balão "Oi, tudo bem?" desaparecer). Sem isso o user podia tapar
+       num hotspot acidentalmente e abrir drawer antes de ver o welcome.
+       :global(.hs) é necessário porque os hotspots vivem no SVG inlined
+       e não recebem o hash de scope do Astro. */
+    body.welcome-pending .kitchen-canvas :global(.hs),
+    body.welcome-pending .lang-toggle,
+    body.welcome-pending .mobile-swipe-hint {
+      pointer-events: none;
+    }
 
     /* Drawer prose pra sobre mim */
     .drawer-prose {
@@ -1048,8 +1058,12 @@ const countByCategory = Object.fromEntries(
       // Snap pro topo (que agora é a cozinha) sem scroll animado.
       window.scrollTo(0, 0);
       // Primeira vez chegando na cozinha → mostra balão "Oi, tudo bem?"
-      // em cima do hotspot Nossa cozinha (sobre).
+      // em cima do hotspot Nossa cozinha (sobre). Enquanto o balão não
+      // aparece (1200ms), trava cliques em hotspots e toggles via classe
+      // body.welcome-pending — pra que o user veja o welcome sem
+      // acidentalmente abrir alguma coisa antes dele aparecer.
       if (wasFirstTime) {
+        document.body.classList.add('welcome-pending');
         window.setTimeout(showWelcomeBalloon, 1200);
       }
     }
@@ -1069,7 +1083,12 @@ const countByCategory = Object.fromEntries(
       tooltip.classList.add('is-welcome');
       // ttl 5s — balão aparece, fica pinned, depois some
       showTooltipAt(target, text, 5000);
-      window.setTimeout(() => tooltip.classList.remove('is-welcome'), 5400);
+      window.setTimeout(() => {
+        tooltip.classList.remove('is-welcome');
+        // Só libera cliques DEPOIS que o balão sumiu — user vê o welcome
+        // inteiro sem disparar nada por acidente.
+        document.body.classList.remove('welcome-pending');
+      }, 5400);
     }
 
     if (kitchenReachedBefore) {
@@ -1303,8 +1322,15 @@ const countByCategory = Object.fromEntries(
         tooltip.dataset.pinned = '1';
         tooltipPinTimer = window.setTimeout(() => {
           delete tooltip.dataset.pinned;
-          if (!g.matches(':hover')) tooltip.classList.remove('show');
-          else tooltip.textContent = (g as HTMLElement).dataset?.label ?? '';
+          // Em touch (hover: none), `:hover` pode dar match falso depois de
+          // um tap — então sempre esconde. Em desktop hover real, se o user
+          // ainda está em cima do hotspot, troca o texto pro label dele.
+          const canHover = window.matchMedia('(hover: hover)').matches;
+          if (canHover && g.matches(':hover')) {
+            tooltip.textContent = (g as HTMLElement).dataset?.label ?? '';
+          } else {
+            tooltip.classList.remove('show');
+          }
         }, pinMs);
       }
     }

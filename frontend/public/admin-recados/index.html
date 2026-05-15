@@ -47,11 +47,27 @@
       align-items: center;
       gap: 12px;
     }
-    /* Logo: mesmo SVG usado no admin Decap, mesmo tamanho. */
-    .login-brand img {
-      width: min(80vw, 640px);
-      height: auto;
-      display: block;
+    /* Logo: texto renderizado usando as fontes do site (Caveat + Cutive Mono),
+       igual ao header das outras telas, só que em tamanho maior pra tela de
+       login. "— by Gigi" alinhado à direita embaixo de "Cozy Corner". */
+    .login-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1;
+    }
+    .login-logo-name {
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      font-size: clamp(48px, 12vw, 72px);
+      color: var(--ink);
+      line-height: 1;
+    }
+    .login-logo-by {
+      font-family: 'Cutive Mono', monospace;
+      font-size: 14px;
+      color: var(--ink-soft);
+      margin-top: 4px;
     }
     .login-inbox-label {
       font-family: 'Cutive Mono', monospace;
@@ -252,7 +268,10 @@
        em light mode com "Inbox" como subtítulo. -->
   <section id="login-screen" class="login-screen">
     <div class="login-brand">
-      <img src="/logos/cozy-corner-logo.svg" alt="Cozy Corner" />
+      <div class="login-logo" aria-label="Cozy Corner">
+        <span class="login-logo-name">Cozy Corner</span>
+        <span class="login-logo-by">— by Gigi</span>
+      </div>
       <div class="login-inbox-label">Inbox</div>
     </div>
     <form class="login-form" id="login-form" onsubmit="return false">
