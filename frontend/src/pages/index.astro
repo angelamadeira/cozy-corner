@@ -589,6 +589,18 @@ const countByCategory = Object.fromEntries(
         fill: var(--terracota);
       }
     }
+    /* :active funciona em mouse E touch, fica enquanto o user está
+       apertando e some quando solta — perfeito pra feedback de toque
+       sem o sticky state do :hover. */
+    .kitchen-canvas :global(.hs:active) { scale: 1.03; }
+    .kitchen-canvas :global(.hs:active) :global(*[stroke="currentColor"]),
+    .kitchen-canvas :global(.hs:active[stroke="currentColor"]) {
+      stroke: var(--terracota);
+    }
+    .kitchen-canvas :global(.hs:active) :global(*[fill="currentColor"]),
+    .kitchen-canvas :global(.hs:active[fill="currentColor"]) {
+      fill: var(--terracota);
+    }
     .kitchen-canvas :global(.hs:focus) { outline: none; }
     .kitchen-canvas :global(.hs:focus-visible) {
       outline: 2px solid var(--terracota);
