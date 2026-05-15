@@ -42,8 +42,8 @@ const types = [
         </p>
       </div>
       <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">
-        <Icon name="ph:lightbulb-thin" class="icon-light" width={22} height={22} />
-        <Icon name="ph:moon-thin" class="icon-dark" width={22} height={22} />
+        <Icon name="ph:lightbulb-thin" class="icon-light" width={20} height={20} />
+        <Icon name="ph:moon-thin" class="icon-dark" width={20} height={20} />
       </button>
     </header>
 
@@ -269,15 +269,18 @@ const types = [
     }
     .ds-title { line-height: 1; }
     .dark-toggle {
-      width: 44px; height: 44px;
-      background: var(--surface);
+      width: 36px; height: 36px;
+      background: transparent;
       border: 1px solid var(--line);
       border-radius: var(--r-pill);
-      font-size: 20px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: transform var(--dur-fast) var(--ease-out);
     }
     .dark-toggle:hover { transform: scale(1.05); }
+    .dark-toggle :global(svg) { fill: none; stroke: currentColor; }
 
     .ds-section {
       padding: var(--s-7) 0;

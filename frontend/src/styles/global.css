@@ -106,7 +106,9 @@ body.dark-mode {
   --ink:        #F5F0E5;
   --ink-soft:   #C5BFB1;
   --ink-mute:   #7A7361;
-  --line:       #2A3445;
+  /* --line bumped pra ficar visível no dark mode (era #2A3445, quase
+     invisível contra navy). Agora alinha com a borda dos toggles. */
+  --line:       #7A7361;
   --line-soft:  #1F2735;
   --white:      #0F1A2A;
   --terracota:  #D58860;  /* mais brilhante no escuro */

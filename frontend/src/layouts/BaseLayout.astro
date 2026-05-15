@@ -376,17 +376,8 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
         /* Mantém 36px de height (alinhado com .dark-toggle) e top 10px
            (centrado no header de 56px). */
         body:has(.dark-toggle) .lang-toggle {
-          right: calc(16px + 36px + 12px);  /* header padding + dark-toggle + gap */
+          right: calc(var(--s-6) + 36px + 12px);  /* header padding (32) + dark-toggle (36) + gap (12) = 80px */
         }
-      }
-      /* Em dark mode, unifica a cor de borda dos botões circulares (toggles
-         de idioma/dark mode e botões de ícone do modo cozinha). Sem isso,
-         a borda padrão var(--line) fica muito sutil contra navy e os botões
-         parecem ter visual diferente uns dos outros. */
-      body.dark-mode .lang-toggle,
-      body.dark-mode .dark-toggle,
-      body.dark-mode .cm-icon-btn {
-        border-color: var(--ink-mute);
       }
       /* Esconde durante intro, drawer aberto, cooking mode e print.
          Transition rápida e SEM delay quando esconde (sai instantâneo).
