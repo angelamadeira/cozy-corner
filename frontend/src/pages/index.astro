@@ -373,8 +373,13 @@ const countByCategory = Object.fromEntries(
     #flow-kitchen {
       background: var(--bg);
       padding: 0;
+      /* svh = "small viewport height" — sempre considera a barra do iOS
+         Safari como visível. Mais conservador que dvh (que tenta ajustar
+         dinamicamente), garante que a bancada nunca fica atrás da barra. */
       height: 100vh;
+      height: 100svh;
       min-height: 100vh;
+      min-height: 100svh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -397,7 +402,7 @@ const countByCategory = Object.fromEntries(
     /* Desktop: preenche 100vh de altura, aspect 1500:1000.
        Excesso lateral cortado pelo overflow:hidden do #flow-kitchen. */
     .kitchen-desktop {
-      height: min(100vh, 1000px);
+      height: min(100svh, 1000px);
       aspect-ratio: 1500 / 1000;
     }
     .kitchen-canvas :global(svg) {
@@ -418,7 +423,7 @@ const countByCategory = Object.fromEntries(
         display: block;
         /* Largura limitada por viewport-width OU height-derivada (não passa
            do viewport vertical). Garante que a altura nunca excede 100vh. */
-        width: min(90vw, calc(100vh * 991 / 1000));
+        width: min(90vw, calc(100svh * 991 / 1000));
         aspect-ratio: 991 / 1000;
       }
     }
@@ -427,24 +432,21 @@ const countByCategory = Object.fromEntries(
     @media (max-width: 600px) {
       .kitchen-desktop,
       .kitchen-tablet { display: none; }
-      /* No mobile o SVG é mais alto que o viewport — não usa flex/100vh.
-         Volta pra block flow + altura natural pra página scrollar verticalmente. */
+      /* Herda o flex flex-end do #flow-kitchen base, mas remove o
+         padding lateral (cozinha encosta nas bordas no mobile). */
       #flow-kitchen {
         padding-left: 0;
         padding-right: 0;
-        display: block;
-        height: auto;
-        min-height: auto;
-        overflow: visible;
       }
-      /* Altura explícita = largura × proporção do SVG (1000/460), cascateando.
-         Evita problemas de aspect-ratio dentro de flex container.
-         Mobile: ocupa 100vw, encostado nas bordas da tela. */
+      /* Wrap ocupa 100vw e 100vh, ancorada ao bottom do viewport pelo
+         flex-end do pai. SVG dentro usa preserveAspectRatio=xMidYMax meet
+         pra que a bancada cole no fundo da tela em qualquer aspect ratio. */
       .kitchen-mobile-wrap {
         display: block;
         position: relative;
         width: 100vw;
-        height: calc(100vw * 1000 / 460);
+        height: 100vh;
+        height: 100svh;
       }
       .kitchen-mobile-scroll {
         display: flex;
@@ -477,6 +479,30 @@ const countByCategory = Object.fromEntries(
       .kitchen-mobile-part:first-child :global(#bancada),
       .kitchen-mobile-part:first-child :global(#counter-paneling) {
         transform: translateX(2px);
+      }
+      /* Frame de foto e livros: shift de 28px à direita
+         (só na primeira tela mobile). */
+      .kitchen-mobile-part:first-child :global(#sobre),
+      .kitchen-mobile-part:first-child :global(#todas) {
+        transform: translateX(28px);
+      }
+      /* Estante: shift de 14px à direita. */
+      .kitchen-mobile-part:first-child :global(#estante) {
+        transform: translateX(14px);
+      }
+      /* Prato principal: shift de 20px à direita. */
+      .kitchen-mobile-part:first-child :global(#principais) {
+        transform: translateX(20px);
+      }
+      /* SEGUNDA tela mobile: empurra todo o conteúdo 16px pra direita
+         (planta, relógio, geladeira, calendário, recado), mantendo
+         bancada e paneling no lugar. */
+      .kitchen-mobile-part:last-child :global(svg > g) {
+        transform: translateX(16px);
+      }
+      .kitchen-mobile-part:last-child :global(#bancada),
+      .kitchen-mobile-part:last-child :global(#counter-paneling) {
+        transform: translateX(-16px);
       }
       /* Botão de navegação: setinha clicável que alterna entre as duas partes.
          Fixed pra ficar sempre acessível enquanto o usuário rola pela cozinha. */
@@ -534,9 +560,12 @@ const countByCategory = Object.fromEntries(
       pointer-events: bounding-box;
       transform-box: fill-box;
       transform-origin: center;
-      transition: transform 200ms ease;
+      /* Anima só `scale` no hover (propriedade separada), pra não animar
+         o `transform: translateX(...)` que usamos pra reposicionar
+         elementos no mobile. */
+      transition: scale 200ms ease;
     }
-    .kitchen-canvas :global(.hs:hover) { transform: scale(1.03); }
+    .kitchen-canvas :global(.hs:hover) { scale: 1.03; }
     /* Hover: pinta o stroke em terracota pra destacar */
     .kitchen-canvas :global(.hs:hover) :global(*[stroke="currentColor"]),
     .kitchen-canvas :global(.hs:hover[stroke="currentColor"]) {
