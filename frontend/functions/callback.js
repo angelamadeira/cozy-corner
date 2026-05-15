@@ -98,6 +98,7 @@ export async function onRequest(context) {
 <h1>Login bem-sucedido 💛</h1>
 <p>Veja o status da comunicação com o Decap abaixo. (Auto-close desabilitado pra debug.)</p>
 <div id="log"></div>
+<button onclick="window.__sendNow && window.__sendNow()">Enviar agora (manual)</button>
 <button onclick="window.close()">Fechar janela</button>
 <script>
   (function () {
@@ -138,9 +139,11 @@ export async function onRequest(context) {
 
     window.addEventListener('message', handleMessage, false);
     log('info', 'listener instalado. opener existe: ' + !!window.opener);
-    log('info', 'window.opener.location (se acessível): ' + (function () {
-      try { return window.opener && window.opener.location.origin; } catch (e) { return 'inacessível (cross-origin?)'; }
+    log('info', 'opener.location (se acessível): ' + (function () {
+      try { return window.opener && window.opener.location.origin; } catch (e) { return 'BLOQUEADO cross-origin: ' + e.message; }
     })());
+    log('info', 'window.name: "' + window.name + '"');
+    log('info', 'document.referrer: "' + document.referrer + '"');
 
     if (window.opener) {
       try {
@@ -149,17 +152,46 @@ export async function onRequest(context) {
       } catch (e) { log('err', 'erro ao postar authorizing:', e.message); }
     }
 
+    // Auto-send com DELAY de 8 segundos pra dar tempo de inspecionar.
+    // (botão manual abaixo também envia.)
     var attempts = 0;
-    var interval = setInterval(function () {
-      if (sent || attempts >= 10) {
-        clearInterval(interval);
-        if (!sent) log('warn', 'desistiu após ' + attempts + ' tentativas sem confirmar envio');
-        return;
+    var maxAttempts = 6;
+    var started = false;
+
+    function startDefensiveSending() {
+      if (started) return;
+      started = true;
+      log('warn', '== começando envios defensivos (5s atrás) ==');
+      var interval = setInterval(function () {
+        if (sent || attempts >= maxAttempts) {
+          clearInterval(interval);
+          if (!sent) log('warn', 'desistiu após ' + attempts + ' tentativas');
+          return;
+        }
+        attempts++;
+        log('info', 'tentativa #' + attempts + ' de enviar token');
+        sendToken('*');
+      }, 500);
+    }
+
+    // Conta regressiva de 8s antes de começar
+    var countdown = 8;
+    log('warn', '⏳ aguardando ' + countdown + 's antes de enviar token (inspecione AGORA)');
+    var ticker = setInterval(function () {
+      countdown--;
+      if (countdown <= 0) {
+        clearInterval(ticker);
+        startDefensiveSending();
+      } else if (countdown <= 3) {
+        log('warn', '⏳ ' + countdown + 's...');
       }
-      attempts++;
-      log('info', 'tentativa defensiva #' + attempts + ' de enviar token direto');
-      sendToken('*');
-    }, 500);
+    }, 1000);
+
+    // Botão manual também
+    window.__sendNow = function () {
+      log('info', '== envio manual disparado ==');
+      startDefensiveSending();
+    };
   })();
 </script>
 </body>
