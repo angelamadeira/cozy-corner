@@ -1098,12 +1098,11 @@ const countByCategory = Object.fromEntries(
       // Snap pro topo (que agora é a cozinha) sem scroll animado.
       window.scrollTo(0, 0);
       // Primeira vez chegando na cozinha → mostra balão "Oi, tudo bem?"
-      // em cima do hotspot Nossa cozinha (sobre). Enquanto o balão não
-      // aparece (1200ms), trava cliques em hotspots e toggles via classe
-      // body.welcome-pending — pra que o user veja o welcome sem
-      // acidentalmente abrir alguma coisa antes dele aparecer.
+      // em cima do hotspot Nossa cozinha (sobre) após 1.2s. A trava de
+      // cliques (body.welcome-pending) já foi adicionada lá em cima ao
+      // detectar !kitchenReachedBefore — fica desde o load até o balão
+      // welcome desaparecer (~6.6s depois do balão aparecer).
       if (wasFirstTime) {
-        document.body.classList.add('welcome-pending');
         window.setTimeout(showWelcomeBalloon, 1200);
       }
     }
@@ -1141,6 +1140,12 @@ const countByCategory = Object.fromEntries(
       lockKitchen();
     } else {
       document.body.classList.add('intro-active');
+      // Trava cliques + tooltips em hotspots e toggles desde o carregamento
+      // (não só depois que a cozinha trava). Sem isso, durante o scroll da
+      // intro pra cozinha o user já enxergava tooltips e podia clicar em
+      // hotspots peeking pela tela. A classe só sai quando o balão welcome
+      // termina (em showWelcomeBalloon setTimeout).
+      document.body.classList.add('welcome-pending');
     }
 
     // DEBUG: aperta 'D' pra ver os retângulos clicáveis dos hotspots.
