@@ -924,19 +924,22 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
       right: 24px;
     }
     /* Mobile no modo cozinha: header é estreito demais pro timer caber
-       junto. Manda o FAB pro canto inferior direito, acima da barra do
-       nav prev/próximo. Painel também desce. */
+       junto. Manda o FAB pro canto inferior direito, com folga acima da
+       barra do nav prev/próximo (que tá fixa na base do viewport com
+       ~54px de altura + safe-area-inset). Painel também desce. */
     @media (max-width: 600px) {
       :global(body.cm-open) .timer-fab {
         top: auto;
         right: var(--s-4);
-        bottom: calc(var(--s-7) + env(safe-area-inset-bottom, 0px));
+        /* nav (~54px) + gap (var(--s-5)=24px) + safe-area = ~78px */
+        bottom: calc(var(--s-8) + var(--s-4) + env(safe-area-inset-bottom, 0px));
       }
       :global(body.cm-open) .timer-panel {
         top: auto;
         right: var(--s-4);
         left: var(--s-4);
-        bottom: calc(var(--s-7) + 56px + env(safe-area-inset-bottom, 0px));
+        /* fab bottom (80) + fab height (48) + gap (var(--s-4)=16) = 144 */
+        bottom: calc(var(--s-8) + var(--s-4) + 48px + var(--s-4) + env(safe-area-inset-bottom, 0px));
         width: auto;
       }
     }
