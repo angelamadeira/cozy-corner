@@ -604,6 +604,12 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
       border-top-width: 0;
       pointer-events: none;
     }
+    /* Padding-bottom no scroll da lista pra que o último ingrediente
+       fique visível ao rolar até o fim. Em mobile o timer FAB (quando
+       ativo) fica em bottom:80px+safe com 48px de altura — então cobre
+       uma faixa entre 24px e 72px acima da base do painel. 80px de
+       padding garante folga pro último item escapar do FAB. */
+    .cm-ing-list { padding-bottom: calc(var(--s-8) + var(--s-4)); }
     .cm-ing-toggle-mobile { visibility: visible; }
     .cm-header { padding: var(--s-3) var(--s-4); }
     .cm-step-num { font-size: 22px; }
