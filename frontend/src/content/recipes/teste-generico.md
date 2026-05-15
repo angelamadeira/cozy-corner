@@ -1,5 +1,5 @@
 ---
-title: Massa de bolo branco de aniversário
+title: Massa de bolo branco
 description: Sempre uso essa massa pros bolinhos de aniversário! Fica super
   fofinha e estruturada.
 category:
