@@ -33,7 +33,10 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
          color-scheme ajuda iOS a entender o tema da página. -->
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" id="theme-color-meta" content="#FAF6EE" />
-    <!-- Aplica dark mode ANTES do body renderizar pra evitar flash -->
+    <!-- Aplica dark mode ANTES do body renderizar pra evitar flash.
+         Também marca html se a cozinha já foi alcançada — pra esconder
+         o intro-cover antes do paint (senão iOS Safari samplea o navy
+         do cover e pinta a barra de URL com essa cor). -->
     <script is:inline>
       try {
         var isDark = localStorage.getItem('cozy-dark-mode') === 'true';
@@ -41,6 +44,9 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
           document.documentElement.classList.add('pre-dark');
           var m = document.getElementById('theme-color-meta');
           if (m) m.setAttribute('content', '#0F1A2A');
+        }
+        if (localStorage.getItem('cozy-kitchen-reached') === 'true') {
+          document.documentElement.classList.add('cozy-kitchen-locked');
         }
       } catch (e) {}
     </script>
@@ -156,6 +162,10 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
       html { background: #FAF6EE; }
       html.pre-dark { background: #0F1A2A; }
       html.pre-dark body { background: #0F1A2A; color: #F5F0E5; }
+      /* Em visitas recorrentes (cozinha já alcançada), esconde o
+         intro-cover navy antes mesmo do paint — evita iOS samplear
+         navy pra barra de URL. */
+      html.cozy-kitchen-locked .intro-cover { display: none !important; }
     </style>
   </head>
   <body>
