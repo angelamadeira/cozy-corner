@@ -589,16 +589,16 @@ const countByCategory = Object.fromEntries(
         fill: var(--terracota);
       }
     }
-    /* :active funciona em mouse E touch, fica enquanto o user está
-       apertando e some quando solta — perfeito pra feedback de toque
-       sem o sticky state do :hover. */
-    .kitchen-canvas :global(.hs:active) { scale: 1.03; }
-    .kitchen-canvas :global(.hs:active) :global(*[stroke="currentColor"]),
-    .kitchen-canvas :global(.hs:active[stroke="currentColor"]) {
+    /* Feedback visual de tap: JS adiciona .hs-pressed por ~280ms quando
+       o user clica. Funciona melhor que :active em touch (que pode ser
+       brevíssimo demais). */
+    .kitchen-canvas :global(.hs.hs-pressed) { scale: 1.03; }
+    .kitchen-canvas :global(.hs.hs-pressed) :global(*[stroke="currentColor"]),
+    .kitchen-canvas :global(.hs.hs-pressed[stroke="currentColor"]) {
       stroke: var(--terracota);
     }
-    .kitchen-canvas :global(.hs:active) :global(*[fill="currentColor"]),
-    .kitchen-canvas :global(.hs:active[fill="currentColor"]) {
+    .kitchen-canvas :global(.hs.hs-pressed) :global(*[fill="currentColor"]),
+    .kitchen-canvas :global(.hs.hs-pressed[fill="currentColor"]) {
       fill: var(--terracota);
     }
     .kitchen-canvas :global(.hs:focus) { outline: none; }
@@ -1294,6 +1294,11 @@ const countByCategory = Object.fromEntries(
     document.querySelectorAll<Element>('.kitchen-canvas .hs').forEach((g) => {
       const ds = (g as HTMLElement | SVGElement).dataset;
       const fire = () => {
+        // Feedback visual de tap: classe que dura ~280ms (mais confiável
+        // que :active em touch, que pode ser brevíssimo demais pra ser visto).
+        g.classList.add('hs-pressed');
+        window.setTimeout(() => g.classList.remove('hs-pressed'), 280);
+
         const action = ds.action;
         const key = ds.key;
         if (action === 'cat' && key) openCategory(key);

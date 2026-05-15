@@ -30,8 +30,9 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
     {description && <meta name="description" content={description} />}
     <!-- Cor da barra de navegação no iOS Safari + Chrome mobile.
          Default cream — script abaixo ajusta pra navy se dark mode tá on.
-         color-scheme ajuda iOS a entender o tema da página. -->
-    <meta name="color-scheme" content="light dark" />
+         color-scheme=light força iOS a não usar o tema do sistema,
+         só nosso theme-color manda. -->
+    <meta name="color-scheme" content="light" />
     <meta name="theme-color" id="theme-color-meta" content="#FAF6EE" />
     <!-- Aplica dark mode ANTES do body renderizar pra evitar flash.
          Também marca html se a cozinha já foi alcançada — pra esconder
