@@ -48,6 +48,21 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
       } catch (e) {}
     </script>
 
+    <!-- Mede a viewport real e expõe como --vh-real.
+         100vh / 100svh no iOS Safari nem sempre exclui a barra de URL,
+         então usamos window.innerHeight que é confiável em qualquer
+         navegador. Re-mede em resize/orientation change. -->
+    <script is:inline>
+      (function () {
+        function setVH() {
+          document.documentElement.style.setProperty('--vh-real', window.innerHeight + 'px');
+        }
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', setVH);
+      })();
+    </script>
+
     <!-- i18n: detecta idioma, aplica traduções via data-t -->
     <script is:inline define:vars={{ dictsJson }}>
       window.__COZY_I18N = JSON.parse(dictsJson);

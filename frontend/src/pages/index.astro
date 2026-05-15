@@ -373,13 +373,15 @@ const countByCategory = Object.fromEntries(
     #flow-kitchen {
       background: var(--bg);
       padding: 0;
-      /* svh = "small viewport height" — sempre considera a barra do iOS
-         Safari como visível. Mais conservador que dvh (que tenta ajustar
-         dinamicamente), garante que a bancada nunca fica atrás da barra. */
+      /* --vh-real é window.innerHeight medido por JS no BaseLayout.
+         Confiável em iOS Safari, onde 100vh/svh nem sempre excluem
+         a barra de URL. Fallbacks pra browsers velhos. */
       height: 100vh;
       height: 100svh;
+      height: var(--vh-real, 100svh);
       min-height: 100vh;
       min-height: 100svh;
+      min-height: var(--vh-real, 100svh);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -447,6 +449,7 @@ const countByCategory = Object.fromEntries(
         width: 100vw;
         height: 100vh;
         height: 100svh;
+        height: var(--vh-real, 100svh);
       }
       .kitchen-mobile-scroll {
         display: flex;
