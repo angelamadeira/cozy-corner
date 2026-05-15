@@ -10,6 +10,9 @@ backend:
   # no Cloudflare Pages → Settings → Variables and Secrets.
   base_url: https://cozy-corner.pages.dev
   auth_endpoint: auth
+  # API proxy: roteia chamadas pro GitHub via Cloudflare Function (functions/api/).
+  # Necessário porque alguns ISPs/firewalls bloqueiam api.github.com direto.
+  api_root: https://cozy-corner.pages.dev/api
 
 # Permite rodar Decap localmente com `npx decap-server`
 local_backend: true
