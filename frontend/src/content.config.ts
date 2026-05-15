@@ -27,9 +27,15 @@ const recipes = defineCollection({
       z.array(z.enum(CATEGORIES)).min(1, 'Adicione pelo menos uma categoria')
     ),
     time: z.number().int().positive(), // minutos
-    // Decap salva campo number vazio como "" — pré-processa pra virar undefined
+    // Decap salva campo number vazio como "" — e em alguns casos como -1
+    // (default do Decap quando number field tem valueType: "int" e o user
+    // limpa o campo). Pré-processa pra normalizar tudo isso pra undefined.
     servings: z.preprocess(
-      (val) => (val === '' || val === null) ? undefined : val,
+      (val) => {
+        if (val === '' || val === null || val === undefined) return undefined;
+        if (typeof val === 'number' && val <= 0) return undefined;
+        return val;
+      },
       z.number().int().positive().optional()
     ),
     difficulty: z.enum(['fácil', 'médio', 'difícil']).default('médio'),
