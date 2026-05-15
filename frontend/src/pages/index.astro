@@ -190,6 +190,12 @@ const countByCategory = Object.fromEntries(
             id: r.id,                  // mantido por compat — não usado em URLs
             slug: recipeSlug(r),       // URL slug derivado do título (ver lib/slug.ts)
             title: r.data.title,
+            // Campos pré-normalizados (lowercase) usados pela busca dentro
+            // do drawer da cozinha. Manter aqui evita ter que normalizar
+            // toda string no client a cada keystroke.
+            searchTitle: r.data.title.toLowerCase(),
+            searchIngredients: r.data.ingredients.join(' ').toLowerCase(),
+            searchTags: r.data.tags.join(' ').toLowerCase(),
             time: r.data.time,
             servings: r.data.servings,
             difficulty: r.data.difficulty,
@@ -1248,9 +1254,24 @@ const countByCategory = Object.fromEntries(
     // =============================================
     // DRAWERS / MODAIS
     // =============================================
-    function renderRecipeList(category: string) {
-      const recipes = RECIPES.byCategory[category] || [];
+    // Normaliza string pra match acento-insensible
+    function normalizeSearch(s: string): string {
+      return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    }
+
+    function renderRecipeList(category: string, query = '') {
+      const all = RECIPES.byCategory[category] || [];
       const escapeAttr = (s: string) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      // Filtra por título / ingredientes / tags (já lowercase no JSON)
+      const q = normalizeSearch(query.trim());
+      const recipes = q
+        ? all.filter((r: any) => {
+            const t = normalizeSearch(r.searchTitle || '');
+            const i = normalizeSearch(r.searchIngredients || '');
+            const g = normalizeSearch(r.searchTags || '');
+            return t.includes(q) || i.includes(q) || g.includes(q);
+          })
+        : all;
       catResults.innerHTML = recipes.map((r: any) => {
         const thumb = r.cover
           ? `<div class="recipe-thumb has-img"><img src="${escapeAttr(r.cover)}" alt="${escapeAttr(r.coverAlt || r.title)}" loading="lazy" /></div>`
@@ -1268,12 +1289,16 @@ const countByCategory = Object.fromEntries(
       `;
       }).join('');
       if (recipes.length === 0) {
-        const emptyMsg = T('meta.no_recipes_yet') || 'ainda sem receitas por aqui...';
+        const emptyMsg = q
+          ? (T('search.no_results') || 'nenhuma receita encontrada')
+          : (T('meta.no_recipes_yet') || 'ainda sem receitas por aqui...');
         catResults.innerHTML = `<li style="padding: 24px 0; color: var(--ink-mute); font-family: var(--font-mono); font-size: 14px;">${emptyMsg}</li>`;
       }
     }
 
     const sobreDrawer = document.getElementById('sobre-drawer')!;
+    const drawerSearchInput = catDrawer.querySelector<HTMLInputElement>('.search-input');
+    let currentCategoryKey = '';
 
     function openCategory(key: string) {
       // Pega label do dicionário i18n (category.{key}) — fallback pro PT do JSON
@@ -1282,11 +1307,20 @@ const countByCategory = Object.fromEntries(
       const count = RECIPES.counts[key] || 0;
       const unitKey = count === 1 ? 'search.results_count_one' : 'search.results_count_other';
       catCount.textContent = T(unitKey, { n: count });
+      currentCategoryKey = key;
+      // Reseta input ao abrir nova categoria (pra não filtrar com query antiga)
+      if (drawerSearchInput) drawerSearchInput.value = '';
       renderRecipeList(key);
       catDrawer.classList.add('open');
       backdrop.classList.add('open');
       document.body.classList.add('drawer-open');
     }
+
+    // Filtra a lista do drawer ao vivo conforme o user digita.
+    drawerSearchInput?.addEventListener('input', () => {
+      if (!currentCategoryKey) return;
+      renderRecipeList(currentCategoryKey, drawerSearchInput.value);
+    });
 
     function openRecado() {
       // Recado é modal centrado (não side drawer) — não encolhe a cozinha
