@@ -42,7 +42,7 @@
   },
   "filter": {
     "all": "all",
-    "all_categories": "all categories",
+    "all_categories": "All",
     "quick": "under 30 min",
     "vegetarian": "vegetarian",
     "gluten_free": "gluten-free"

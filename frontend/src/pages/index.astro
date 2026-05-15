@@ -430,7 +430,10 @@ const countByCategory = Object.fromEntries(
     }
     .kitchen-canvas {
       position: relative;
-      color: var(--ink);
+      /* Linhas mais cozy: usa --ink-soft (warm gray-brown) em vez do
+         --ink quase preto. Hotspots viram --terracota no hover/pressed,
+         então mantêm o destaque visual sem precisar do contraste alto. */
+      color: var(--ink-soft);
     }
     /* Desktop: preenche 100vh de altura, aspect 1500:1000.
        Excesso lateral cortado pelo overflow:hidden do #flow-kitchen. */
