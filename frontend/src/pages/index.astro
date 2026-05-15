@@ -574,15 +574,20 @@ const countByCategory = Object.fromEntries(
          elementos no mobile. */
       transition: scale 200ms ease;
     }
-    .kitchen-canvas :global(.hs:hover) { scale: 1.03; }
-    /* Hover: pinta o stroke em terracota pra destacar */
-    .kitchen-canvas :global(.hs:hover) :global(*[stroke="currentColor"]),
-    .kitchen-canvas :global(.hs:hover[stroke="currentColor"]) {
-      stroke: var(--terracota);
-    }
-    .kitchen-canvas :global(.hs:hover) :global(*[fill="currentColor"]),
-    .kitchen-canvas :global(.hs:hover[fill="currentColor"]) {
-      fill: var(--terracota);
+    /* Hover só em dispositivos que realmente suportam (mouse/trackpad).
+       Em touch, o estado de hover fica grudado depois do tap, deixando
+       o elemento em terracota até o próximo toque em outro lugar. */
+    @media (hover: hover) {
+      .kitchen-canvas :global(.hs:hover) { scale: 1.03; }
+      /* Hover: pinta o stroke em terracota pra destacar */
+      .kitchen-canvas :global(.hs:hover) :global(*[stroke="currentColor"]),
+      .kitchen-canvas :global(.hs:hover[stroke="currentColor"]) {
+        stroke: var(--terracota);
+      }
+      .kitchen-canvas :global(.hs:hover) :global(*[fill="currentColor"]),
+      .kitchen-canvas :global(.hs:hover[fill="currentColor"]) {
+        fill: var(--terracota);
+      }
     }
     .kitchen-canvas :global(.hs:focus) { outline: none; }
     .kitchen-canvas :global(.hs:focus-visible) {
