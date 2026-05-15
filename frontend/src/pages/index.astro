@@ -748,15 +748,11 @@ const countByCategory = Object.fromEntries(
     }
     /* Trava o scroll horizontal entre painel 1 e 2 (swipe pra ver o
        resto da cozinha) durante a janela do welcome. Vertical fica livre
-       pra que o user consiga scrolar do hero pra cozinha — só depois
-       que chega na cozinha (kitchen-locked) é que trava tudo. */
+       pra que o user consiga scrolar do hero pra cozinha. */
     body.welcome-pending .kitchen-mobile-scroll {
       overflow-x: hidden;
       touch-action: pan-y;
     }
-    /* Quando já chegou na cozinha + balão de welcome ativo, trava scroll
-       da página inteira (lockKitchen adiciona kitchen-locked no body). */
-    body.welcome-pending.kitchen-locked { overflow: hidden; }
 
     /* Drawer prose pra sobre mim */
     .drawer-prose {
@@ -1097,11 +1093,6 @@ const countByCategory = Object.fromEntries(
     function lockKitchen() {
       if (kitchenLocked) return;
       kitchenLocked = true;
-      // body.kitchen-locked + body.welcome-pending = scroll geral travado
-      // até o balão de welcome desaparecer. Antes disso (durante o scroll
-      // do hero pra cozinha), só welcome-pending está ativo → user ainda
-      // consegue rolar pra baixo.
-      document.body.classList.add('kitchen-locked');
       const wasFirstTime = !kitchenReachedBefore;
       try { localStorage.setItem(KITCHEN_REACHED_KEY, 'true'); } catch (e) {}
       // Cozinha vira o topo da página — esconde intro e transição.
