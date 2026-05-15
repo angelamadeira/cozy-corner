@@ -4,12 +4,15 @@ import { Icon } from 'astro-icon/components';
 import { getCollection, render } from 'astro:content';
 import { CATEGORY_META } from '../../lib/categories';
 import { iconForMaterial } from '../../lib/materials';
+import { recipeSlug } from '../../lib/slug';
 import CookingMode from '../../components/CookingMode.astro';
 
 export async function getStaticPaths() {
   const recipes = await getCollection('recipes', ({ data }) => data.published);
   return recipes.map((recipe) => ({
-    params: { slug: recipe.id },
+    // URL derivada do título (slugificado), não do filename — Decap não
+    // renomeia o .md quando o título muda. Ver src/lib/slug.ts.
+    params: { slug: recipeSlug(recipe) },
     props: { recipe },
   }));
 }

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
 import { CATEGORY_META } from '../lib/categories';
+import { recipeSlug } from '../lib/slug';
 
 const allRecipes = await getCollection('recipes', ({ data }) => data.published);
 
@@ -11,6 +12,7 @@ const index = allRecipes.map((r) => {
   const coverMedia = r.data.media.find((m) => m.cover) || r.data.media[0];
   return {
     id: r.id,
+    slug: recipeSlug(r),
     title: r.data.title,
     description: r.data.description ?? '',
     // Categoria principal (primeira da lista). UI mostra só uma pra não poluir.
@@ -235,7 +237,7 @@ const popularTags = [...tagCount.entries()]
           : '<div class="thumb">' + T('recipe.photo', 'foto') + '</div>';
 
         li.innerHTML =
-          '<a href="/receitas/' + doc.id + '/">' +
+          '<a href="/receitas/' + doc.slug + '/">' +
             thumb +
             '<div class="info">' +
               '<h3 class="recipe-name">' + highlight(doc.title, q) + '</h3>' +

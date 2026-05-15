@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
 import { CATEGORY_META } from '../lib/categories';
+import { recipeSlug } from '../lib/slug';
 import introData from '../content/pages/intro.json';
 import cozinhaData from '../content/pages/cozinha.json';
 import recadoData from '../content/pages/recado.json';
@@ -186,7 +187,8 @@ const countByCategory = Object.fromEntries(
         v.map(r => {
           const coverMedia = r.data.media.find(m => m.cover) || r.data.media[0];
           return {
-            id: r.id,
+            id: r.id,                  // mantido por compat — não usado em URLs
+            slug: recipeSlug(r),       // URL slug derivado do título (ver lib/slug.ts)
             title: r.data.title,
             time: r.data.time,
             servings: r.data.servings,
@@ -1236,7 +1238,7 @@ const countByCategory = Object.fromEntries(
           : `<div class="recipe-thumb">foto</div>`;
         return `
         <li>
-          <a href="/receitas/${r.id}/">
+          <a href="/receitas/${r.slug}/">
             ${thumb}
             <div>
               <div class="recipe-row-title">${r.title}</div>

@@ -3,15 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
 import { CATEGORY_META } from '../lib/categories';
+import { recipeSlug } from '../lib/slug';
 
 const allRecipes = await getCollection('recipes', ({ data }) => data.published);
 
 // Agrupa receitas por categoria pra alimentar o drawer.
 // Uma receita em N categorias aparece em cada uma.
-const recipesByCategory: Record<string, Array<{id: string; title: string; time: number; servings: number; difficulty: string}>> = {};
+const recipesByCategory: Record<string, Array<{id: string; slug: string; title: string; time: number; servings: number; difficulty: string}>> = {};
 for (const r of allRecipes) {
   const item = {
     id: r.id,
+    slug: recipeSlug(r),
     title: r.data.title,
     time: r.data.time,
     servings: r.data.servings,
@@ -23,6 +25,7 @@ for (const r of allRecipes) {
 }
 recipesByCategory.todas = allRecipes.map((r) => ({
   id: r.id,
+  slug: recipeSlug(r),
   title: r.data.title,
   time: r.data.time,
   servings: r.data.servings,
@@ -543,7 +546,7 @@ const categoryLabels: Record<string, string> = {
         catList.innerHTML = recipes.length === 0
           ? '<li class="drawer-empty">essa categoria ainda está vazia.</li>'
           : recipes.map((r) =>
-              '<li><a href="/receitas/' + r.id + '/">' +
+              '<li><a href="/receitas/' + r.slug + '/">' +
                 '<span><span class="recipe-name">' + r.title + '</span>' +
                 '<span class="recipe-meta">' + r.time + ' min · ' + r.servings + ' porções · ' + r.difficulty + '</span></span>' +
                 '<span class="arrow">→</span>' +

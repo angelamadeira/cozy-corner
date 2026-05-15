@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
 import { CATEGORY_META } from '../../lib/categories';
+import { recipeSlug } from '../../lib/slug';
 
 export async function getStaticPaths() {
   const allRecipes = await getCollection('recipes', ({ data }) => data.published);
@@ -143,7 +144,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
             data-difficulty={r.data.difficulty}
             data-cat={r.data.category.join('|')}
           >
-            <a href={`/receitas/${r.id}/`}>
+            <a href={`/receitas/${recipeSlug(r)}/`}>
               {(() => {
                 const cover = r.data.media.find((m) => m.cover) || r.data.media[0];
                 return cover?.src ? (
