@@ -242,6 +242,17 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
           // Também limpa o flag de sessionStorage pra não disparar fade-in
           // numa próxima navegação que não seja via cozyNavigate.
           try { sessionStorage.removeItem('cozy-fade-in'); } catch (err) {}
+          // Re-sincroniza dark mode com localStorage. Em bfcache (Safari
+          // back/forward), o body é restaurado no estado em que estava
+          // quando a página foi unload-ada — se o user mudou o dark mode
+          // em outra página, esse estado é stale. Sincroniza manualmente.
+          try {
+            var isDark = localStorage.getItem('cozy-dark-mode') === 'true';
+            var hasDark = document.body.classList.contains('dark-mode');
+            if (isDark !== hasDark) {
+              document.body.classList.toggle('dark-mode', isDark);
+            }
+          } catch (err) {}
         });
 
         // Fade-out (saindo): expõe helper global.
