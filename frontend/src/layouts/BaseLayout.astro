@@ -80,19 +80,36 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
 
     <!-- Sincroniza theme-color quando o dark mode é alternado em runtime
          (observer na class do body). Mantém a barra do iOS sempre na
-         mesma cor que o fundo da página. -->
+         mesma cor que o fundo da página.
+         iOS Safari às vezes cacheia a primeira leitura do theme-color
+         e não atualiza — então re-setamos várias vezes (load, 200ms,
+         e em qualquer mudança de class no body). -->
     <script is:inline>
       (function () {
         function syncThemeColor() {
           var m = document.getElementById('theme-color-meta');
           if (!m) return;
           var isDark = document.body.classList.contains('dark-mode');
-          m.setAttribute('content', isDark ? '#0F1A2A' : '#FAF6EE');
+          var color = isDark ? '#0F1A2A' : '#FAF6EE';
+          // Força reset: remove e re-cria a meta tag — iOS Safari trata
+          // como tag nova e re-lê. Hack mas funciona pra cache teimoso.
+          var parent = m.parentNode;
+          parent.removeChild(m);
+          m.setAttribute('content', color);
+          parent.appendChild(m);
         }
         document.addEventListener('DOMContentLoaded', function () {
           syncThemeColor();
+          // iOS Safari pode ignorar a primeira leitura — re-aplica depois
+          // de uns ms pra garantir.
+          setTimeout(syncThemeColor, 100);
+          setTimeout(syncThemeColor, 500);
           var obs = new MutationObserver(syncThemeColor);
           obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        });
+        // Re-aplica quando a aba fica visível de novo (volta de outra aba/app)
+        document.addEventListener('visibilitychange', function () {
+          if (!document.hidden) syncThemeColor();
         });
       })();
     </script>
