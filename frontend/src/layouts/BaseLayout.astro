@@ -29,7 +29,9 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
     <!-- Cor da barra de navegação no iOS Safari + Chrome mobile.
-         Default cream — script abaixo ajusta pra navy se dark mode tá on. -->
+         Default cream — script abaixo ajusta pra navy se dark mode tá on.
+         color-scheme ajuda iOS a entender o tema da página. -->
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" id="theme-color-meta" content="#FAF6EE" />
     <!-- Aplica dark mode ANTES do body renderizar pra evitar flash -->
     <script is:inline>
@@ -149,6 +151,9 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
       /* pre-dark é aplicado no html pelo script inline acima.
          Quando o body é criado, JS migra pra body.dark-mode.
          Aqui só garantimos o bg correto enquanto isso acontece. */
+      /* Cor de fundo explícita no html — garante que iOS Safari pegue
+         a cor certa pra status bar/URL bar (sampling do topo do paint). */
+      html { background: #FAF6EE; }
       html.pre-dark { background: #0F1A2A; }
       html.pre-dark body { background: #0F1A2A; color: #F5F0E5; }
     </style>
