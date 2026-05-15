@@ -16,9 +16,15 @@ export async function getStaticPaths() {
     return [...count.entries()].filter(([, n]) => n < rs.length).map(([t]) => t);
   }
 
-  // Uma página por categoria + uma especial 'todas'
+  // Helper: ordena receitas alfabeticamente por título (case/acento-insensible).
+  const sortByTitle = (rs) => [...rs].sort((a, b) =>
+    a.data.title.localeCompare(b.data.title, 'pt', { sensitivity: 'base' })
+  );
+
+  // Uma página por categoria + uma especial 'todas'.
+  // Todas as listas saem em ordem alfabética.
   const paths = Object.entries(CATEGORY_META).map(([slug, meta]) => {
-    const catRecipes = allRecipes.filter((r) => r.data.category.includes(slug as any));
+    const catRecipes = sortByTitle(allRecipes.filter((r) => r.data.category.includes(slug as any)));
     return {
       params: { slug },
       props: {
@@ -39,7 +45,7 @@ export async function getStaticPaths() {
       label: 'Todas as receitas',
       icon: 'ph:books-thin',
       hotspot: 'livros',
-      recipes: allRecipes,
+      recipes: sortByTitle(allRecipes),
       tags: [],
     },
   });

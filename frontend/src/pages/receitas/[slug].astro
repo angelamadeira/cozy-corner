@@ -1527,6 +1527,18 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     });
     timerClose.addEventListener('click', closePanel);
 
+    // Fecha o painel quando clica fora dele (e fora do FAB).
+    document.addEventListener('click', (e) => {
+      if (timerPanel.hasAttribute('hidden')) return;
+      const target = e.target as Node;
+      if (timerPanel.contains(target) || timerFab.contains(target)) return;
+      closePanel();
+    });
+    // Esc também fecha o painel
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !timerPanel.hasAttribute('hidden')) closePanel();
+    });
+
     timerPresets.forEach((btn) => {
       btn.addEventListener('click', () => {
         const m = parseInt(btn.dataset.min || '0', 10);

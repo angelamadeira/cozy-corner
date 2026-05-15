@@ -230,6 +230,20 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
           });
         }
 
+        // bfcache fix: quando o user usa o botão "voltar" do navegador,
+        // a página é restaurada do cache no estado em que estava (overlay
+        // opaco, porque a gente acabou de clicar num link). Precisamos
+        // resetar o overlay quando isso acontece.
+        window.addEventListener('pageshow', function (e) {
+          // `persisted` é true quando vem do bfcache. Mesmo se for false,
+          // resetar é seguro — overlay nunca deve ficar visível "por si só".
+          overlay.classList.remove('is-entering', 'is-leaving');
+          document.documentElement.classList.remove('cozy-fading-in');
+          // Também limpa o flag de sessionStorage pra não disparar fade-in
+          // numa próxima navegação que não seja via cozyNavigate.
+          try { sessionStorage.removeItem('cozy-fade-in'); } catch (err) {}
+        });
+
         // Fade-out (saindo): expõe helper global.
         window.cozyNavigate = function (url) {
           try { sessionStorage.setItem('cozy-fade-in', '1'); } catch (e) {}
@@ -352,9 +366,9 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
       /* Quando a página tem dark-toggle no header (receita, categoria, busca),
          desloca o lang-toggle pra esquerda pra não sobrepor.
          Dark-toggle: right edge a 24px (header padding s-6), width 36 →
-         left edge a 60px. Lang-toggle right edge = 60 + 40 (gap) = 100px. */
+         left edge a 60px. Lang-toggle right edge = 60 + 24 (gap) = 84px. */
       body:has(.dark-toggle) .lang-toggle {
-        right: 100px;
+        right: 84px;
       }
       /* Em mobile e no intro/loading, esconde */
       @media (max-width: 600px) {
@@ -362,8 +376,17 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
         /* Mantém 36px de height (alinhado com .dark-toggle) e top 10px
            (centrado no header de 56px). */
         body:has(.dark-toggle) .lang-toggle {
-          right: calc(16px + 36px + 24px);  /* header padding + dark-toggle + gap */
+          right: calc(16px + 36px + 12px);  /* header padding + dark-toggle + gap */
         }
+      }
+      /* Em dark mode, unifica a cor de borda dos botões circulares (toggles
+         de idioma/dark mode e botões de ícone do modo cozinha). Sem isso,
+         a borda padrão var(--line) fica muito sutil contra navy e os botões
+         parecem ter visual diferente uns dos outros. */
+      body.dark-mode .lang-toggle,
+      body.dark-mode .dark-toggle,
+      body.dark-mode .cm-icon-btn {
+        border-color: var(--ink-mute);
       }
       /* Esconde durante intro, drawer aberto, cooking mode e print.
          Transition rápida e SEM delay quando esconde (sai instantâneo).

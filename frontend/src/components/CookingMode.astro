@@ -290,6 +290,12 @@ const { steps, ingredients, recipeTitle, triggerSelector = '#open-cooking-mode' 
     overflow: hidden;
     min-height: 0;
   }
+  /* Quando o painel de ingredientes está escondido (tela "All done!"),
+     colapsa a coluna direita pra cozinha ocupar toda a largura — conteúdo
+     da end screen fica centralizado de verdade no viewport. */
+  .cm-body:has(.cm-ingredients[hidden]) {
+    grid-template-columns: 1fr;
+  }
   /* Coluna esquerda: stage (cresce) + nav (auto) embaixo */
   .cm-main {
     display: grid;

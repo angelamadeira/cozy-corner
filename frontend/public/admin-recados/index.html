@@ -42,21 +42,16 @@
       gap: 32px;
     }
     .login-brand {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
-    .login-brand-name {
-      font-family: 'Caveat', cursive;
-      font-weight: 600;
-      font-size: clamp(80px, 16vw, 180px);
-      line-height: 0.9;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-    }
-    .login-brand-by {
-      font-family: 'Cutive Mono', monospace;
-      font-size: 14px;
-      color: var(--ink-soft);
-      margin-top: 4px;
+    /* Logo: mesmo SVG usado no admin Decap, mesmo tamanho. */
+    .login-brand img {
+      width: min(80vw, 640px);
+      height: auto;
+      display: block;
     }
     .login-inbox-label {
       font-family: 'Cutive Mono', monospace;
@@ -64,7 +59,6 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--ink-mute);
-      margin-top: 12px;
     }
     .login-form {
       display: flex;
@@ -258,8 +252,7 @@
        em light mode com "Inbox" como subtítulo. -->
   <section id="login-screen" class="login-screen">
     <div class="login-brand">
-      <div class="login-brand-name">Cozy Corner</div>
-      <div class="login-brand-by">— by Gigi</div>
+      <img src="/logos/cozy-corner-logo.svg" alt="Cozy Corner" />
       <div class="login-inbox-label">Inbox</div>
     </div>
     <form class="login-form" id="login-form" onsubmit="return false">
@@ -267,12 +260,10 @@
       <button id="login-btn" type="submit">Entrar</button>
       <p id="login-error" class="error hidden"></p>
     </form>
-    <a class="login-back" href="/">← voltar pra cozinha</a>
   </section>
 
   <!-- Lista de recados (depois do login) -->
   <main class="recados-main hidden" id="recados-screen">
-    <a class="back-link" href="/">← voltar pra cozinha</a>
     <h1>Inbox</h1>
     <p class="subtitle">recados deixados no site</p>
     <div class="toolbar">
