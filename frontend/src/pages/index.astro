@@ -642,6 +642,12 @@ const countByCategory = Object.fromEntries(
       border-top-color: var(--ink);
     }
     .kitchen-tooltip.show { opacity: 1; }
+    /* Em dispositivos sem hover (touch — celular/tablet), esconde o tooltip.
+       Hover não dispara naturalmente em touch, e o "click pra ver" não é UX
+       intuitiva nesse contexto. */
+    @media (hover: none), (pointer: coarse) {
+      .kitchen-tooltip { display: none !important; }
+    }
 
     /* Drawer prose pra sobre mim */
     .drawer-prose {
