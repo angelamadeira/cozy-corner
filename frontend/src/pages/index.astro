@@ -630,17 +630,30 @@ const countByCategory = Object.fromEntries(
     .kitchen-canvas :global(.hs) {
       -webkit-tap-highlight-color: transparent;
     }
-    /* Feedback visual de tap: JS adiciona .hs-pressed por ~280ms quando
+    /* Feedback visual de tap: JS adiciona .hs-pressed por ~450ms quando
        o user clica. Funciona melhor que :active em touch (que pode ser
-       brevíssimo demais). */
-    .kitchen-canvas :global(.hs.hs-pressed) { scale: 1.03; }
+       brevíssimo demais). 450ms dá tempo de o user ver o pulse antes
+       do drawer cobrir o hotspot. */
+    .kitchen-canvas :global(.hs.hs-pressed) {
+      scale: 1.08;
+      animation: hs-tap 450ms var(--ease-out);
+    }
     .kitchen-canvas :global(.hs.hs-pressed) :global(*[stroke="currentColor"]),
     .kitchen-canvas :global(.hs.hs-pressed[stroke="currentColor"]) {
       stroke: var(--terracota);
+      stroke-width: 1.8;
     }
     .kitchen-canvas :global(.hs.hs-pressed) :global(*[fill="currentColor"]),
     .kitchen-canvas :global(.hs.hs-pressed[fill="currentColor"]) {
       fill: var(--terracota);
+    }
+    @keyframes hs-tap {
+      0%   { scale: 1; }
+      30%  { scale: 1.12; }
+      100% { scale: 1.08; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .kitchen-canvas :global(.hs.hs-pressed) { animation: none; }
     }
     .kitchen-canvas :global(.hs:focus) { outline: none; }
     .kitchen-canvas :global(.hs:focus-visible) {
@@ -1600,10 +1613,15 @@ const countByCategory = Object.fromEntries(
     document.querySelectorAll<Element>('.kitchen-canvas .hs').forEach((g) => {
       const ds = (g as HTMLElement | SVGElement).dataset;
       const fire = () => {
-        // Feedback visual de tap: classe que dura ~280ms (mais confiável
+        // Feedback visual de tap: classe que dura ~450ms (mais confiável
         // que :active em touch, que pode ser brevíssimo demais pra ser visto).
+        // Duração maior dá tempo de o user ver o pulse antes do drawer
+        // cobrir o hotspot.
         g.classList.add('hs-pressed');
-        window.setTimeout(() => g.classList.remove('hs-pressed'), 280);
+        window.setTimeout(() => g.classList.remove('hs-pressed'), 450);
+        // Feedback tátil em devices que suportam vibração (Android Chrome,
+        // alguns navegadores). iOS Safari não suporta — silencioso.
+        try { if ('vibrate' in navigator) (navigator as any).vibrate(15); } catch {}
 
         const action = ds.action;
         const key = ds.key;
