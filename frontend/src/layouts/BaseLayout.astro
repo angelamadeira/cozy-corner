@@ -211,6 +211,13 @@ const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });
          navy pra barra de URL. */
       html.cozy-kitchen-locked .intro-cover { display: none !important; }
     </style>
+
+    <!-- Cloudflare Web Analytics — privacidade-first, sem cookies.
+         Dashboard: https://dash.cloudflare.com → Web Analytics → cozy-corner.
+         Coleta pageviews, top pages, países, dispositivos. `defer` garante
+         que não bloqueia render. -->
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "aa58183c6ae147a5b02d3e2b7ae7dbab"}'></script>
   </head>
   <body>
     <script is:inline>
