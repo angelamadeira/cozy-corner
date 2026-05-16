@@ -164,7 +164,7 @@ const ingredientsEnEff = ingredientsEn.length === ingredients.length ? ingredien
       navEl?.removeAttribute('hidden');
       ingredientsPanel?.removeAttribute('hidden');
       // Escolhe array PT ou EN baseado no idioma atual (atualizado em tempo
-       real quando o user troca o toggle de idioma).
+      // real quando o user troca o toggle de idioma).
       const lang = window.__COZY_LANG === 'en' ? 'en' : 'pt';
       const stepsArr = lang === 'en' ? stepsEn : steps;
       stepText.textContent = stepsArr[current];
