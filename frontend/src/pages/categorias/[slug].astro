@@ -536,10 +536,12 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     @media (max-width: 640px) {
       .recipe-item a { grid-template-columns: 72px 1fr 20px; }
       .cat-title { font-size: 32px; }
-      /* Filtros viram trilho horizontal scrollável em vez de wrap em
-         múltiplas linhas — economiza espaço vertical e fica mais natural
-         de navegar com swipe. Primeira chip alinha com a borda esquerda
-         do conteúdo (mesma da caixa de busca acima). */
+    }
+    /* Filtros viram trilho horizontal scrollável só em touch real (celular/
+       tablet sem mouse). Em desktop responsivo (DevTools mobile, janela
+       estreita), continuam fazendo wrap em múltiplas linhas — o trilho
+       não é prático com mouse e estava dando problema. */
+    @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
       .filters {
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -547,12 +549,7 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         padding-right: var(--s-4);
-        /* Affordance visual de "arrastável" — cursor grab. Vira grabbing
-           via JS quando o usuário está de fato arrastando. */
-        cursor: grab;
       }
-      .filters.dragging { cursor: grabbing; }
-      .filters.dragging .chip { pointer-events: none; }
       .filters::-webkit-scrollbar { display: none; }
       .filters .chip {
         flex: 0 0 auto;
