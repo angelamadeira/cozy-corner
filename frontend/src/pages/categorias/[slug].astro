@@ -348,6 +348,11 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       user-select: none;
     }
     .chip :global(svg) { fill: none; stroke: currentColor; flex: none; }
+    /* Força todos os cliques nos filhos (svg, span interno do data-t) a
+       chegarem direto no chip pai. Sem isso, iOS Safari às vezes não
+       bubbla cliques de elementos inline aninhados de forma confiável,
+       e o filtro não acionava em mobile. */
+    .chip > * { pointer-events: none; }
     .chip:hover { border-color: var(--terracota); color: var(--ink); }
     .chip-active, .chip-active:hover {
       background: var(--ink);
