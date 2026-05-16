@@ -190,7 +190,6 @@ collections:
             fields:
               - { name: recado, label: "Post-it (deixar recado)", widget: string, default: "Deixar um recadinho" }
               - { name: sobre, label: "Foto na parede (sobre nós)", widget: string, default: "Nossa cozinha" }
-              - { name: vegetarianas, label: "Vaso (vegetarianas)", widget: string, default: "vegetarianas" }
               - { name: akim_meow, label: "Akim — balão de fala (clique no gato)", widget: string, default: "miau 🐱" }
               - { name: dark_mode_on, label: "Interruptor — luz apagada → acender", widget: string, default: "Que tal acender a luz?" }
               - { name: dark_mode_off, label: "Interruptor — luz acesa → apagar", widget: string, default: "Que tal apagar a luz?" }
@@ -200,7 +199,6 @@ collections:
             fields:
               - { name: recado, label: "Post-it (leave a note)", widget: string, default: "Leave a little note" }
               - { name: sobre, label: "Wall photo (about us)", widget: string, default: "Our kitchen" }
-              - { name: vegetarianas, label: "Plant (vegetarian)", widget: string, default: "vegetarian" }
               - { name: akim_meow, label: "Akim — speech bubble (click the cat)", widget: string, default: "meow 🐱" }
               - { name: dark_mode_on, label: "Switch — light off → turn on", widget: string, default: "Care to turn on the light?" }
               - { name: dark_mode_off, label: "Switch — light on → turn off", widget: string, default: "Care to turn off the light?" }
