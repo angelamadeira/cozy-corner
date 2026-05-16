@@ -168,23 +168,25 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
               <div class="info">
                 <h3 class="recipe-name">{r.data.title}</h3>
                 {(() => {
-                  // Cada item de metadata vai dentro de um <span class="mi">.
-                  // Empacotar como um único flex item evita que whitespace
-                  // interno (entre icon/valor/label) vire flex items extras,
-                  // que somariam ao gap criando espaços fantasmas.
+                  // Cada metadata é um <span class="mi"> com icon + valor +
+                  // label e (exceto o último) o separador "·" no FINAL. Ao
+                  // quebrar linha, o "·" fica pendurado no fim da linha
+                  // anterior e a nova linha começa limpa com o icone — sem
+                  // deslocar o item pra direita.
                   const diffKey = r.data.difficulty === 'fácil' ? 'easy'
                     : r.data.difficulty === 'difícil' ? 'hard' : 'medium';
-                  const items = [
-                    <span class="mi"><Icon name="ph:clock-thin" /> {r.data.time} <span data-t="meta.minutes">min</span></span>,
+                  const innerItems = [
+                    <><Icon name="ph:clock-thin" /> {r.data.time} <span data-t="meta.minutes">min</span></>,
                     r.data.servings ? (
-                      <span class="mi"><Icon name="ph:fork-knife-thin" /> {r.data.servings} <span data-t="meta.servings_other">porções</span></span>
+                      <><Icon name="ph:fork-knife-thin" /> {r.data.servings} <span data-t="meta.servings_other">porções</span></>
                     ) : null,
-                    <span class="mi"><Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${diffKey}`}>{r.data.difficulty}</span></span>,
+                    <><Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${diffKey}`}>{r.data.difficulty}</span></>,
                   ].filter(Boolean);
+                  const lastIdx = innerItems.length - 1;
                   return (
                     <p class="recipe-meta">
-                      {items.map((item, i) => (
-                        <>{i > 0 && <span class="sep">·</span>}{item}</>
+                      {innerItems.map((item, i) => (
+                        <span class="mi">{item}{i < lastIdx && <span class="sep">·</span>}</span>
                       ))}
                     </p>
                   );
@@ -232,6 +234,10 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     .logo-by { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
     .dark-toggle {
       width: 36px; height: 36px;
+      /* appearance: none impede iOS Safari de aplicar o estilo nativo de
+         botão (que renderiza o conteúdo SVG em azul tinted). */
+      -webkit-appearance: none;
+      appearance: none;
       background: transparent;
       border: 1px solid var(--line);
       border-radius: var(--r-pill);
@@ -239,6 +245,8 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      color: var(--ink);
+      padding: 0;
     }
     .icon-dark { display: none; }
     body.dark-mode .icon-light { display: none; }
@@ -404,11 +412,20 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       display: inline-flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       font-family: var(--font-mono);
       font-size: var(--fs-meta);
       color: var(--ink-soft);
     }
+    /* Cada metadata é um wrapper inline-flex que mantém icon + valor + label
+       (e o separador, quando presente) sempre juntos no wrap. Gap interno
+       pequeno cuida do espaçamento entre sep e o resto do conteúdo. */
+    .recipe-meta .mi {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .recipe-meta .mi .sep { opacity: 0.4; }
     /* SVGs dos icones meta: garantia explícita de tamanho/display.
        Sem `display: inline-block`, em alguns contextos (especialmente
        quando o svg fica direto dentro de um .mi inline span), a largura
@@ -680,65 +697,56 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       });
     });
 
-    // No viewport onde a faixa de filtros vira trilho horizontal (mobile/
-    // tablet em modo responsivo), adiciona dois inputs de scroll que não
-    // funcionam nativamente:
-    //   1. Wheel: traduz deltaY (scroll vertical do mouse) → scrollLeft.
-    //   2. Click-and-drag: arrastar com mouse rola o trilho.
-    // Ambos só atuam quando o trilho está de fato em modo overflow (mobile),
-    // detectado por scrollWidth > clientWidth. Em desktop com wrap em 2
-    // linhas, scrollWidth == clientWidth e os handlers se omitem.
-    document.querySelectorAll<HTMLElement>('.filters').forEach((track) => {
-      // ---- wheel (vertical → horizontal) ----
-      track.addEventListener('wheel', (e) => {
-        if (track.scrollWidth <= track.clientWidth) return;
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-        e.preventDefault();
-        track.scrollLeft += e.deltaY;
-      }, { passive: false });
-
-      // ---- click-and-drag ----
-      let isDown = false;
-      let startX = 0;
-      let startScrollLeft = 0;
-      let movedDistance = 0;  // pra detectar drag vs click
-
-      track.addEventListener('mousedown', (e) => {
-        if (track.scrollWidth <= track.clientWidth) return;
-        // Só botão esquerdo
-        if (e.button !== 0) return;
-        isDown = true;
-        movedDistance = 0;
-        startX = e.pageX;
-        startScrollLeft = track.scrollLeft;
-        track.classList.add('dragging');
-      });
-
-      // mousemove/up no document pra capturar mesmo se o cursor sai do trilho
-      document.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const dx = e.pageX - startX;
-        movedDistance = Math.abs(dx);
-        track.scrollLeft = startScrollLeft - dx;
-      });
-
-      document.addEventListener('mouseup', () => {
-        if (!isDown) return;
-        isDown = false;
-        track.classList.remove('dragging');
-      });
-
-      // Previne click acidental num chip depois de um drag (sem isso, soltar
-      // o mouse em cima de um chip ativaria o filtro mesmo se a intenção
-      // era apenas arrastar).
-      track.addEventListener('click', (e) => {
-        if (movedDistance > 5) {
+    // Drag-to-scroll + wheel scroll no trilho de filtros. SÓ em devices com
+    // mouse real (hover: hover). Em touch, mouse events são sintetizados a
+    // partir de touch e podem interferir com o tap nos chips, impedindo o
+    // filtro de funcionar. Em touch o swipe nativo já cuida do scroll.
+    const canHoverFilter = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (canHoverFilter) {
+      document.querySelectorAll<HTMLElement>('.filters').forEach((track) => {
+        // ---- wheel (vertical → horizontal) ----
+        track.addEventListener('wheel', (e) => {
+          if (track.scrollWidth <= track.clientWidth) return;
+          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
           e.preventDefault();
-          e.stopPropagation();
+          track.scrollLeft += e.deltaY;
+        }, { passive: false });
+
+        // ---- click-and-drag ----
+        let isDown = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+        let movedDistance = 0;
+
+        track.addEventListener('mousedown', (e) => {
+          if (track.scrollWidth <= track.clientWidth) return;
+          if (e.button !== 0) return;
+          isDown = true;
           movedDistance = 0;
-        }
-      }, true);
-    });
+          startX = e.pageX;
+          startScrollLeft = track.scrollLeft;
+          track.classList.add('dragging');
+        });
+        document.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const dx = e.pageX - startX;
+          movedDistance = Math.abs(dx);
+          track.scrollLeft = startScrollLeft - dx;
+        });
+        document.addEventListener('mouseup', () => {
+          if (!isDown) return;
+          isDown = false;
+          track.classList.remove('dragging');
+        });
+        track.addEventListener('click', (e) => {
+          if (movedDistance > 5) {
+            e.preventDefault();
+            e.stopPropagation();
+            movedDistance = 0;
+          }
+        }, true);
+      });
+    }
   </script>
 </BaseLayout>
