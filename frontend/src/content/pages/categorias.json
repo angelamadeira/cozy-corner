@@ -1,6 +1,6 @@
 {
   "pt": {
-    "principais": "Pratos principais",
+    "principais": "Pratos salgados",
     "sobremesas": "Sobremesas",
     "datas": "Datas comemorativas",
     "vegetarianas": "Vegetarianas",
@@ -9,7 +9,7 @@
     "todas": "Todas as receitas"
   },
   "en": {
-    "principais": "Main dishes",
+    "principais": "Savory dishes",
     "sobremesas": "Desserts",
     "datas": "Special occasions",
     "vegetarianas": "Vegetarian",
