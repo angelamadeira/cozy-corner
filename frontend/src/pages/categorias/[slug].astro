@@ -685,22 +685,43 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     }
 
     searchInput?.addEventListener('input', applyFilters);
-    tagChips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        tagChips.forEach((c) => c.classList.remove('chip-active'));
-        chip.classList.add('chip-active');
-        activeTag = chip.dataset.tag || 'all';
-        applyFilters();
+    // Aciona chip via click (desktop) E touchend (mobile). Em iOS Safari,
+    // quando o chip está dentro de um container com overflow-x: auto (o
+    // trilho horizontal responsivo), o `click` é engolido sempre que o
+    // dedo microssacada durante o tap. touchend é mais confiável.
+    function activateChip(chips: NodeListOf<HTMLElement>, chip: HTMLElement,
+                          attr: 'tag' | 'cat', setter: (v: string) => void) {
+      chips.forEach((c) => c.classList.remove('chip-active'));
+      chip.classList.add('chip-active');
+      setter(chip.dataset[attr] || 'all');
+      applyFilters();
+    }
+    function wireChip(chips: NodeListOf<HTMLElement>, attr: 'tag' | 'cat', setter: (v: string) => void) {
+      chips.forEach((chip) => {
+        let touchedAt = 0;
+        let touchMoved = false;
+        chip.addEventListener('touchstart', () => {
+          touchedAt = Date.now();
+          touchMoved = false;
+        }, { passive: true });
+        chip.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
+        chip.addEventListener('touchend', (e) => {
+          // Só dispara se foi tap rápido sem scroll (movimento)
+          if (touchMoved) return;
+          if (Date.now() - touchedAt > 500) return;
+          e.preventDefault();  // Previne click fantasma posterior
+          activateChip(chips, chip, attr, setter);
+        });
+        // Click cobre desktop e fallback
+        chip.addEventListener('click', () => {
+          // Se acabou de vir de um touchend bem-sucedido, ignora
+          if (Date.now() - touchedAt < 600) return;
+          activateChip(chips, chip, attr, setter);
+        });
       });
-    });
-    catChips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        catChips.forEach((c) => c.classList.remove('chip-active'));
-        chip.classList.add('chip-active');
-        activeCat = chip.dataset.cat || 'all';
-        applyFilters();
-      });
-    });
+    }
+    wireChip(tagChips, 'tag', (v) => { activeTag = v; });
+    wireChip(catChips, 'cat', (v) => { activeCat = v; });
 
     // Drag-to-scroll + wheel scroll no trilho de filtros. SÓ em devices com
     // mouse real (hover: hover). Em touch, mouse events são sintetizados a
