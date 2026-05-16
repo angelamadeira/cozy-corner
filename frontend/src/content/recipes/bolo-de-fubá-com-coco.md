@@ -1,6 +1,6 @@
 ---
 title: Bolo de fubá com coco
-description: Esse bolo fica fofíssimo e o coco deixa a massa mais molhadinha e
+description: Esse bolo fica fofíssimo! O coco deixa a massa mais molhadinha e
   com uma textura interessante. Vale jogar uma calda de goiabada por cima também
   pra incrementar.
 category:
