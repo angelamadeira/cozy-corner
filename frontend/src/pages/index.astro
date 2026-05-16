@@ -680,6 +680,24 @@ const countByCategory = Object.fromEntries(
       .kitchen-canvas :global(.zzz-3) { transform: translate(30px, -40px) scale(1.2); }
     }
 
+    /* Akim respirando — scaleX (largura) em vez de Y pra não deslocar
+       a cabeça verticalmente. Origem no centro: a posição XY do gato
+       não muda, só a largura oscila levemente. Hover/click usa a CSS
+       property `scale` (independente do transform), então se compõem. */
+    .kitchen-canvas :global(#akim) {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+      animation: akim-breathe 3.6s ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes akim-breathe {
+      0%, 100% { transform: scaleX(1); }
+      50%      { transform: scaleX(1.035); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .kitchen-canvas :global(#akim) { animation: none; }
+    }
+
     /* Quando um drawer abre, encolhe o body, alinha cena ao bottom */
     body {
       transition: padding-right 0.45s var(--ease-out);
