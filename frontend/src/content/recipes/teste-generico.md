@@ -53,5 +53,6 @@ steps_en:
   - Alternate adding flour and milk and gently stir the dough.
   - 'Finally, add the yeast and pour into the baking dish.'
   - Bake for approximately 35 minutes at 180 degrees.
+title_en: White cake dough
 ---
 Onde aparece esse texto?
