@@ -205,6 +205,38 @@ collections:
               - { name: dark_mode_on, label: "Switch — light off → turn on", widget: string, default: "Care to turn on the light?" }
               - { name: dark_mode_off, label: "Switch — light on → turn off", widget: string, default: "Care to turn off the light?" }
 
+      # ---------- CATEGORIAS (nomes usados em tudo: kitchen tooltip, página da categoria, drawer) ----------
+      # Estas labels aparecem em vários lugares do site (tooltips dos
+      # hotspots de categoria, título da página /categorias/X/, drawer
+      # da cozinha). Editando aqui, muda em todos os lugares.
+      - name: categorias
+        label: 🏷️ Categorias (labels)
+        file: frontend/src/content/pages/categorias.json
+        format: json
+        fields:
+          - name: pt
+            label: 🇧🇷 Português
+            widget: object
+            fields:
+              - { name: principais, label: "Pratos principais (prato no fogão)", widget: string, default: "Pratos principais" }
+              - { name: sobremesas, label: "Sobremesas (doce na bancada)", widget: string, default: "Sobremesas" }
+              - { name: datas, label: "Datas comemorativas (calendário)", widget: string, default: "Datas comemorativas" }
+              - { name: vegetarianas, label: "Vegetarianas (vaso de planta)", widget: string, default: "Vegetarianas" }
+              - { name: congelar, label: "Para congelar (freezer)", widget: string, default: "Para congelar" }
+              - { name: rapidas, label: "Receitas rápidas (relógio)", widget: string, default: "Receitas rápidas" }
+              - { name: todas, label: "Todas as receitas (livros)", widget: string, default: "Todas as receitas" }
+          - name: en
+            label: 🇬🇧 English
+            widget: object
+            fields:
+              - { name: principais, label: "Main dishes (plate on stove)", widget: string, default: "Main dishes" }
+              - { name: sobremesas, label: "Desserts (sweet on counter)", widget: string, default: "Desserts" }
+              - { name: datas, label: "Special occasions (calendar)", widget: string, default: "Special occasions" }
+              - { name: vegetarianas, label: "Vegetarian (plant pot)", widget: string, default: "Vegetarian" }
+              - { name: congelar, label: "To freeze (freezer)", widget: string, default: "To freeze" }
+              - { name: rapidas, label: "Quick recipes (clock)", widget: string, default: "Quick recipes" }
+              - { name: todas, label: "All recipes (books)", widget: string, default: "All recipes" }
+
       # ---------- RECADO (modal do post-it) ----------
       # Os recados ficam salvos no Cloudflare KV (lidos em /admin-recados/).
       # Não há envio de email automático — não precisa de email/subject/template.

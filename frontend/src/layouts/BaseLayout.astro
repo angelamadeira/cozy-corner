@@ -8,6 +8,7 @@ import enDict from '../i18n/en.json';
 // Os valores aqui SOBRESCREVEM os de pt.json/en.json — i18n vira fallback.
 import introContent from '../content/pages/intro.json';
 import hotspotContent from '../content/pages/cozinha.json';
+import categoryContent from '../content/pages/categorias.json';
 import recadoContent from '../content/pages/recado.json';
 import sobreContent from '../content/pages/sobre.json';
 
@@ -26,6 +27,7 @@ type LangContent = { pt?: Record<string, string>; en?: Record<string, string> };
 const sections: Record<string, LangContent> = {
   intro: introContent,
   hotspot: hotspotContent,
+  category: categoryContent,
   recado: recadoContent,
   sobre: sobreContent,
 };

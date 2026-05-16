@@ -1,0 +1,20 @@
+{
+  "pt": {
+    "principais": "Pratos principais",
+    "sobremesas": "Sobremesas",
+    "datas": "Datas comemorativas",
+    "vegetarianas": "Vegetarianas",
+    "congelar": "Para congelar",
+    "rapidas": "Receitas rápidas",
+    "todas": "Todas as receitas"
+  },
+  "en": {
+    "principais": "Main dishes",
+    "sobremesas": "Desserts",
+    "datas": "Special occasions",
+    "vegetarianas": "Vegetarian",
+    "congelar": "To freeze",
+    "rapidas": "Quick recipes",
+    "todas": "All recipes"
+  }
+}
