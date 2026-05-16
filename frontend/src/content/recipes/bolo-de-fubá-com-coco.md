@@ -26,11 +26,11 @@ ingredients:
 materials:
   - forma redonda com furo no meio
 steps:
+  - Unte com óleo e farinha de trigo uma forma redonda com furo.
   - No liquidificador, bata os ovos, o óleo, o leite e o açúcar.
   - Acrescente o fubá e a farinha de trigo peneirada. Misture levemente apenas
     para incorporar.
-  - Adicione o coco ralado e o fermento em pó. Misture e despeje numa forma
-    redonda com furo.
+  - Adicione o coco ralado e o fermento em pó. Misture e despeje na forma.
   - Asse em forno pré-aquecido a 180 graus por aproximadamente 35 a 40 minutos.
 published: true
 publishedAt: 2026-05-16T13:26:00.000-03:00
