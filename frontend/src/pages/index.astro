@@ -849,6 +849,21 @@ const countByCategory = Object.fromEntries(
       z-index: 200;
       overflow-y: auto;
       padding: var(--s-7) var(--s-6);
+      /* Bloqueia scroll chain pro body — sem isso, no iOS Safari quando
+         o user rola até o topo/fundo do drawer e continua puxando, a
+         página inteira embaixo se move (rubber band). overscroll-behavior:
+         contain impede o gesto de propagar. */
+      overscroll-behavior: contain;
+    }
+    /* Em mobile, trava o scroll vertical do body quando drawer aberto.
+       Sem isso, swipe vertical na área do drawer pode acionar pull-to-
+       refresh ou movimentar a página subjacente. */
+    @media (hover: none) and (pointer: coarse) {
+      body.drawer-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+      }
     }
     .cat-drawer.open { transform: translateX(0); }
 
