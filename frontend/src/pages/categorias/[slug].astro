@@ -105,11 +105,11 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
 
     {slug === 'todas' ? (
       <div class="filters filters-cats">
-        <span class="chip chip-active" data-cat="all" data-t="filter.all_categories">Todas</span>
+        <span class="chip chip-active" data-cat="all"><span data-t="filter.all_categories">Todas</span></span>
         {Object.entries(CATEGORY_META).map(([catSlug, meta]) => (
-          <span class="chip" data-cat={catSlug} data-t={`category.${catSlug}`}>
+          <span class="chip" data-cat={catSlug}>
             <Icon name={meta.icon} width={14} height={14} />
-            {meta.label.toLowerCase()}
+            <span data-t={`category.${catSlug}`}>{meta.label.toLowerCase()}</span>
           </span>
         ))}
       </div>
@@ -167,17 +167,28 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
               })()}
               <div class="info">
                 <h3 class="recipe-name">{r.data.title}</h3>
-                <p class="recipe-meta">
-                  <Icon name="ph:clock-thin" /> {r.data.time} <span data-t="meta.minutes">min</span>
-                  {r.data.servings && (
-                    <>
-                      <span class="sep">·</span>
-                      <Icon name="ph:fork-knife-thin" /> {r.data.servings} <span data-t="meta.servings_other">porções</span>
-                    </>
-                  )}
-                  <span class="sep">·</span>
-                  <Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${r.data.difficulty === 'fácil' ? 'easy' : r.data.difficulty === 'difícil' ? 'hard' : 'medium'}`}>{r.data.difficulty}</span>
-                </p>
+                {(() => {
+                  // Cada item de metadata vai dentro de um <span class="mi">.
+                  // Empacotar como um único flex item evita que whitespace
+                  // interno (entre icon/valor/label) vire flex items extras,
+                  // que somariam ao gap criando espaços fantasmas.
+                  const diffKey = r.data.difficulty === 'fácil' ? 'easy'
+                    : r.data.difficulty === 'difícil' ? 'hard' : 'medium';
+                  const items = [
+                    <span class="mi"><Icon name="ph:clock-thin" /> {r.data.time} <span data-t="meta.minutes">min</span></span>,
+                    r.data.servings ? (
+                      <span class="mi"><Icon name="ph:fork-knife-thin" /> {r.data.servings} <span data-t="meta.servings_other">porções</span></span>
+                    ) : null,
+                    <span class="mi"><Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${diffKey}`}>{r.data.difficulty}</span></span>,
+                  ].filter(Boolean);
+                  return (
+                    <p class="recipe-meta">
+                      {items.map((item, i) => (
+                        <>{i > 0 && <span class="sep">·</span>}{item}</>
+                      ))}
+                    </p>
+                  );
+                })()}
                 <p class="recipe-row-match" hidden></p>
               </div>
               <Icon name="ph:caret-right-thin" class="row-arrow" width={20} height={20} />
@@ -398,7 +409,18 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       font-size: var(--fs-meta);
       color: var(--ink-soft);
     }
-    .recipe-meta svg { vertical-align: -0.15em; margin-right: 2px; }
+    /* SVGs dos icones meta: garantia explícita de tamanho/display.
+       Sem `display: inline-block`, em alguns contextos (especialmente
+       quando o svg fica direto dentro de um .mi inline span), a largura
+       1em pode degenerar pra 0 e o icone some visualmente. */
+    .recipe-meta svg {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.15em;
+      margin-right: 2px;
+      flex: none;
+    }
     .recipe-meta .sep { opacity: 0.4; }
     /* Linha "em <ingrediente>" mostrada quando a busca casou num
        ingrediente/tag em vez do título. O conteúdo é injetado via JS
@@ -485,10 +507,13 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         scroll-snap-type: x proximity;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        /* Padding-right só pra dar respiro visual quando o user scrolla
-           até o fim — última chip não cola na borda direita do container. */
         padding-right: var(--s-4);
+        /* Affordance visual de "arrastável" — cursor grab. Vira grabbing
+           via JS quando o usuário está de fato arrastando. */
+        cursor: grab;
       }
+      .filters.dragging { cursor: grabbing; }
+      .filters.dragging .chip { pointer-events: none; }
       .filters::-webkit-scrollbar { display: none; }
       .filters .chip {
         flex: 0 0 auto;
@@ -653,6 +678,67 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
         activeCat = chip.dataset.cat || 'all';
         applyFilters();
       });
+    });
+
+    // No viewport onde a faixa de filtros vira trilho horizontal (mobile/
+    // tablet em modo responsivo), adiciona dois inputs de scroll que não
+    // funcionam nativamente:
+    //   1. Wheel: traduz deltaY (scroll vertical do mouse) → scrollLeft.
+    //   2. Click-and-drag: arrastar com mouse rola o trilho.
+    // Ambos só atuam quando o trilho está de fato em modo overflow (mobile),
+    // detectado por scrollWidth > clientWidth. Em desktop com wrap em 2
+    // linhas, scrollWidth == clientWidth e os handlers se omitem.
+    document.querySelectorAll<HTMLElement>('.filters').forEach((track) => {
+      // ---- wheel (vertical → horizontal) ----
+      track.addEventListener('wheel', (e) => {
+        if (track.scrollWidth <= track.clientWidth) return;
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+        e.preventDefault();
+        track.scrollLeft += e.deltaY;
+      }, { passive: false });
+
+      // ---- click-and-drag ----
+      let isDown = false;
+      let startX = 0;
+      let startScrollLeft = 0;
+      let movedDistance = 0;  // pra detectar drag vs click
+
+      track.addEventListener('mousedown', (e) => {
+        if (track.scrollWidth <= track.clientWidth) return;
+        // Só botão esquerdo
+        if (e.button !== 0) return;
+        isDown = true;
+        movedDistance = 0;
+        startX = e.pageX;
+        startScrollLeft = track.scrollLeft;
+        track.classList.add('dragging');
+      });
+
+      // mousemove/up no document pra capturar mesmo se o cursor sai do trilho
+      document.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const dx = e.pageX - startX;
+        movedDistance = Math.abs(dx);
+        track.scrollLeft = startScrollLeft - dx;
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        track.classList.remove('dragging');
+      });
+
+      // Previne click acidental num chip depois de um drag (sem isso, soltar
+      // o mouse em cima de um chip ativaria o filtro mesmo se a intenção
+      // era apenas arrastar).
+      track.addEventListener('click', (e) => {
+        if (movedDistance > 5) {
+          e.preventDefault();
+          e.stopPropagation();
+          movedDistance = 0;
+        }
+      }, true);
     });
   </script>
 </BaseLayout>

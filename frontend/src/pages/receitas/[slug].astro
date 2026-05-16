@@ -123,23 +123,31 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     <section class="titlebar">
       <h1 class="recipe-title">{data.title}</h1>
       <div class="meta-row">
-        <p class="recipe-meta">
-          <Icon name="ph:clock-thin" /> {data.time} <span data-t="meta.minutes">min</span>
-          {data.servings && (
-            <>
-              <span class="sep">·</span>
-              <Icon name="ph:fork-knife-thin" /> <span id="meta-servings">{data.servings}</span> <span data-t="meta.servings_other">porções</span>
-            </>
-          )}
-          <span class="sep">·</span>
-          <Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${data.difficulty === 'fácil' ? 'easy' : data.difficulty === 'difícil' ? 'hard' : 'medium'}`}>{data.difficulty}</span>
-          {data.tags.includes('vegetariana') && (
-            <>
-              <span class="sep">·</span>
-              <Icon name="ph:plant-thin" /> <span data-t="meta.vegetarian">vegetariana</span>
-            </>
-          )}
-        </p>
+        {(() => {
+          // Cada item de metadata vai dentro de um <span class="mi">. Empacotar
+          // como um único flex item evita que whitespace interno (entre icon/
+          // valor/label) vire flex items extras, que somariam ao gap criando
+          // espaços fantasmas em torno dos números.
+          const diffKey = data.difficulty === 'fácil' ? 'easy'
+            : data.difficulty === 'difícil' ? 'hard' : 'medium';
+          const items = [
+            <span class="mi"><Icon name="ph:clock-thin" /> {data.time} <span data-t="meta.minutes">min</span></span>,
+            data.servings ? (
+              <span class="mi"><Icon name="ph:fork-knife-thin" /> <span id="meta-servings">{data.servings}</span> <span data-t="meta.servings_other">porções</span></span>
+            ) : null,
+            <span class="mi"><Icon name="ph:gauge-thin" /> <span data-t={`meta.difficulty_${diffKey}`}>{data.difficulty}</span></span>,
+            data.tags.includes('vegetariana') ? (
+              <span class="mi"><Icon name="ph:plant-thin" /> <span data-t="meta.vegetarian">vegetariana</span></span>
+            ) : null,
+          ].filter(Boolean);
+          return (
+            <p class="recipe-meta">
+              {items.map((item, i) => (
+                <>{i > 0 && <span class="sep">·</span>}{item}</>
+              ))}
+            </p>
+          );
+        })()}
         <p class="recipe-added">
           <Icon name="ph:calendar-thin" /> <span data-t="meta.added_on_prefix">adicionada em</span> <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
         </p>

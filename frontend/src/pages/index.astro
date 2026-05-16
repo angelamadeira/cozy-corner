@@ -727,10 +727,14 @@ const countByCategory = Object.fromEntries(
       transition: right 0.45s var(--ease-out);
     }
 
-    /* Tooltip flutuante — alinhado ao DS */
+    /* Tooltip flutuante — alinhado ao DS.
+       --clamp-x: deslocamento horizontal aplicado em runtime pelo JS quando
+       o tooltip extrapola a viewport (pra trazer ele de volta pra dentro
+       sem afetar o ponto de "ancoragem" lógico). Default 0. */
     .kitchen-tooltip {
+      --clamp-x: 0px;
       position: fixed;
-      transform: translate(-50%, -100%) translateY(calc(-1 * var(--s-3)));
+      transform: translate(-50%, -100%) translate(var(--clamp-x), calc(-1 * var(--s-3)));
       background: var(--ink);
       color: var(--bg);
       font-family: var(--font-mono);
@@ -746,13 +750,25 @@ const countByCategory = Object.fromEntries(
       transition: opacity var(--dur-base) var(--ease-out);
       z-index: 300;
     }
+    /* Seta padrão: aponta pra baixo (tooltip ESTÁ acima do hotspot).
+       Quando .flip-down é aplicado (tooltip foi pra baixo), espelha tudo:
+       transform inverte o Y, e a seta migra pro topo apontando pra cima. */
     .kitchen-tooltip::after {
       content: '';
       position: absolute;
       top: 100%; left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(calc(-50% - var(--clamp-x)));
       border: 6px solid transparent;
       border-top-color: var(--ink);
+    }
+    .kitchen-tooltip.flip-down {
+      transform: translate(-50%, 0) translate(var(--clamp-x), var(--s-3));
+    }
+    .kitchen-tooltip.flip-down::after {
+      top: auto;
+      bottom: 100%;
+      border-top-color: transparent;
+      border-bottom-color: var(--ink);
     }
     .kitchen-tooltip.show { opacity: 1; }
     /* Em dispositivos sem hover (touch — celular/tablet), esconde o tooltip.
@@ -1470,9 +1486,48 @@ const countByCategory = Object.fromEntries(
     function showTooltipAt(g: Element, text: string, pinMs = 0) {
       const rect = g.getBoundingClientRect();
       tooltip.textContent = text;
+      // Posição inicial: centrado horizontalmente no hotspot, alinhado ao topo
+      // do hotspot. O CSS translate(-50%, -100%) já move pra cima da posição.
       tooltip.style.left = `${rect.left + rect.width / 2}px`;
       tooltip.style.top = `${rect.top}px`;
+      // Reset modificadores antes de medir
+      tooltip.classList.remove('flip-down');
+      tooltip.style.removeProperty('--clamp-x');
       tooltip.classList.add('show');
+      // rAF pra que o browser aplique posição/conteúdo antes da medição
+      requestAnimationFrame(() => {
+        const tipRect = tooltip.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const margin = 8;  // respiro mínimo das bordas
+        // ---- horizontal clamping ----
+        // Se o tooltip ultrapassa borda esquerda ou direita, "puxa" via
+        // --clamp-x (translateX adicional pra trazer ele de volta pro
+        // viewport, sem mexer no center do hotspot).
+        let dx = 0;
+        if (tipRect.left < margin) dx = margin - tipRect.left;
+        else if (tipRect.right > vw - margin) dx = (vw - margin) - tipRect.right;
+        if (dx !== 0) tooltip.style.setProperty('--clamp-x', `${dx}px`);
+        // ---- vertical flip ----
+        // Se não cabe acima (clipado no topo do viewport), inverte pra baixo
+        // do hotspot. CSS .flip-down troca translateY e a posição da seta.
+        if (tipRect.top < margin) {
+          tooltip.classList.add('flip-down');
+          tooltip.style.top = `${rect.bottom}px`;
+          // Re-mede e re-clampea horizontalmente após o flip (a largura não
+          // muda, mas garante consistência)
+          requestAnimationFrame(() => {
+            const r2 = tooltip.getBoundingClientRect();
+            let dx2 = 0;
+            if (r2.left < margin) dx2 = margin - r2.left;
+            else if (r2.right > vw - margin) dx2 = (vw - margin) - r2.right;
+            if (dx2 !== dx) tooltip.style.setProperty('--clamp-x', `${dx2}px`);
+          });
+        } else if (tipRect.bottom > vh - margin) {
+          // Caso raro: clipado embaixo (hotspot no fim do viewport com tooltip
+          // já em cima dele). Não há muito o que fazer além de não piorar.
+        }
+      });
       window.clearTimeout(tooltipPinTimer);
       if (pinMs > 0) {
         tooltip.dataset.pinned = '1';
