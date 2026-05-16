@@ -13,11 +13,23 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
+// Helper: aceita arrays de string OU de objects {item: string}, normaliza pra
+// array de strings. Usado pros campos PT e EN de listas (ingredients, etc.).
+const listOfStrings = z.array(z.union([z.string(), z.object({ item: z.string() })]))
+  .default([])
+  .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item));
+
 const recipes = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/recipes' }),
   schema: z.object({
     title: z.string(),
+    // Campos `*_en` são preenchidos automaticamente pela GitHub Action
+    // .github/workflows/translate-recipes.yml (DeepL API). Você pode editar
+    // manualmente no Decap pra ajustar a tradução — a Action respeita campos
+    // já preenchidos e só completa o que faltar.
+    title_en: z.string().optional(),
     description: z.string().optional(),
+    description_en: z.string().optional(),
     // Categoria(s): aceita string OU array. Sempre normaliza pra array,
     // assim consumidores podem fazer .includes(slug) sem se preocupar com forma.
     // A primeira categoria é considerada a "principal" (usada como back link
@@ -46,22 +58,21 @@ const recipes = defineCollection({
       src: z.string().optional(),
       url: z.string().optional(),
       alt: z.string().optional(),
+      alt_en: z.string().optional(),
       cover: z.boolean().optional(),
     }).transform(m => ({ ...m, src: m.url || m.src || '' })))
       .default([]),
     // Aceita tanto formato legado (array de strings) quanto novo do Decap
     // com `field` definido (array de objetos { item: string }). Normaliza
     // pra array de strings no transform.
-    ingredients: z.array(z.union([z.string(), z.object({ item: z.string() })]))
-      .default([])
-      .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item)),
-    materials: z.array(z.union([z.string(), z.object({ item: z.string() })]))
-      .default([])
-      .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item)),
-    steps: z.array(z.union([z.string(), z.object({ item: z.string() })]))
-      .default([])
-      .transform(arr => arr.map(x => typeof x === 'string' ? x : x.item)),
+    ingredients: listOfStrings,
+    ingredients_en: listOfStrings,
+    materials: listOfStrings,
+    materials_en: listOfStrings,
+    steps: listOfStrings,
+    steps_en: listOfStrings,
     notes: z.string().optional(),
+    notes_en: z.string().optional(),
     published: z.boolean().default(true),
     publishedAt: z.coerce.date(),
     lang: z.string().default('pt-br'),

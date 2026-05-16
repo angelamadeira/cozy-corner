@@ -119,6 +119,36 @@ collections:
         default: pt-br
         options: [pt-br] # adicionar 'en' quando habilitar EN
       - { name: body, label: "Markdown adicional (opcional)", widget: markdown, required: false }
+      # ---------- 🇬🇧 ENGLISH (auto-traduzido) ----------
+      # Esses campos são preenchidos automaticamente pela GitHub Action
+      # `translate-recipes.yml` (DeepL). Você pode editar pra ajustar a
+      # tradução — a Action respeita campos já preenchidos e só completa
+      # o que estiver vazio.
+      - name: title_en
+        label: "🇬🇧 Title (auto)"
+        widget: string
+        required: false
+        hint: "Auto-traduzido. Edite pra refinar."
+      - name: description_en
+        label: "🇬🇧 Description (auto)"
+        widget: text
+        required: false
+      - name: ingredients_en
+        label: "🇬🇧 Ingredients (auto)"
+        widget: list
+        required: false
+        field: { name: item, label: Ingredient, widget: string }
+      - name: materials_en
+        label: "🇬🇧 Tools (auto)"
+        widget: list
+        required: false
+        field: { name: item, label: Tool, widget: string }
+      - name: steps_en
+        label: "🇬🇧 Steps (auto)"
+        widget: list
+        required: false
+        field: { name: item, label: Step, widget: text }
+      - { name: notes_en, label: "🇬🇧 Notes (auto)", widget: text, required: false }
 
   # ====================== PÁGINAS / TEXTOS ======================
   # Cada arquivo aqui tem campos em PT e EN. O i18n do site lê desses

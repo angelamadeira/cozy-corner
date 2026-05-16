@@ -1,0 +1,82 @@
+name: Translate recipes
+
+# Roda toda vez que uma receita PT é modificada em main (incluindo commits
+# automáticos do Decap CMS). O script traduz só campos `*_en` que estão
+# vazios — é idempotente, então roda commits seguidos sem efeito colateral.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/src/content/recipes/**.md'
+
+# Permissions: write pra commitar de volta os arquivos com traduções.
+permissions:
+  contents: write
+
+# Concurrency: cancela runs antigos se um novo commit chega. Evita corrida
+# de commits sobrepostos.
+concurrency:
+  group: translate-recipes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    # Evita loop infinito: se o commit já é do bot da própria action
+    # (mensagem específica), não roda de novo.
+    if: "!contains(github.event.head_commit.message, '[skip translate]')"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Precisa do histórico pra git diff
+          fetch-depth: 2
+          # Token padrão funciona pra push em main neste repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps (gray-matter)
+        run: |
+          npm init -y > /dev/null
+          npm install gray-matter --no-save
+
+      - name: Detect changed recipe files
+        id: changed
+        run: |
+          # Pega arquivos .md modificados ou adicionados em frontend/src/content/recipes/
+          FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'frontend/src/content/recipes/*.md' || true)
+          if [ -z "$FILES" ]; then
+            echo "Nenhum arquivo de receita alterado, saindo."
+            echo "files=" >> $GITHUB_OUTPUT
+          else
+            echo "Arquivos alterados:"
+            echo "$FILES"
+            # Junta em uma linha (separado por espaço) pra passar pro script
+            FILES_LINE=$(echo "$FILES" | tr '\n' ' ')
+            echo "files=$FILES_LINE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Translate
+        if: steps.changed.outputs.files != ''
+        env:
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+        run: |
+          node scripts/translate-recipes.mjs ${{ steps.changed.outputs.files }}
+
+      - name: Commit translations
+        if: steps.changed.outputs.files != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Se nada mudou, ignora
+          if git diff --quiet; then
+            echo "Nenhuma tradução nova pra commitar."
+            exit 0
+          fi
+          git add frontend/src/content/recipes/
+          git commit -m "Auto-translate: campos EN preenchidos via DeepL [skip translate]"
+          git push
