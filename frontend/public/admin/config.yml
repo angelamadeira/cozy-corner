@@ -176,14 +176,13 @@ collections:
               - { name: dark_mode_off, label: "Switch — light on → turn off", widget: string, default: "Care to turn off the light?" }
 
       # ---------- RECADO (modal do post-it) ----------
+      # Os recados ficam salvos no Cloudflare KV (lidos em /admin-recados/).
+      # Não há envio de email automático — não precisa de email/subject/template.
       - name: recado
         label: 💌 Recado (post-it)
         file: frontend/src/content/pages/recado.json
         format: json
         fields:
-          - { name: email, label: "Email pra onde os recados vão", widget: string, default: "angelmadeira@gmail.com" }
-          - { name: emailSubject, label: "Assunto padrão do email", widget: string, default: "Recado do Cozy Corner" }
-          - { name: emailTemplate, label: "Template do corpo do email", widget: text, default: "Oi Gigi, sou {nome}.\n\n{mensagem}", hint: "Use {nome} e {mensagem} pra inserir o que o visitante digitou." }
           - name: pt
             label: 🇧🇷 Português
             widget: object

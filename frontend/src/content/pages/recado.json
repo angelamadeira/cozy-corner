@@ -1,7 +1,4 @@
 {
-  "email": "angelmadeira@gmail.com",
-  "emailSubject": "Recado do Cozy Corner",
-  "emailTemplate": "Oi Gigi, sou {nome}.\n\n{mensagem}",
   "pt": {
     "title": "Deixa um recado",
     "subtitle": "ou só um oi mesmo",

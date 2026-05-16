@@ -1,12 +1,12 @@
 {
   "pt": {
-    "hello": "olá!",
+    "hello": "...oi!",
     "welcome": "que bom te ver por aqui :)",
     "skip": "pular intro"
   },
   "en": {
-    "hello": "hello!",
-    "welcome": "happy to see you here :)",
+    "hello": "...hey!",
+    "welcome": "so happy to see you here :)",
     "skip": "skip intro"
   }
 }
