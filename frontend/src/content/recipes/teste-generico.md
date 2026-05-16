@@ -35,7 +35,6 @@ notes: ''
 published: true
 publishedAt: 2026-05-15T16:53:00.000Z
 lang: pt-br
-title_en: White cake dough
 description_en: I always use this dough for birthday cakes! It's super fluffy and structured.
 ingredients_en:
   - 5 eggs
