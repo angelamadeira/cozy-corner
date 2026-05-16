@@ -201,6 +201,7 @@ const countByCategory = Object.fromEntries(
             id: r.id,                  // mantido por compat — não usado em URLs
             slug: recipeSlug(r),       // URL slug derivado do título (ver lib/slug.ts)
             title: r.data.title,
+            titleEn: r.data.title_en || '',  // versão EN pro toggle de idioma
             // Campos pré-normalizados (lowercase) usados pela busca dentro
             // do drawer da cozinha. Manter aqui evita ter que normalizar
             // toda string no client a cada keystroke.
@@ -1394,14 +1395,26 @@ const countByCategory = Object.fromEntries(
             return t.includes(q) || d.includes(q) || i.includes(q) || g.includes(q);
           })
         : all;
+      // Idioma atual pra escolher título PT vs EN nas linhas de receita.
+      const curLang = (window as any).__COZY_LANG === 'en' ? 'en' : 'pt';
+      const displayTitle = (r: any) => (curLang === 'en' && r.titleEn) ? r.titleEn : r.title;
+      // Labels do meta vêm do i18n (já traduzidos quando o user troca idioma)
+      const lblMin = T('meta.minutes') || 'min';
+      const lblServings = T('meta.servings_other') || 'porções';
+      const diffLabel = (d: string) => {
+        const k = d === 'fácil' ? 'easy' : d === 'difícil' ? 'hard' : 'medium';
+        return T('meta.difficulty_' + k) || d;
+      };
       catResults.innerHTML = recipes.map((r: any) => {
+        const titlePT = r.title;
+        const titleNow = displayTitle(r);
         const thumb = r.cover
-          ? `<div class="recipe-thumb has-img"><img src="${escAttr(r.cover)}" alt="${escAttr(r.coverAlt || r.title)}" loading="lazy" /></div>`
+          ? `<div class="recipe-thumb has-img"><img src="${escAttr(r.cover)}" alt="${escAttr(r.coverAlt || titleNow)}" loading="lazy" /></div>`
           : `<div class="recipe-thumb">foto</div>`;
         // Se a busca casou no título, só destaca o título. Senão mostra
         // ingrediente/tag que bateu numa linha extra abaixo do meta.
         const titleHit = q && normalizeSearch(r.searchTitle || '').includes(q);
-        const titleHtml = titleHit ? highlightMatch(r.title, q) : escHtml(r.title);
+        const titleHtml = titleHit ? highlightMatch(titleNow, q) : escHtml(titleNow);
         let matchLine = '';
         if (q && !titleHit) {
           const ctx = findMatchContext(r, q);
@@ -1412,7 +1425,7 @@ const countByCategory = Object.fromEntries(
             matchLine = `<div class="recipe-row-match">${escHtml(inLabel)} ${highlightMatch(ctx.text, q)}</div>`;
           }
         }
-        const meta = [`${r.time} min`, r.servings ? `${r.servings} porções` : null, r.difficulty].filter(Boolean).join(' · ');
+        const meta = [`${r.time} ${lblMin}`, r.servings ? `${r.servings} ${lblServings}` : null, diffLabel(r.difficulty)].filter(Boolean).join(' · ');
         return `
         <li>
           <a href="/receitas/${r.slug}/">
@@ -1458,6 +1471,13 @@ const countByCategory = Object.fromEntries(
     drawerSearchInput?.addEventListener('input', () => {
       if (!currentCategoryKey) return;
       renderRecipeList(currentCategoryKey, drawerSearchInput.value);
+    });
+
+    // Re-renderiza o drawer quando o user troca o idioma (atualiza títulos
+    // PT↔EN e labels do meta).
+    document.addEventListener('cozy-lang-changed', () => {
+      if (!currentCategoryKey) return;
+      renderRecipeList(currentCategoryKey, drawerSearchInput?.value || '');
     });
 
     function openRecado() {
