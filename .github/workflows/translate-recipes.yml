@@ -7,7 +7,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'frontend/src/content/recipes/**.md'
+      - 'frontend/src/content/recipes/**/*.md'
+      - 'frontend/src/content/recipes/*.md'
+  # Permite rodar manualmente via UI do GitHub Actions
+  workflow_dispatch:
 
 # Permissions: write pra commitar de volta os arquivos com traduções.
 permissions:
