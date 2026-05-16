@@ -1,5 +1,12 @@
 {
-  "phrase1": "olá!",
-  "phrase2": "que bom te ver por aqui :)",
-  "skipLabel": "pular intro ✕"
+  "pt": {
+    "hello": "olá!",
+    "welcome": "que bom te ver por aqui :)",
+    "skip": "pular intro"
+  },
+  "en": {
+    "hello": "hello!",
+    "welcome": "happy to see you here :)",
+    "skip": "skip intro"
+  }
 }

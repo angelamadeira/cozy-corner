@@ -3,6 +3,13 @@ import '../styles/global.css';
 import siteData from '../content/pages/site.json';
 import ptDict from '../i18n/pt.json';
 import enDict from '../i18n/en.json';
+// Conteúdo editável pelo Decap. Cada arquivo é { pt: {...}, en: {...} }
+// e mergea pra dentro do dict do i18n no build, sob um namespace.
+// Os valores aqui SOBRESCREVEM os de pt.json/en.json — i18n vira fallback.
+import introContent from '../content/pages/intro.json';
+import hotspotContent from '../content/pages/cozinha.json';
+import recadoContent from '../content/pages/recado.json';
+import sobreContent from '../content/pages/sobre.json';
 
 interface Props {
   title?: string;
@@ -12,6 +19,25 @@ interface Props {
 
 const { title, description, lang = 'pt-br' } = Astro.props;
 const pageTitle = title ? `${title} · ${siteData.title}` : siteData.title;
+
+// Merge per-section content em pt/en dicts sob seu namespace correspondente.
+// Ex: intro.json.pt.hello → ptDict.intro.hello (sobrescreve se já existir).
+type LangContent = { pt?: Record<string, string>; en?: Record<string, string> };
+const sections: Record<string, LangContent> = {
+  intro: introContent,
+  hotspot: hotspotContent,
+  recado: recadoContent,
+  sobre: sobreContent,
+};
+function mergeContent(dict: any, code: 'pt' | 'en') {
+  for (const [ns, data] of Object.entries(sections)) {
+    const langData = data?.[code];
+    if (!langData) continue;
+    dict[ns] = { ...(dict[ns] || {}), ...langData };
+  }
+}
+mergeContent(ptDict, 'pt');
+mergeContent(enDict, 'en');
 
 // Serializa dicionários pro client-side runtime
 const dictsJson = JSON.stringify({ pt: ptDict, en: enDict });

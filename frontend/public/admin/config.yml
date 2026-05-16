@@ -121,43 +121,130 @@ collections:
       - { name: body, label: "Markdown adicional (opcional)", widget: markdown, required: false }
 
   # ====================== PÁGINAS / TEXTOS ======================
+  # Cada arquivo aqui tem campos em PT e EN. O i18n do site lê desses
+  # JSONs e sobrescreve o pt.json/en.json default — então mudanças aqui
+  # aparecem direto no site após o deploy.
   - name: pages
     label: "Páginas (textos do site)"
     files:
+      # ---------- INTRO (boas-vindas com typewriter) ----------
       - name: intro
-        label: 🟦 Intro
+        label: 🟦 Intro (boas-vindas)
         file: frontend/src/content/pages/intro.json
         format: json
         fields:
-          - { name: phrase1, label: "Frase 1 (typewriter)", widget: string, default: "olá!" }
-          - { name: phrase2, label: "Frase 2 (typewriter)", widget: string, default: "que bom te ver por aqui :)" }
-          - { name: skipLabel, label: "Texto do botão pular", widget: string, default: "pular intro ✕" }
+          - name: pt
+            label: 🇧🇷 Português
+            widget: object
+            fields:
+              - { name: hello, label: "Frase 1 (typewriter)", widget: string, default: "olá!" }
+              - { name: welcome, label: "Frase 2 (typewriter)", widget: string, default: "que bom te ver por aqui :)" }
+              - { name: skip, label: "Texto do botão pular", widget: string, default: "pular intro" }
+          - name: en
+            label: 🇬🇧 English
+            widget: object
+            fields:
+              - { name: hello, label: "Phrase 1 (typewriter)", widget: string, default: "hello!" }
+              - { name: welcome, label: "Phrase 2 (typewriter)", widget: string, default: "happy to see you here :)" }
+              - { name: skip, label: "Skip button text", widget: string, default: "skip intro" }
 
+      # ---------- COZINHA — tooltips dos hotspots + balão do Akim ----------
       - name: cozinha
-        label: 🍳 Cozinha — labels dos hotspots
+        label: 🍳 Cozinha — tooltips dos hotspots
         file: frontend/src/content/pages/cozinha.json
         format: json
         fields:
-          - { name: labelVaso, label: "Vaso → Vegetarianas", widget: string, default: "Vegetarianas" }
-          - { name: labelLivros, label: "Livros → Todas", widget: string, default: "Todas as receitas" }
-          - { name: labelRelogio, label: "Relógio → Rápidas", widget: string, default: "Receitas rápidas" }
-          - { name: labelFreezer, label: "Freezer → Congelar", widget: string, default: "Para congelar" }
-          - { name: labelCalendario, label: "Calendário → Datas", widget: string, default: "Datas comemorativas" }
-          - { name: labelPostit, label: "Post-it → Recado", widget: string, default: "Deixe seu recado" }
-          - { name: labelPrato, label: "Prato → Principais", widget: string, default: "Pratos principais" }
-          - { name: labelDoce, label: "Doce → Sobremesas", widget: string, default: "Sobremesas" }
+          - name: pt
+            label: 🇧🇷 Português
+            widget: object
+            fields:
+              - { name: recado, label: "Post-it (deixar recado)", widget: string, default: "Deixar um recadinho" }
+              - { name: sobre, label: "Foto na parede (sobre nós)", widget: string, default: "Nossa cozinha" }
+              - { name: vegetarianas, label: "Vaso (vegetarianas)", widget: string, default: "vegetarianas" }
+              - { name: akim_meow, label: "Akim — balão de fala (clique no gato)", widget: string, default: "miau 🐱" }
+              - { name: dark_mode_on, label: "Interruptor — luz apagada → acender", widget: string, default: "Que tal acender a luz?" }
+              - { name: dark_mode_off, label: "Interruptor — luz acesa → apagar", widget: string, default: "Que tal apagar a luz?" }
+          - name: en
+            label: 🇬🇧 English
+            widget: object
+            fields:
+              - { name: recado, label: "Post-it (leave a note)", widget: string, default: "Leave a little note" }
+              - { name: sobre, label: "Wall photo (about us)", widget: string, default: "Our kitchen" }
+              - { name: vegetarianas, label: "Plant (vegetarian)", widget: string, default: "vegetarian" }
+              - { name: akim_meow, label: "Akim — speech bubble (click the cat)", widget: string, default: "meow 🐱" }
+              - { name: dark_mode_on, label: "Switch — light off → turn on", widget: string, default: "Care to turn on the light?" }
+              - { name: dark_mode_off, label: "Switch — light on → turn off", widget: string, default: "Care to turn off the light?" }
 
+      # ---------- RECADO (modal do post-it) ----------
       - name: recado
         label: 💌 Recado (post-it)
         file: frontend/src/content/pages/recado.json
         format: json
         fields:
-          - { name: title, label: Título, widget: string, default: "Deixe seu recado" }
-          - { name: subtitle, label: Subtítulo, widget: string, default: "manda um oi, dúvida ou sugestão de receita 💌" }
           - { name: email, label: "Email pra onde os recados vão", widget: string, default: "angelmadeira@gmail.com" }
           - { name: emailSubject, label: "Assunto padrão do email", widget: string, default: "Recado do Cozy Corner" }
           - { name: emailTemplate, label: "Template do corpo do email", widget: text, default: "Oi Gigi, sou {nome}.\n\n{mensagem}", hint: "Use {nome} e {mensagem} pra inserir o que o visitante digitou." }
+          - name: pt
+            label: 🇧🇷 Português
+            widget: object
+            fields:
+              - { name: title, label: "Título do modal", widget: string, default: "Deixa um recado" }
+              - { name: subtitle, label: "Subtítulo", widget: string, default: "ou só um oi mesmo" }
+              - { name: name_label, label: "Label do campo nome", widget: string, default: "seu nome" }
+              - { name: email_label, label: "Label do campo email", widget: string, default: "seu email" }
+              - { name: message_label, label: "Label do campo mensagem", widget: string, default: "mensagem" }
+              - { name: placeholder, label: "Placeholder da mensagem", widget: string, default: "oi Gigi!" }
+              - { name: send, label: "Botão enviar", widget: string, default: "enviar" }
+              - { name: sending, label: "Texto enquanto envia", widget: string, default: "enviando..." }
+              - { name: sent, label: "Mensagem de sucesso", widget: string, default: "obrigada pelo recado! 💛" }
+              - { name: empty, label: "Erro — mensagem vazia", widget: string, default: "escreve a mensagem antes de enviar :)" }
+              - { name: email_invalid, label: "Erro — email inválido", widget: string, default: "coloca um email válido pra eu poder responder :)" }
+              - { name: error, label: "Erro genérico", widget: string, default: "ops, algo deu errado" }
+          - name: en
+            label: 🇬🇧 English
+            widget: object
+            fields:
+              - { name: title, label: "Modal title", widget: string, default: "Leave a note" }
+              - { name: subtitle, label: "Subtitle", widget: string, default: "or just say hi" }
+              - { name: name_label, label: "Name field label", widget: string, default: "your name" }
+              - { name: email_label, label: "Email field label", widget: string, default: "your email" }
+              - { name: message_label, label: "Message field label", widget: string, default: "message" }
+              - { name: placeholder, label: "Message placeholder", widget: string, default: "hi Gigi!" }
+              - { name: send, label: "Send button", widget: string, default: "send" }
+              - { name: sending, label: "Text while sending", widget: string, default: "sending..." }
+              - { name: sent, label: "Success message", widget: string, default: "thanks for the note! 💛" }
+              - { name: empty, label: "Error — empty message", widget: string, default: "type a message before sending :)" }
+              - { name: email_invalid, label: "Error — invalid email", widget: string, default: "drop a valid email so I can reply :)" }
+              - { name: error, label: "Generic error", widget: string, default: "oops, something went wrong" }
 
+      # ---------- SOBRE / NOSSA COZINHA (drawer com foto + texto) ----------
+      - name: sobre
+        label: 🏡 Nossa cozinha (sobre)
+        file: frontend/src/content/pages/sobre.json
+        format: json
+        fields:
+          - name: pt
+            label: 🇧🇷 Português
+            widget: object
+            fields:
+              - { name: title, label: "Título do drawer", widget: string, default: "Oi, tudo bem?" }
+              - { name: photo_alt, label: "Descrição da foto (acessibilidade)", widget: string, default: "Foto da Gigi com o marido" }
+              - { name: p1, label: "Parágrafo 1", widget: text }
+              - { name: p2, label: "Parágrafo 2", widget: text }
+              - { name: p3, label: "Parágrafo 3", widget: text }
+              - { name: p4, label: "Parágrafo 4", widget: text }
+          - name: en
+            label: 🇬🇧 English
+            widget: object
+            fields:
+              - { name: title, label: "Drawer title", widget: string, default: "Hi, how are you?" }
+              - { name: photo_alt, label: "Photo description (accessibility)", widget: string, default: "Photo of Gigi and her husband" }
+              - { name: p1, label: "Paragraph 1", widget: text }
+              - { name: p2, label: "Paragraph 2", widget: text }
+              - { name: p3, label: "Paragraph 3", widget: text }
+              - { name: p4, label: "Paragraph 4", widget: text }
+
+      # ---------- CONFIGURAÇÃO GERAL ----------
       - name: site
         label: ⚙️ Configuração geral
         file: frontend/src/content/pages/site.json

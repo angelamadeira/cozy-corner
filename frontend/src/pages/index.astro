@@ -5,8 +5,10 @@ import { getCollection } from 'astro:content';
 import { CATEGORY_META } from '../lib/categories';
 import { recipeSlug } from '../lib/slug';
 import introData from '../content/pages/intro.json';
-import cozinhaData from '../content/pages/cozinha.json';
 import recadoData from '../content/pages/recado.json';
+// Nota: cozinha.json e sobre.json são consumidos via i18n (merge no
+// BaseLayout). Não precisa importar aqui — basta usar data-t="hotspot.*"
+// / data-t="sobre.*" nos elementos.
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -40,7 +42,7 @@ const countByCategory = Object.fromEntries(
   <!-- ===================== INTRO COVER (azul escuro, typewriter) ===================== -->
   <div class="intro-cover" id="intro-cover">
     <button class="cover-skip" id="cover-skip" type="button">
-      <span data-t="intro.skip">{introData.skipLabel.replace(' ✕', '')}</span>
+      <span data-t="intro.skip">{introData.pt.skip}</span>
       <Icon name="ph:x-thin" width={14} height={14} />
     </button>
     <p class="phrase typewriter" id="ph1"></p>
@@ -162,8 +164,8 @@ const countByCategory = Object.fromEntries(
     <button class="drawer-close" data-close type="button" aria-label="fechar">
       <Icon name="ph:x-thin" width={20} height={20} />
     </button>
-    <h2 id="recado-title" class="recado-title" data-t="recado.title">{recadoData.title}</h2>
-    <p class="recado-sub" data-t="recado.subtitle">{recadoData.subtitle}</p>
+    <h2 id="recado-title" class="recado-title" data-t="recado.title">{recadoData.pt.title}</h2>
+    <p class="recado-sub" data-t="recado.subtitle">{recadoData.pt.subtitle}</p>
     <label class="field-label" data-t="recado.name_label">seu nome</label>
     <input class="field-input" id="r-name" type="text" />
     <label class="field-label" data-t="recado.email_label">seu email</label>

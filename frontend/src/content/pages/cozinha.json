@@ -1,10 +1,18 @@
 {
-  "labelVaso": "Vegetarianas",
-  "labelLivros": "Todas as receitas",
-  "labelRelogio": "Receitas rápidas",
-  "labelFreezer": "Para congelar",
-  "labelCalendario": "Datas comemorativas",
-  "labelPostit": "Deixe seu recado",
-  "labelPrato": "Pratos principais",
-  "labelDoce": "Sobremesas"
+  "pt": {
+    "recado": "Deixar um recadinho",
+    "sobre": "Nossa cozinha",
+    "vegetarianas": "vegetarianas",
+    "akim_meow": "miau 🐱",
+    "dark_mode_on": "Que tal acender a luz?",
+    "dark_mode_off": "Que tal apagar a luz?"
+  },
+  "en": {
+    "recado": "Leave a little note",
+    "sobre": "Our kitchen",
+    "vegetarianas": "vegetarian",
+    "akim_meow": "meow 🐱",
+    "dark_mode_on": "Care to turn on the light?",
+    "dark_mode_off": "Care to turn off the light?"
+  }
 }
