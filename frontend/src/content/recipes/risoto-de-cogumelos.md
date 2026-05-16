@@ -4,6 +4,7 @@ description: Perfeito para vender, dar de presente ou fazer com antecedência,
   fica fresco por até 3 dias sem precisar de geladeira. Sucesso!
 category:
   - sobremesas
+  - congelar
 time: 60
 servings: 1
 difficulty: médio
