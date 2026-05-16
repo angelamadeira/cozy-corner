@@ -699,23 +699,42 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
     function wireChip(chips: NodeListOf<HTMLElement>, attr: 'tag' | 'cat', setter: (v: string) => void) {
       chips.forEach((chip) => {
         let touchedAt = 0;
-        let touchMoved = false;
-        chip.addEventListener('touchstart', () => {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchMovedDistance = 0;
+        let touchActivated = false;
+        chip.addEventListener('touchstart', (e) => {
+          const t = e.touches[0];
+          if (!t) return;
+          touchStartX = t.clientX;
+          touchStartY = t.clientY;
           touchedAt = Date.now();
-          touchMoved = false;
+          touchMovedDistance = 0;
+          touchActivated = false;
         }, { passive: true });
-        chip.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
+        chip.addEventListener('touchmove', (e) => {
+          const t = e.touches[0];
+          if (!t) return;
+          const dx = t.clientX - touchStartX;
+          const dy = t.clientY - touchStartY;
+          const d = Math.hypot(dx, dy);
+          if (d > touchMovedDistance) touchMovedDistance = d;
+        }, { passive: true });
         chip.addEventListener('touchend', (e) => {
-          // Só dispara se foi tap rápido sem scroll (movimento)
-          if (touchMoved) return;
+          // Considera tap se o dedo moveu pouco (<10px) e foi rápido (<500ms)
+          if (touchMovedDistance > 10) return;
           if (Date.now() - touchedAt > 500) return;
-          e.preventDefault();  // Previne click fantasma posterior
+          touchActivated = true;
+          e.preventDefault();  // Previne click fantasma duplicado
           activateChip(chips, chip, attr, setter);
         });
-        // Click cobre desktop e fallback
         chip.addEventListener('click', () => {
-          // Se acabou de vir de um touchend bem-sucedido, ignora
-          if (Date.now() - touchedAt < 600) return;
+          // Se touchend já ativou (mesmo com preventDefault, alguns browsers
+          // ainda disparam o click), evita ativar duas vezes.
+          if (touchActivated) {
+            touchActivated = false;
+            return;
+          }
           activateChip(chips, chip, attr, setter);
         });
       });
