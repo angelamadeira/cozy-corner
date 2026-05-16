@@ -156,6 +156,14 @@ body.dark-mode {
 /* Honra o atributo `hidden` mesmo quando uma classe define `display: ...`.
    Sem isso, regras tipo `display: grid` sobrescrevem o UA stylesheet do hidden. */
 [hidden] { display: none !important; }
+/* Toggle de idioma: elementos podem usar [data-lang="pt"] ou [data-lang="en"]
+   pra renderizar duas versões e o CSS esconde a inativa. Funciona com o
+   <html lang="..."> que o JS de i18n atualiza no toggle de idioma. */
+html[lang="en"] [data-lang="pt"],
+html:not([lang="en"]) [data-lang="en"] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   /* Remove a caixa azul/cinza que o browser desenha em qualquer elemento

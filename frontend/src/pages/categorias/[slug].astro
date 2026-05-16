@@ -166,7 +166,10 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
                 );
               })()}
               <div class="info">
-                <h3 class="recipe-name">{r.data.title}</h3>
+                <h3 class="recipe-name-h">
+                  <span class="recipe-name" data-lang="pt">{r.data.title}</span>
+                  <span class="recipe-name-en" data-lang="en">{r.data.title_en || r.data.title}</span>
+                </h3>
                 {(() => {
                   // Cada metadata é um <span class="mi"> com icon + valor +
                   // label e (exceto o último) o separador "·" no FINAL. Ao
@@ -388,7 +391,8 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       margin: 0 calc(-1 * var(--s-3));
       border-radius: var(--r-sm);
     }
-    .recipe-item a:hover .recipe-name { color: var(--terracota); }
+    .recipe-item a:hover .recipe-name,
+    .recipe-item a:hover .recipe-name-en { color: var(--terracota); }
     .recipe-item a:hover .row-arrow { transform: translateX(4px); }
 
     .thumb {
@@ -414,7 +418,12 @@ const { slug, label, icon, recipes, tags = [] } = Astro.props;
       object-fit: cover;
       display: block;
     }
-    .recipe-name {
+    /* H3 wrapper (.recipe-name-h) e os spans internos (.recipe-name +
+       .recipe-name-en) compartilham o mesmo estilo. O h3 vira display:block
+       padrão; os spans são inline mas o data-lang esconde o inativo. */
+    .recipe-name-h,
+    .recipe-name,
+    .recipe-name-en {
       font-family: var(--font-display);
       font-weight: 600;
       font-size: var(--fs-h3);

@@ -121,7 +121,10 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
 
     <!-- ============ TÍTULO + META ============ -->
     <section class="titlebar">
-      <h1 class="recipe-title">{data.title}</h1>
+      <h1 class="recipe-title">
+        <span data-lang="pt">{data.title}</span>
+        <span data-lang="en">{data.title_en || data.title}</span>
+      </h1>
       <div class="meta-row">
         {(() => {
           // Cada metadata é um <span class="mi"> com icon + valor + label e
@@ -153,24 +156,34 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
           <Icon name="ph:calendar-thin" /> <span data-t="meta.added_on_prefix">adicionada em</span> <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{publishedLabel}</time>
         </p>
       </div>
-      {data.description && <p class="recipe-description">{data.description}</p>}
+      {data.description && (
+        <p class="recipe-description">
+          <span data-lang="pt">{data.description}</span>
+          <span data-lang="en">{data.description_en || data.description}</span>
+        </p>
+      )}
     </section>
 
     <!-- ============ BODY ============ -->
     <section class="body">
       <aside class="ingredients-col">
         <h2 class="section-title" data-t="recipe.ingredients">Ingredientes</h2>
-        <div class="unit-toggle" role="tablist" aria-label="Sistema de unidades">
+        <div class="unit-toggle" data-lang="pt" role="tablist" aria-label="Sistema de unidades">
           <button class="unit-btn active" type="button" data-unit="metric" aria-selected="true" data-t="recipe.units_metric">métrico</button>
           <button class="unit-btn" type="button" data-unit="imperial" aria-selected="false" data-t="recipe.units_imperial">imperial</button>
         </div>
 
-        <ul class="ingredient-list" id="ingredient-list" data-original-servings={data.servings ?? ''}>
+        {/* PT mantém o id pro conversor de unidades. EN é estático
+           (ingredientes já vêm em ml/g, sem conversão imperial necessária). */}
+        <ul class="ingredient-list" id="ingredient-list" data-original-servings={data.servings ?? ''} data-lang="pt">
           {data.ingredients.map((ing) => <li data-source={ing}>{ing}</li>)}
+        </ul>
+        <ul class="ingredient-list" data-lang="en">
+          {(data.ingredients_en?.length ? data.ingredients_en : data.ingredients).map((ing) => <li>{ing}</li>)}
         </ul>
 
         {data.servings && (
-        <div class="portion-slider">
+        <div class="portion-slider" data-lang="pt">
           <label>
             <span class="portion-label"><span data-t="recipe.adjust_servings">ajustar porções</span>: <strong id="portion-value">{data.servings}</strong></span>
             <input type="range" min="1" max="12" value={data.servings} id="portion-range" />
@@ -181,8 +194,16 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         {data.materials.length > 0 && (
           <>
             <h2 class="section-title materials-title" data-t="recipe.materials">Materiais</h2>
-            <ul class="material-list">
+            <ul class="material-list" data-lang="pt">
               {data.materials.map((m) => (
+                <li>
+                  <Icon name={iconForMaterial(m)} width={14} height={14} />
+                  {m}
+                </li>
+              ))}
+            </ul>
+            <ul class="material-list" data-lang="en">
+              {(data.materials_en?.length ? data.materials_en : data.materials).map((m) => (
                 <li>
                   <Icon name={iconForMaterial(m)} width={14} height={14} />
                   {m}
@@ -201,8 +222,16 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
           </button>
         </div>
 
-        <ol class="step-list">
+        <ol class="step-list" data-lang="pt">
           {data.steps.map((step, i) => (
+            <li class="step">
+              <span class="step-num">{i + 1}</span>
+              <p>{step}</p>
+            </li>
+          ))}
+        </ol>
+        <ol class="step-list" data-lang="en">
+          {(data.steps_en?.length ? data.steps_en : data.steps).map((step, i) => (
             <li class="step">
               <span class="step-num">{i + 1}</span>
               <p>{step}</p>
@@ -213,7 +242,8 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
         {data.notes && (
           <aside class="recipe-notes">
             <h3 class="notes-title" data-t="recipe.notes">Notas</h3>
-            <p>{data.notes}</p>
+            <p data-lang="pt">{data.notes}</p>
+            <p data-lang="en">{data.notes_en || data.notes}</p>
           </aside>
         )}
 
@@ -238,7 +268,13 @@ const publishedLabel = new Intl.DateTimeFormat('pt-BR', {
     <span class="pf-date"><span data-t="recipe.printed_on">impresso em</span> <span id="print-date"></span></span>
   </footer>
 
-  <CookingMode steps={data.steps} ingredients={data.ingredients} recipeTitle={data.title} />
+  <CookingMode
+    steps={data.steps}
+    stepsEn={data.steps_en}
+    ingredients={data.ingredients}
+    ingredientsEn={data.ingredients_en}
+    recipeTitle={data.title}
+  />
 
   <!-- ============ CRONÔMETRO ============ -->
   <div class="timer" id="timer" data-state="idle">
