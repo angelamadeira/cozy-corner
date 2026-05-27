@@ -1,0 +1,2440 @@
+---
+// Case study do próprio site: "Receita deste site" / "Recipe for this site".
+// Estende a metáfora central — o site explica o próprio modo de preparo.
+// Conteúdo PT/EN via data-lang (mesmo toggle do resto do site).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+// SVGs da cozinha inlined em build time — passo Ilustração mostra as 3
+// versões responsivas. Inline em vez de <img> resolve currentColor (herda
+// cor do texto da página) e garante renderização consistente.
+const kitchenDesktop = readFileSync(resolve('public/kitchen/cozinha.svg'), 'utf-8');
+const kitchenTablet = readFileSync(resolve('public/kitchen/cozinha-tablet.svg'), 'utf-8');
+const kitchenMobile1 = readFileSync(resolve('public/kitchen/cozinha-mobile-1.svg'), 'utf-8');
+const kitchenMobile2 = readFileSync(resolve('public/kitchen/cozinha-mobile-2.svg'), 'utf-8');
+---
+
+<BaseLayout
+  title="Receita deste site"
+  description="Como o Cozy Corner foi cozinhado em 4 dias, sozinha, com IA como co-piloto."
+>
+  <header class="site-header">
+    <a href="/" class="logo-link" data-fade aria-label="Cozy Corner">
+      <span class="logo-name">Cozy Corner</span>
+      <span class="logo-by">— by Gigi</span>
+    </a>
+    <button class="dark-toggle" id="dark-toggle" type="button" aria-label="alternar dark mode">
+      <Icon name="ph:lightbulb-thin" class="icon-light" width={20} height={20} />
+      <Icon name="ph:moon-thin" class="icon-dark" width={20} height={20} />
+    </button>
+  </header>
+
+  <main class="case">
+    <nav class="top-nav">
+      <a href="/" class="back-link" data-fade>
+        <Icon name="ph:arrow-left-thin" />
+        <span data-lang="pt">voltar pra cozinha</span>
+        <span data-lang="en">back to the kitchen</span>
+      </a>
+    </nav>
+
+    {/* Hero, meta, ingredients, brief migraram pra dentro do Passo 1 (Início) do overlay.
+       AI cooked, tasting, next batches, leave a note migraram pra Passo 9 (Fim). */}
+
+    {/* ===================== DEEP DIVES OVERLAY (full-screen takeover) ===================== */}
+    <div class="cs-overlay" id="cs-overlay" hidden role="dialog" aria-modal="true" aria-label="Os 7 passos da receita deste site">
+    {/* ===================== SEQUENTIAL TABS DEEP DIVES (sections 5-11) ===================== */}
+    <div class="seqtabs">
+      <nav class="seqtabs-nav" aria-label="case study sections">
+        {/* Mobile: dropdown nativo (todas as opções acessíveis via picker do OS) */}
+        <div class="seqtabs-select-wrap">
+          <select class="seqtabs-select" id="seqtabs-select" aria-label="escolher passo">
+            {/* opções populadas via JS pra suportar PT/EN dinâmico */}
+          </select>
+          <span class="seqtabs-select-caret" aria-hidden="true">
+            <Icon name="ph:caret-down-thin" width={14} height={14} />
+          </span>
+        </div>
+        {/* Desktop: tab strip horizontal */}
+        <ol class="seqtabs-strip" role="tablist">
+          <li><button class="seqtab is-active" type="button" data-tab="inicio" role="tab" data-no-fade>
+            <span class="seqtab-num">1</span>
+            <span class="seqtab-label">
+              <span data-lang="pt">Ingredientes</span>
+              <span data-lang="en">Ingredients</span>
+            </span>
+          </button></li>
+          <li><button class="seqtab" type="button" data-tab="design-system" role="tab" data-no-fade>
+            <span class="seqtab-num">2</span>
+            <span class="seqtab-label">
+              <span data-lang="pt">Design System</span>
+              <span data-lang="en">Design System</span>
+            </span>
+          </button></li>
+          <li><button class="seqtab" type="button" data-tab="ilustracao" role="tab" data-no-fade>
+            <span class="seqtab-num">3</span>
+            <span class="seqtab-label">
+              <span data-lang="pt">Ilustração</span>
+              <span data-lang="en">Illustration</span>
+            </span>
+          </button></li>
+          <li><button class="seqtab" type="button" data-tab="traducoes" role="tab" data-no-fade>
+            <span class="seqtab-num">4</span>
+            <span class="seqtab-label">
+              <span data-lang="pt">Traduções</span>
+              <span data-lang="en">Translations</span>
+            </span>
+          </button></li>
+          <li><button class="seqtab" type="button" data-tab="admin" role="tab" data-no-fade>
+            <span class="seqtab-num">5</span>
+            <span class="seqtab-label">
+              <span data-lang="pt">Admin</span>
+              <span data-lang="en">Admin</span>
+            </span>
+          </button></li>
+          <li><button class="seqtab" type="button" data-tab="fim" role="tab" data-no-fade>
+            <span class="seqtab-num">6</span>
+            <span class="seqtab-label">
+              <span data-lang="pt">Conclusões</span>
+              <span data-lang="en">Conclusions</span>
+            </span>
+          </button></li>
+        </ol>
+        <div class="seqtabs-nav-actions">
+          <button class="cs-lang-toggle" id="cs-lang-toggle" type="button" aria-label="alternar idioma" data-no-fade>
+            <span class="cs-lang-pt">PT</span>
+            <span class="cs-lang-en">EN</span>
+          </button>
+          <button class="cs-dark-toggle" id="cs-dark-toggle" type="button" aria-label="alternar dark mode" data-no-fade>
+            <Icon name="ph:lightbulb-thin" class="cs-icon-light" width={18} height={18} />
+            <Icon name="ph:moon-thin" class="cs-icon-dark" width={18} height={18} />
+          </button>
+          <button class="cs-close-btn" id="cs-close-btn" type="button" aria-label="voltar pra cozinha" data-no-fade>
+            <Icon name="ph:x-thin" width={18} height={18} />
+          </button>
+        </div>
+      </nav>
+
+      <div class="seqtabs-panels">
+
+        {/* ===================== INÍCIO (passo 1/9) — hero + meta + ingredientes + brief ===================== */}
+        <article class="seqtab-panel is-active" data-panel="inicio" data-num="1" role="tabpanel">
+          <header class="seqtab-panel-header">
+            <span class="seqtab-panel-step">
+              <span data-lang="pt">Passo 1 de 6</span>
+              <span data-lang="en">Step 1 of 6</span>
+            </span>
+            <p class="hero-eyebrow">
+              <span data-lang="pt">Receita deste site</span>
+              <span data-lang="en">Recipe for this site</span>
+            </p>
+            <h2 class="hero-title">
+              <span data-lang="pt">Como cozinhei o Cozy Corner em 4 dias —</span>
+              <span data-lang="en">How I cooked Cozy Corner in 4 days —</span>
+              <br />
+              <em class="hero-em">
+                <span data-lang="pt">sozinha, com IA como co-piloto.</span>
+                <span data-lang="en">solo, with AI as my co-pilot.</span>
+              </em>
+            </h2>
+          </header>
+          <div class="seqtab-panel-body">
+            {/* Recipe meta card */}
+            <section class="meta-card">
+              <ul class="meta-list">
+                <li>
+                  <span class="meta-icon"><Icon name="ph:clock-thin" width={20} height={20} /></span>
+                  <span class="meta-row">
+                    <strong>
+                      <span data-lang="pt">Tempo de preparo</span>
+                      <span data-lang="en">Prep time</span>
+                    </strong>
+                    <span class="meta-value">
+                      <span data-lang="pt">4 dias</span>
+                      <span data-lang="en">4 days</span>
+                    </span>
+                  </span>
+                </li>
+                <li>
+                  <span class="meta-icon"><Icon name="ph:users-thin" width={20} height={20} /></span>
+                  <span class="meta-row">
+                    <strong>
+                      <span data-lang="pt">Serve</span>
+                      <span data-lang="en">Serves</span>
+                    </strong>
+                    <span class="meta-value">
+                      <span data-lang="pt">1 designer · 1 marido · 1 gato (Akim)</span>
+                      <span data-lang="en">1 designer · 1 husband · 1 cat (Akim)</span>
+                    </span>
+                  </span>
+                </li>
+                <li>
+                  <span class="meta-icon"><Icon name="ph:gauge-thin" width={20} height={20} /></span>
+                  <span class="meta-row">
+                    <strong>
+                      <span data-lang="pt">Dificuldade</span>
+                      <span data-lang="en">Difficulty</span>
+                    </strong>
+                    <span class="meta-value">
+                      <span data-lang="pt">fácil (com os co-pilotos certos)</span>
+                      <span data-lang="en">easy (with the right co-pilots)</span>
+                    </span>
+                  </span>
+                </li>
+                <li>
+                  <span class="meta-icon"><Icon name="ph:fork-knife-thin" width={20} height={20} /></span>
+                  <span class="meta-row">
+                    <strong>
+                      <span data-lang="pt">Rendimento</span>
+                      <span data-lang="en">Yield</span>
+                    </strong>
+                    <span class="meta-value">
+                      <span data-lang="pt">1 site bilíngue, acessível, com dark mode, modo cozinha e cronômetro</span>
+                      <span data-lang="en">1 fully bilingual, accessible site with dark mode, cooking mode, and a real timer</span>
+                    </span>
+                  </span>
+                </li>
+                <li>
+                  <span class="meta-icon"><Icon name="ph:flame-thin" width={20} height={20} /></span>
+                  <span class="meta-row">
+                    <strong>
+                      <span data-lang="pt">Fogo</span>
+                      <span data-lang="en">Heat</span>
+                    </strong>
+                    <span class="meta-value">
+                      <span data-lang="pt">um fim de semana focado</span>
+                      <span data-lang="en">one focused weekend</span>
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            </section>
+
+            {/* Ingredients */}
+            <section class="block">
+              <h3 class="section-title">
+                <span data-lang="pt">Ingredientes</span>
+                <span data-lang="en">Ingredients</span>
+              </h3>
+              <ul class="ing-list">
+                <li>Astro <span class="dim">v6.3.2</span></li>
+                <li>
+                  <span data-lang="pt">Cloudflare Pages <span class="dim">(o forno)</span></span>
+                  <span data-lang="en">Cloudflare Pages <span class="dim">(the oven)</span></span>
+                </li>
+                <li>
+                  <span data-lang="pt">JavaScript vanilla <span class="dim">— sem React, sem Tailwind, sem framework noise</span></span>
+                  <span data-lang="en">Vanilla JavaScript <span class="dim">— no React, no Tailwind, no framework noise</span></span>
+                </li>
+                <li>Phosphor Icons</li>
+                <li>
+                  Inter · Caveat · Cutive Mono
+                  <span class="dim">
+                    <span data-lang="pt"> (a tipografia)</span>
+                    <span data-lang="en"> (the typography pairing)</span>
+                  </span>
+                </li>
+                <li>
+                  Claude
+                  <span class="dim">
+                    <span data-lang="pt"> — pra código</span>
+                    <span data-lang="en"> — for code</span>
+                  </span>
+                </li>
+                <li>
+                  Gemini
+                  <span class="dim">
+                    <span data-lang="pt"> — pras ilustrações</span>
+                    <span data-lang="en"> — for illustrations</span>
+                  </span>
+                </li>
+                <li>
+                  <span data-lang="pt">Um fim de semana livre e um café forte</span>
+                  <span data-lang="en">A clear weekend and a strong coffee</span>
+                </li>
+              </ul>
+            </section>
+
+            {/* Brief — motivação */}
+            <section class="block">
+              <h3 class="section-title">
+                <span data-lang="pt">O brief que dei pra mim mesma</span>
+                <span data-lang="en">The brief I gave myself</span>
+              </h3>
+              <p class="prose">
+                <span data-lang="pt">Sou Product Designer há 6+ anos. Penso em fluxos, organizo sistemas, especifico telas — mas, na prática, quem fazia o trabalho aparecer no mundo era sempre outra pessoa.</span>
+                <span data-lang="en">I've been a Product Designer for 6+ years. I think in flows, organize systems, spec screens — but in practice, someone else always made my work show up in the world.</span>
+              </p>
+              <p class="prose">
+                <span data-lang="pt">Esse projeto começou de uma vontade simples: provar pra mim mesma que dava — eu, sozinha — pra desenhar, codar, escrever e deployar um produto inteiro, sem passar bastão.</span>
+                <span data-lang="en">This project started from a simple itch: prove to myself I could — solo — design, code, write, and deploy a whole product, without passing the baton.</span>
+              </p>
+              <p class="prose">
+                <span data-lang="pt">O escopo nasceu da minha rotina: meu marido e eu cozinhamos juntos toda semana, e nossas receitas viviam espalhadas em prints de WhatsApp e screenshots do Notes. Faltava um lugar bonito. Pronto, brief: site de receitas, com voz, em dois idiomas.</span>
+                <span data-lang="en">The scope came from my routine: my husband and I cook together every week, and our recipes were scattered across WhatsApp screenshots and notes app captures. They deserved a real home. Brief locked: a recipe site, with voice, in two languages.</span>
+              </p>
+            </section>
+
+            {/* Reference / Inspiration */}
+            <section class="block">
+              <h3 class="section-title">
+                <span data-lang="pt">Referência</span>
+                <span data-lang="en">Reference</span>
+              </h3>
+              <a href="https://alt-portfolio.framer.website/" target="_blank" rel="noopener" class="cs-reference">
+                <div class="cs-reference-text">
+                  <span class="cs-reference-tag">
+                    <span data-lang="pt">inspiração principal</span>
+                    <span data-lang="en">main inspiration</span>
+                  </span>
+                  <span class="cs-reference-name">Alt. Portfolio</span>
+                  <span class="cs-reference-author">
+                    <span data-lang="pt">por María Eugenia Solano · portfólio em formato de café</span>
+                    <span data-lang="en">by María Eugenia Solano · café-shaped portfolio</span>
+                  </span>
+                </div>
+                <Icon name="ph:arrow-up-right-thin" width={20} height={20} class="cs-reference-arrow" />
+              </a>
+              <p class="prose">
+                <span data-lang="pt">Adorei o conceito de <strong>espaço físico como navegação</strong> e peguei emprestado pro Cozy Corner. Café virou cozinha, cada elemento da cena vira hotspot pra uma categoria. O resto — modo cozinha, cronômetro, busca, voz, marca, o gato Akim — apareceu no caminho.</span>
+                <span data-lang="en">I loved the concept of <strong>physical space as navigation</strong> and borrowed it for Cozy Corner. Café became kitchen, each scene element became a hotspot for a category. The rest — cooking mode, timer, search, voice, brand, Akim the cat — came along the way.</span>
+              </p>
+            </section>
+          </div>
+        </article>
+
+        {/* ===================== 6. DESIGN SYSTEM (passo 2/8) ===================== */}
+        <article class="seqtab-panel" data-panel="design-system" data-num="2" role="tabpanel">
+          <header class="seqtab-panel-header">
+            <span class="seqtab-panel-step">
+              <span data-lang="pt">Passo 2 de 6</span>
+              <span data-lang="en">Step 2 of 6</span>
+            </span>
+            <h2 class="seqtab-panel-title">
+              <span data-lang="pt">Design System</span>
+              <span data-lang="en">Design System</span>
+            </h2>
+          </header>
+          <div class="seqtab-panel-body">
+            {/* ===== Princípios — 4 pills com tagline ===== */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Princípios</span>
+              <span data-lang="en">Principles</span>
+            </h3>
+            <div class="cs-principles">
+              <div class="cs-principle">
+                <span class="cs-principle-name">Cozy</span>
+                <span class="cs-principle-tag">
+                  <span data-lang="pt">cream warm · nunca branco puro</span>
+                  <span data-lang="en">cream warm · never pure white</span>
+                </span>
+              </div>
+              <div class="cs-principle">
+                <span class="cs-principle-name">
+                  <span data-lang="pt">Narrativo</span>
+                  <span data-lang="en">Narrative</span>
+                </span>
+                <span class="cs-principle-tag">
+                  <span data-lang="pt">4 famílias tipográficas</span>
+                  <span data-lang="en">4 typography families</span>
+                </span>
+              </div>
+              <div class="cs-principle">
+                <span class="cs-principle-name">Slow</span>
+                <span class="cs-principle-tag">
+                  <span data-lang="pt">animações curvas · wipe 1.4s</span>
+                  <span data-lang="en">curved animations · 1.4s wipe</span>
+                </span>
+              </div>
+              <div class="cs-principle">
+                <span class="cs-principle-name">Tactile</span>
+                <span class="cs-principle-tag">
+                  <span data-lang="pt">cozinha line-art · Akim mia</span>
+                  <span data-lang="en">line-art kitchen · Akim meows</span>
+                </span>
+              </div>
+            </div>
+
+            {/* ===== Paleta ===== */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Paleta</span>
+              <span data-lang="en">Palette</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Bicromática na prática: creme dominante + terracota como único acento usado com frequência. Em dark mode o creme vira navy e o terracota fica mais brilhante pra manter o calor.</span>
+              <span data-lang="en">Bichromatic in practice: dominant cream + terracotta as the only frequently-used accent. In dark mode, cream becomes navy and terracotta gets brighter to keep the warmth.</span>
+            </p>
+            <div class="cs-palette">
+              <div class="cs-color">
+                <div class="cs-color-chip-split">
+                  <div class="cs-chip-half" style="background: #FAF6EE;"></div>
+                  <div class="cs-chip-half" style="background: #0F1A2A;"></div>
+                </div>
+                <div class="cs-color-info">
+                  <code class="cs-color-name">--bg</code>
+                  <div class="cs-color-hexes">
+                    <span><span class="cs-hex-label">light</span><span class="cs-hex-val">#FAF6EE</span></span>
+                    <span><span class="cs-hex-label">dark</span><span class="cs-hex-val">#0F1A2A</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="cs-color">
+                <div class="cs-color-chip-split">
+                  <div class="cs-chip-half" style="background: #C56B4A;"></div>
+                  <div class="cs-chip-half" style="background: #D58860;"></div>
+                </div>
+                <div class="cs-color-info">
+                  <code class="cs-color-name">--terracota</code>
+                  <div class="cs-color-hexes">
+                    <span><span class="cs-hex-label">light</span><span class="cs-hex-val">#C56B4A</span></span>
+                    <span><span class="cs-hex-label">dark</span><span class="cs-hex-val">#D58860</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="cs-color">
+                <div class="cs-color-chip-split">
+                  <div class="cs-chip-half" style="background: #1A1A1A;"></div>
+                  <div class="cs-chip-half" style="background: #F5F0E5;"></div>
+                </div>
+                <div class="cs-color-info">
+                  <code class="cs-color-name">--ink</code>
+                  <div class="cs-color-hexes">
+                    <span><span class="cs-hex-label">light</span><span class="cs-hex-val">#1A1A1A</span></span>
+                    <span><span class="cs-hex-label">dark</span><span class="cs-hex-val">#F5F0E5</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ===== Tipografia — samples vivos ===== */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Tipografia</span>
+              <span data-lang="en">Typography</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Quatro famílias com papéis distintos. Caveat é exclusiva da marca; Inter carrega os títulos; Cutive Mono cobre body, UI e microcopy técnica.</span>
+              <span data-lang="en">Four families with distinct roles. Caveat is brand-exclusive; Inter carries headings; Cutive Mono covers body, UI, and technical microcopy.</span>
+            </p>
+            <div class="cs-type-stack">
+              <div class="cs-type-row">
+                <div class="cs-type-meta">
+                  <code class="cs-type-name">--font-brand</code>
+                  <span class="cs-type-usage">
+                    <span data-lang="pt">só o logo</span>
+                    <span data-lang="en">logo only</span>
+                  </span>
+                </div>
+                <div class="cs-type-sample" style="font-family:'Caveat',cursive; font-weight:600; font-size:38px; line-height:1;">Cozy Corner</div>
+              </div>
+              <div class="cs-type-row">
+                <div class="cs-type-meta">
+                  <code class="cs-type-name">--font-display</code>
+                  <span class="cs-type-usage">
+                    <span data-lang="pt">títulos · clamp 22-96px</span>
+                    <span data-lang="en">titles · clamp 22-96px</span>
+                  </span>
+                </div>
+                <div class="cs-type-sample" style="font-family:'Inter',sans-serif; font-weight:500; font-size:24px; line-height:1.1;">Bolo de fubá com coco</div>
+              </div>
+              <div class="cs-type-row">
+                <div class="cs-type-meta">
+                  <code class="cs-type-name">--font-sans</code>
+                  <span class="cs-type-usage">
+                    <span data-lang="pt">body, UI · 16px</span>
+                    <span data-lang="en">body, UI · 16px</span>
+                  </span>
+                </div>
+                <div class="cs-type-sample" style="font-family:'Cutive Mono',monospace; font-size:15px;">Sempre uso essa massa</div>
+              </div>
+              <div class="cs-type-row">
+                <div class="cs-type-meta">
+                  <code class="cs-type-name">--font-mono</code>
+                  <span class="cs-type-usage">
+                    <span data-lang="pt">meta · 13px</span>
+                    <span data-lang="en">meta · 13px</span>
+                  </span>
+                </div>
+                <div class="cs-type-sample" style="font-family:'Cutive Mono',monospace; font-size:13px; color:var(--ink-soft);">60 min · 8 porções · fácil</div>
+              </div>
+            </div>
+
+            {/* ===== Spacing + Radius — escala visual ===== */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Spacing &amp; Radius</span>
+              <span data-lang="en">Spacing &amp; Radius</span>
+            </h3>
+            <div class="cs-tokens-grid">
+              <div class="cs-spacing-block">
+                <span class="cs-mini-label">
+                  <span data-lang="pt">base-4 · 8 níveis</span>
+                  <span data-lang="en">base-4 · 8 levels</span>
+                </span>
+                <div class="cs-spacing-stack">
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 4px"></div><code>--s-1 · 4</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 8px"></div><code>--s-2 · 8</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 12px"></div><code>--s-3 · 12</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 16px"></div><code>--s-4 · 16</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 24px"></div><code>--s-5 · 24</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 32px"></div><code>--s-6 · 32</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 48px"></div><code>--s-7 · 48</code></div>
+                  <div class="cs-spacing-row"><div class="cs-spacing-bar" style="width: 64px"></div><code>--s-8 · 64</code></div>
+                </div>
+              </div>
+              <div class="cs-radius-block">
+                <span class="cs-mini-label">
+                  <span data-lang="pt">4 valores fixos</span>
+                  <span data-lang="en">4 fixed values</span>
+                </span>
+                <div class="cs-radius-grid">
+                  <div class="cs-radius-item">
+                    <div class="cs-radius-box" style="border-radius: 4px"></div>
+                    <code>sm · 4</code>
+                  </div>
+                  <div class="cs-radius-item">
+                    <div class="cs-radius-box" style="border-radius: 8px"></div>
+                    <code>md · 8</code>
+                  </div>
+                  <div class="cs-radius-item">
+                    <div class="cs-radius-box" style="border-radius: 16px"></div>
+                    <code>lg · 16</code>
+                  </div>
+                  <div class="cs-radius-item">
+                    <div class="cs-radius-box" style="border-radius: 999px"></div>
+                    <code>pill</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ===== Motion ===== */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Motion</span>
+              <span data-lang="en">Motion</span>
+            </h3>
+            <div class="cs-motion-list">
+              <div class="cs-motion-row"><code>--dur-fast</code><span>150ms <span class="dim">· hover, tap</span></span></div>
+              <div class="cs-motion-row"><code>--dur-base</code><span>300ms <span class="dim">· drawer, fade</span></span></div>
+              <div class="cs-motion-row"><code>--dur-slow</code><span>600ms <span class="dim">
+                <span data-lang="pt">· transições maiores</span>
+                <span data-lang="en">· larger transitions</span>
+              </span></span></div>
+              <div class="cs-motion-row"><code>intro wipe</code><span>1400ms <span class="dim">
+                <span data-lang="pt">· cobertura inicial</span>
+                <span data-lang="en">· initial cover</span>
+              </span></span></div>
+            </div>
+            <p class="prose">
+              <span data-lang="pt">Easings sempre curvos (<code>ease-out</code>, <code>ease-in-out</code>, <code>ease-spring</code>) — nada de linear. <strong>3 níveis de sombra</strong> reservados pra card sutil, drawer/dropdown e modal central.</span>
+              <span data-lang="en">Easings always curved (<code>ease-out</code>, <code>ease-in-out</code>, <code>ease-spring</code>) — nothing linear. <strong>3 shadow levels</strong> reserved for subtle card, drawer/dropdown, and central modal.</span>
+            </p>
+
+            {/* ===== A11y ===== */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Acessibilidade</span>
+              <span data-lang="en">Accessibility</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">A11y entrou como filtro de cada decisão: contraste AAA no texto principal, foco visível em todo interativo, navegação 100% por teclado, <code>prefers-reduced-motion</code> respeitado, alt texts escritos com intenção. A doc completa vive em <code>/design-system</code> com swatches light/dark lado a lado e mini-mockups de componentes reais.</span>
+              <span data-lang="en">A11y was a filter on every decision: AAA contrast on body text, visible focus on every interactive, full keyboard navigation, <code>prefers-reduced-motion</code> respected, alt texts written with intent. Full docs live at <code>/design-system</code> with light/dark swatches side by side and mini-mockups of real components.</span>
+            </p>
+          </div>
+        </article>
+
+        {/* ===================== 7. ILUSTRAÇÃO (GEMINI) (passo 3/8) ===================== */}
+        <article class="seqtab-panel" data-panel="ilustracao" data-num="3" role="tabpanel">
+          <header class="seqtab-panel-header">
+            <span class="seqtab-panel-step">
+              <span data-lang="pt">Passo 3 de 6</span>
+              <span data-lang="en">Step 3 of 6</span>
+            </span>
+            <h2 class="seqtab-panel-title">
+              <span data-lang="pt">Ilustração (Gemini)</span>
+              <span data-lang="en">Illustration (Gemini)</span>
+            </h2>
+          </header>
+          <div class="seqtab-panel-body">
+            <p class="prose">
+              <span data-lang="pt">A cena da cozinha line-art foi feita em camadas: Gemini gerou variações iniciais de cada objeto (geladeira, bancada, relógio, gato), e eu ajustei cada SVG manualmente pra refinar traços, garantir consistência de <code>stroke-width</code>, e amarrar todos os elementos no clima warm da paleta.</span>
+              <span data-lang="en">The line-art kitchen scene was built in layers: Gemini generated initial variants of each object (fridge, counter, clock, cat), and I tuned each SVG by hand to refine strokes, ensure consistent <code>stroke-width</code>, and tie everything to the warm palette.</span>
+            </p>
+            <p class="prose">
+              <span data-lang="pt">Cada objeto da cozinha virou hotspot interativo — não com retângulo invisível por cima, mas usando o bounding-box do próprio grupo SVG como hit-area. O relógio leva pras rápidas, a geladeira pras congelar, o gato é o Akim e abre uma mensagem própria.</span>
+              <span data-lang="en">Each kitchen object became an interactive hotspot — not with an invisible rectangle on top, but using the SVG group's own bounding-box as the hit-area. The clock leads to quick recipes, the fridge to freezer recipes, the cat is Akim and opens his own message.</span>
+            </p>
+
+            {/* Variantes responsivas da ilustração */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">3 versões pra 3 tamanhos</span>
+              <span data-lang="en">3 versions for 3 screen sizes</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">A cena foi desenhada três vezes — não é o mesmo SVG escalado. Cada versão tem composição própria pra caber bem no aspect ratio do device.</span>
+              <span data-lang="en">The scene was drawn three times — not the same SVG scaled. Each version has its own composition to fit the device's aspect ratio.</span>
+            </p>
+
+            <div class="cs-responsive-grid">
+              <figure class="cs-device">
+                <figcaption class="cs-device-label">
+                  <span data-lang="pt">Desktop · ≥ 1024px</span>
+                  <span data-lang="en">Desktop · ≥ 1024px</span>
+                  <span class="cs-device-dim">1500 × 1000</span>
+                </figcaption>
+                <div class="cs-device-canvas" role="img" aria-label="Cena da cozinha — versão desktop, 1500x1000, layout horizontal completo">
+                  <Fragment set:html={kitchenDesktop} />
+                </div>
+              </figure>
+
+              <figure class="cs-device">
+                <figcaption class="cs-device-label">
+                  <span data-lang="pt">Tablet · 601 – 1023px</span>
+                  <span data-lang="en">Tablet · 601 – 1023px</span>
+                  <span class="cs-device-dim">991 × 1000</span>
+                </figcaption>
+                <div class="cs-device-canvas" role="img" aria-label="Cena da cozinha — versão tablet, 991x1000, layout quase quadrado condensado">
+                  <Fragment set:html={kitchenTablet} />
+                </div>
+              </figure>
+
+              <figure class="cs-device">
+                <figcaption class="cs-device-label">
+                  <span data-lang="pt">Mobile · ≤ 600px</span>
+                  <span data-lang="en">Mobile · ≤ 600px</span>
+                  <span class="cs-device-dim">
+                    <span data-lang="pt">460 × 1000 · 2 partes com scroll horizontal</span>
+                    <span data-lang="en">460 × 1000 · 2 parts with horizontal scroll</span>
+                  </span>
+                </figcaption>
+                <div class="cs-device-canvas cs-device-mobile-pair">
+                  <div class="cs-device-mobile-part" role="img" aria-label="Cena da cozinha — versão mobile parte 1">
+                    <Fragment set:html={kitchenMobile1} />
+                  </div>
+                  <div class="cs-device-mobile-part" role="img" aria-label="Cena da cozinha — versão mobile parte 2">
+                    <Fragment set:html={kitchenMobile2} />
+                  </div>
+                </div>
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        {/* ===================== 10. TRADUÇÕES (passo 4/6) ===================== */}
+        <article class="seqtab-panel" data-panel="traducoes" data-num="4" role="tabpanel">
+          <header class="seqtab-panel-header">
+            <span class="seqtab-panel-step">
+              <span data-lang="pt">Passo 4 de 6</span>
+              <span data-lang="en">Step 4 of 6</span>
+            </span>
+            <h2 class="seqtab-panel-title">
+              <span data-lang="pt">Traduções</span>
+              <span data-lang="en">Translations</span>
+            </h2>
+          </header>
+          <div class="seqtab-panel-body">
+            {/* Cards lado a lado destacando o problema e a solução */}
+            <div class="cs-problem-solution">
+              <div class="cs-ps-card cs-ps-problem">
+                <span class="cs-ps-label">
+                  <span data-lang="pt">Demanda</span>
+                  <span data-lang="en">Demand</span>
+                </span>
+                <p>
+                  <span data-lang="pt">Trocar texto entre PT e EN <strong>na hora, sem reload</strong>, com pluralização correta (1 receita / 2 receitas) e algumas interpolações. Duas línguas, controladas por mim — sem time de tradução, sem CMS de strings.</span>
+                  <span data-lang="en">Swap text between PT and EN <strong>instantly, no reload</strong>, with correct pluralization (1 recipe / 2 recipes) and a few interpolations. Two languages, controlled by me — no translation team, no string CMS.</span>
+                </p>
+              </div>
+              <div class="cs-ps-card cs-ps-solution">
+                <span class="cs-ps-label">
+                  <span data-lang="pt">Solução</span>
+                  <span data-lang="en">Solution</span>
+                </span>
+                <p>
+                  <span data-lang="pt"><strong>~120 linhas de vanilla JS.</strong> Dicionário JSON aninhado + atributo <code>data-t</code> no HTML + um listener no toggle de idioma que percorre o DOM e troca <code>textContent</code>. Sem lib, sem build pipeline novo, sem overhead.</span>
+                  <span data-lang="en"><strong>~120 lines of vanilla JS.</strong> Nested JSON dictionary + <code>data-t</code> attribute on HTML elements + one listener on the language toggle that walks the DOM and swaps <code>textContent</code>. No library, no new build pipeline, no overhead.</span>
+                </p>
+              </div>
+            </div>
+
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Por que não usar uma biblioteca</span>
+              <span data-lang="en">Why not use a library</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Olhei i18next, react-intl, o i18n nativo do Astro. Todos resolvem MUITO mais do que eu precisava — estrutura de pastas obrigatória, build pipeline novo, runtime overhead, conceitos pra aprender. Pra uma demanda trivial, o custo da lib era maior que o custo de escrever do zero.</span>
+              <span data-lang="en">Looked at i18next, react-intl, Astro's native i18n. They all solve WAY more than I needed — required folder structures, new build pipelines, runtime overhead, concepts to learn. For a trivial need, the library cost was higher than writing it from scratch.</span>
+            </p>
+
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Tradução com DeepL + revisão manual</span>
+              <span data-lang="en">DeepL drafts + manual review</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">DeepL rascunha as strings EN, eu reviso cada uma pra ajustar a voz. <em>"Que tal apagar a luz?"</em> virou <em>"Care to turn off the light?"</em>, não <em>"Want to turn off the lights?"</em>. Voz importa demais pra terceirizar 100%.</span>
+              <span data-lang="en">DeepL drafts the EN strings, I review each one to tune the voice. <em>"Que tal apagar a luz?"</em> became <em>"Care to turn off the light?"</em>, not <em>"Want to turn off the lights?"</em>. Voice matters too much to fully outsource.</span>
+            </p>
+
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Trade-offs honestos</span>
+              <span data-lang="en">Honest trade-offs</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Não escala pra 5+ idiomas (sem fallback automático, sem lazy loading de dicionários, sem hot reload). Pra 2 idiomas controlados por mim, valeu cada linha não escrita.</span>
+              <span data-lang="en">Doesn't scale to 5+ languages (no automatic fallback, no lazy loading of dictionaries, no hot reload). For 2 languages controlled by me, every unwritten line was worth it.</span>
+            </p>
+          </div>
+        </article>
+
+        {/* ===================== 11. ADMIN (passo 5/6) ===================== */}
+        <article class="seqtab-panel" data-panel="admin" data-num="5" role="tabpanel">
+          <header class="seqtab-panel-header">
+            <span class="seqtab-panel-step">
+              <span data-lang="pt">Passo 5 de 6</span>
+              <span data-lang="en">Step 5 of 6</span>
+            </span>
+            <h2 class="seqtab-panel-title">
+              <span data-lang="pt">Admin</span>
+              <span data-lang="en">Admin</span>
+            </h2>
+          </header>
+          <div class="seqtab-panel-body">
+            {/* Cards Demanda + Solução */}
+            <div class="cs-problem-solution">
+              <div class="cs-ps-card cs-ps-problem">
+                <span class="cs-ps-label">
+                  <span data-lang="pt">Demanda</span>
+                  <span data-lang="en">Demand</span>
+                </span>
+                <p>
+                  <span data-lang="pt">Editar receitas e ler mensagens do site <strong>sem servidor próprio, sem banco de dados, sem painel SaaS</strong>. Workflow simples: escrever → commitar → deploy automático.</span>
+                  <span data-lang="en">Edit recipes and read site messages <strong>with no server of my own, no database, no SaaS dashboard</strong>. Simple workflow: write → commit → automatic deploy.</span>
+                </p>
+              </div>
+              <div class="cs-ps-card cs-ps-solution">
+                <span class="cs-ps-label">
+                  <span data-lang="pt">Solução</span>
+                  <span data-lang="en">Solution</span>
+                </span>
+                <p>
+                  <span data-lang="pt"><strong>Decap CMS</strong> em <code>/admin</code> (Git-based, sem servidor) + <strong>Cloudflare Functions</strong> custom pra OAuth + interface própria em <code>/admin-recados</code> lendo do <strong>Cloudflare KV</strong>.</span>
+                  <span data-lang="en"><strong>Decap CMS</strong> at <code>/admin</code> (Git-based, no server) + custom <strong>Cloudflare Functions</strong> for OAuth + a separate interface at <code>/admin-recados</code> reading from <strong>Cloudflare KV</strong>.</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Stack zero-infra */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Stack zero-infra</span>
+              <span data-lang="en">Zero-infra stack</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Tudo que eu edito no admin vira commit no GitHub via Decap CMS. O Cloudflare Pages detecta o push e refaz o build automaticamente — deploy pronto em segundos. <strong>Sem banco de dados, sem painel SaaS, sem custo recorrente.</strong> Roda local com <code>npx decap-server</code> pra desenvolver offline.</span>
+              <span data-lang="en">Everything I edit in the admin becomes a GitHub commit via Decap CMS. Cloudflare Pages detects the push and rebuilds automatically — deploy ready in seconds. <strong>No database, no SaaS dashboard, no recurring cost.</strong> Runs locally with <code>npx decap-server</code> for offline development.</p>
+            </p>
+
+            {/* Dashboard de receitas */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Dashboard — lista de receitas</span>
+              <span data-lang="en">Dashboard — recipe list</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Depois de logar, caio na lista de receitas. Cada item mostra título + categorias (sobremesas, congelar, vegetarianas, etc.). Sidebar com as duas coleções (<strong>Receitas</strong> e <strong>Páginas</strong>), Quick add no topo. Filter, sort e busca embutidos pelo próprio Decap.</span>
+              <span data-lang="en">After logging in, I land on the recipe list. Each item shows title + categories (desserts, freezer, vegetarian, etc.). Sidebar with the two collections (<strong>Recipes</strong> and <strong>Pages</strong>), Quick add at the top. Filter, sort, and search are built into Decap.</span>
+            </p>
+            <figure class="cs-screenshot">
+              <div class="cs-screenshot-frame">
+                <img src="/case-study/admin-decap.png" alt="Dashboard do Decap CMS — lista de receitas com sidebar de coleções, botões de filtro e ordenação" loading="lazy" />
+                <div class="cs-screenshot-fallback" aria-hidden="true">
+                  <Icon name="ph:image-thin" width={28} height={28} />
+                  <span class="cs-screenshot-fallback-label">
+                    <span data-lang="pt">screenshot pendente</span>
+                    <span data-lang="en">screenshot pending</span>
+                  </span>
+                  <code>admin-decap.png</code>
+                </div>
+              </div>
+              <figcaption>
+                <span data-lang="pt">/admin · dashboard com a lista de receitas</span>
+                <span data-lang="en">/admin · dashboard with the recipe list</span>
+              </figcaption>
+            </figure>
+
+            {/* Adicionar nova receita */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Como adicionar uma receita</span>
+              <span data-lang="en">How to add a recipe</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">Click em <strong>"New Receita"</strong> abre o editor com todos os campos do schema configurado no <code>config.yml</code>: título, descrição curta, categorias, tempo em minutos (default 30), porções, dificuldade (fácil/médio/difícil), sistema de unidades (métrico/imperial), tags de filtro, mídia (fotos e vídeos), ingredientes, modo de preparo. Salvar dispara o workflow editorial (rascunho → revisão → publicado), commitando no GitHub e disparando rebuild automático no Cloudflare Pages.</span>
+              <span data-lang="en">Clicking <strong>"New Receita"</strong> opens the editor with every field from the schema in <code>config.yml</code>: title, short description, categories, time in minutes (default 30), servings, difficulty (easy/medium/hard), unit system (metric/imperial), filter tags, media (photos and videos), ingredients, instructions. Saving triggers the editorial workflow (draft → review → published), committing to GitHub and triggering an automatic rebuild on Cloudflare Pages.</span>
+            </p>
+            <figure class="cs-screenshot">
+              <div class="cs-screenshot-frame">
+                <img src="/case-study/admin-decap-editor.png" alt="Editor de nova receita no Decap CMS — campos visíveis: título, descrição curta, categorias, tempo, porções, dificuldade, sistema de unidades, tags, mídia" loading="lazy" />
+                <div class="cs-screenshot-fallback" aria-hidden="true">
+                  <Icon name="ph:image-thin" width={28} height={28} />
+                  <span class="cs-screenshot-fallback-label">
+                    <span data-lang="pt">screenshot pendente</span>
+                    <span data-lang="en">screenshot pending</span>
+                  </span>
+                  <code>admin-decap-editor.png</code>
+                </div>
+              </div>
+              <figcaption>
+                <span data-lang="pt">/admin · editor de nova receita (campos do schema)</span>
+                <span data-lang="en">/admin · new recipe editor (schema fields)</span>
+              </figcaption>
+            </figure>
+
+            {/* Autenticação custom */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">OAuth via Cloudflare Functions</span>
+              <span data-lang="en">OAuth via Cloudflare Functions</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">A peça que precisei codar foi a autenticação. O Decap precisa de OAuth com o GitHub, mas o fluxo padrão assume hospedagem na Netlify. Como uso Cloudflare Pages, escrevi dois <strong>Cloudflare Functions custom</strong> (<code>auth.js</code> + <code>callback.js</code>) que fazem o handshake direto. Bônus: um proxy pra <code>api.github.com</code> porque alguns ISPs bloqueiam acesso direto à API.</span>
+              <span data-lang="en">The piece I had to code was authentication. Decap needs OAuth with GitHub, but its default flow assumes Netlify hosting. Since I use Cloudflare Pages, I wrote two <strong>custom Cloudflare Functions</strong> (<code>auth.js</code> + <code>callback.js</code>) handling the handshake directly. Bonus: a proxy for <code>api.github.com</code> because some ISPs block direct API access.</span>
+            </p>
+
+            {/* /admin-recados */}
+            <h3 class="cs-block-label">
+              <span data-lang="pt">Interface própria pros recados</span>
+              <span data-lang="en">Custom interface for messages</span>
+            </h3>
+            <p class="prose">
+              <span data-lang="pt">As mensagens do formulário de contato vivem no <strong>Cloudflare KV</strong> (chave-valor edge-native — zero infra de banco). Pra ler com conforto, fiz uma interface separada em <code>/admin-recados</code>, com a mesma marca, leitura cronológica e marcação de lidas.</span>
+              <span data-lang="en">Contact form messages live in <strong>Cloudflare KV</strong> (edge-native key-value — zero database infra). To read them comfortably, I built a separate interface at <code>/admin-recados</code> with the same branding, chronological reading and read-status marking.</span>
+            </p>
+            <figure class="cs-screenshot">
+              <div class="cs-screenshot-frame">
+                <img src="/case-study/admin-recados.png" alt="Tela de entrada de /admin-recados — fundo creme com input de token de acesso" loading="lazy" />
+                <div class="cs-screenshot-fallback" aria-hidden="true">
+                  <Icon name="ph:image-thin" width={28} height={28} />
+                  <span class="cs-screenshot-fallback-label">
+                    <span data-lang="pt">screenshot pendente</span>
+                    <span data-lang="en">screenshot pending</span>
+                  </span>
+                  <code>admin-recados.png</code>
+                </div>
+              </div>
+              <figcaption>
+                <span data-lang="pt">/admin-recados · tela de entrada (token gate)</span>
+                <span data-lang="en">/admin-recados · entry screen (token gate)</span>
+              </figcaption>
+            </figure>
+          </div>
+        </article>
+
+        {/* ===================== FIM (passo 6/6) — AI cooked + tasting + next batches + CTA ===================== */}
+        <article class="seqtab-panel" data-panel="fim" data-num="6" role="tabpanel">
+          <header class="seqtab-panel-header">
+            <span class="seqtab-panel-step">
+              <span data-lang="pt">Passo 6 de 6</span>
+              <span data-lang="en">Step 6 of 6</span>
+            </span>
+            <h2 class="seqtab-panel-title">
+              <span data-lang="pt">Conclusões finais</span>
+              <span data-lang="en">Final conclusions</span>
+            </h2>
+          </header>
+          <div class="seqtab-panel-body">
+            {/* AI cooked / couldn't */}
+            <section class="block">
+              <h3 class="section-title">
+                <span data-lang="pt">O que a IA cozinhou — e o que ela não conseguiu</span>
+                <span data-lang="en">What AI cooked — and what it couldn't</span>
+              </h3>
+              <div class="grid-3">
+                <div class="grid-item">
+                  <h4>
+                    <span data-lang="pt">→ O que eu fiz</span>
+                    <span data-lang="en">→ What I owned</span>
+                  </h4>
+                  <p class="prose">
+                    <span data-lang="pt">Decisões de marca e tom. A voz em PT e EN. Cada microinteração que importa. O julgamento de "isso é bom o suficiente" e "isso precisa voltar".</span>
+                    <span data-lang="en">Brand and tone decisions. The voice in both PT and EN. Every microinteraction that matters. The judgment of "this is good enough" and "this needs to go back".</span>
+                  </p>
+                </div>
+                <div class="grid-item">
+                  <h4>
+                    <span data-lang="pt">→ O que a IA acelerou</span>
+                    <span data-lang="en">→ What AI accelerated</span>
+                  </h4>
+                  <p class="prose">
+                    <span data-lang="pt">Claude pra código — scaffold de componentes Astro, refatorações, scripts de build, pegando edge cases que eu não pensaria. Gemini pras ilustrações da cozinha — variações rápidas de cada objeto (fogão, geladeira, gato), depois ajustadas em SVG.</span>
+                    <span data-lang="en">Claude for code — scaffolding Astro components, refactors, build scripts, catching edge cases I wouldn't think of. Gemini for the kitchen illustrations — quick variants of each object (stove, fridge, cat), then hand-tuned in SVG.</span>
+                  </p>
+                </div>
+                <div class="grid-item">
+                  <h4>
+                    <span data-lang="pt">→ O que a IA não conseguiu</span>
+                    <span data-lang="en">→ What AI couldn't do</span>
+                  </h4>
+                  <p class="prose">
+                    <span data-lang="pt">Decidir o tom. Sentir quando uma animação está "perto, mas não". Editar minha própria escrita pra voz consistente. Saber por que uma decisão técnica funciona pra esse projeto e não pra outro. Esses momentos ainda são meus.</span>
+                    <span data-lang="en">Decide the tone. Feel when an animation is "close, but not quite". Edit my own writing for consistent voice. Know why a technical decision works for this project and not another. Those moments are still mine.</span>
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Tasting notes */}
+            <section class="block">
+              <h3 class="section-title">
+                <span data-lang="pt">Notas de degustação</span>
+                <span data-lang="en">Tasting notes</span>
+              </h3>
+              <p class="prose">
+                <span data-lang="pt">O aha moment foi chocantemente simples: foi chocantemente rápido e chocantemente fácil. Não "a IA fez tudo" — eu desenhei cada decisão. Mas o gap entre "quero essa feature" e "a feature está no ar, polida" colapsou de semanas pra horas. Perguntas que me travariam por meio dia viram conversas de 2 minutos.</span>
+                <span data-lang="en">The aha moment was shockingly simple: it was shockingly fast and shockingly easy. Not "AI did everything" — I designed every decision. But the gap between "I want this feature" and "the feature is live, polished" collapsed from weeks to hours. Questions that would stall me for half a day became two-minute conversations.</span>
+              </p>
+              <p class="prose">
+                <span data-lang="pt">A lição que levo: o muro entre design e engenharia caiu. Não totalmente — ainda existe especialidade, ainda existem complexidades que pedem time inteiro. Mas pra projetos do tamanho do Cozy Corner, designer sozinho com IA boa não é fantasia. É terça-feira. E isso muda o que dá pra prototipar, o que dá pra propor, o que dá pra defender com prova em vez de Figma.</span>
+                <span data-lang="en">The lesson I take: the wall between design and engineering came down. Not entirely — specialty still exists, complexity that demands a full team still exists. But for projects the size of Cozy Corner, one designer with good AI isn't a fantasy. It's a Tuesday. And that changes what you can prototype, what you can propose, what you can defend with proof instead of a Figma file.</span>
+              </p>
+            </section>
+
+            {/* Next batches */}
+            <section class="block">
+              <h3 class="section-title">
+                <span data-lang="pt">Próximas fornadas</span>
+                <span data-lang="en">Next batches</span>
+              </h3>
+              <p class="prose">
+                <span data-lang="pt">Receitas de verdade: tô subindo as nossas, devagar, no ritmo do que cabe num fim de semana. Se você quiser ser cobaia de teste da primeira leva, deixa um recado.</span>
+                <span data-lang="en">Real recipes: I'm uploading ours slowly, at the pace of what fits in a weekend. If you want to be a test taster for the first batch, leave a note.</span>
+              </p>
+              <p class="prose">
+                <span data-lang="pt">Próxima fornada: um <strong>app mobile</strong>. Mesmo método, terreno novo — quero ver até onde o fluxo design + IA leva quando o output é um app nativo, não um site.</span>
+                <span data-lang="en">Next batch: a <strong>mobile app</strong>. Same method, new territory — I want to see how far the design + AI workflow goes when the output is a native app, not a site.</span>
+              </p>
+            </section>
+
+            {/* CTA — Deixa um recado */}
+            <section class="block cta">
+              <h3 class="section-title">
+                <span data-lang="pt">Deixa um recado</span>
+                <span data-lang="en">Leave a note</span>
+              </h3>
+              <p class="prose">
+                <span data-lang="pt">Curtiu o que viu? Quer trocar ideia sobre design, IA, ou só falar oi —</span>
+                <span data-lang="en">Liked what you saw? Want to chat about design, AI, or just say hi —</span>
+              </p>
+              <div class="cta-links">
+                <a class="btn btn-primary" href="https://linkedin.com/in/angelamadeira" target="_blank" rel="noopener">
+                  <Icon name="ph:linkedin-logo-thin" width={18} height={18} />
+                  LinkedIn
+                </a>
+                <a class="btn btn-ghost" href="mailto:angelmadeira@gmail.com">
+                  <Icon name="ph:envelope-thin" width={18} height={18} />
+                  <span data-lang="pt">Email</span>
+                  <span data-lang="en">Email</span>
+                </a>
+                <a class="btn btn-ghost" href="/#recado-modal" data-fade>
+                  <Icon name="ph:note-pencil-thin" width={18} height={18} />
+                  <span data-lang="pt">Recado no site</span>
+                  <span data-lang="en">Note on the site</span>
+                </a>
+              </div>
+            </section>
+          </div>
+        </article>
+
+      </div>
+
+      <footer class="seqtabs-footer">
+        <button class="seqtabs-navbtn seqtabs-prev" id="seqtabs-prev" type="button" data-no-fade>
+          <Icon name="ph:caret-left-thin" width={18} height={18} />
+          <span class="seqtabs-navbtn-text">
+            <span class="seqtabs-navbtn-dir">
+              <span data-lang="pt">Anterior</span>
+              <span data-lang="en">Previous</span>
+            </span>
+            <span class="seqtabs-navbtn-target" id="seqtabs-prev-target">
+              <span data-lang="pt"></span>
+              <span data-lang="en"></span>
+            </span>
+          </span>
+        </button>
+        <button class="seqtabs-navbtn seqtabs-next" id="seqtabs-next" type="button" data-no-fade>
+          <span class="seqtabs-navbtn-text">
+            <span class="seqtabs-navbtn-dir">
+              <span data-lang="pt">Próximo</span>
+              <span data-lang="en">Next</span>
+            </span>
+            <span class="seqtabs-navbtn-target" id="seqtabs-next-target">
+              <span data-lang="pt"></span>
+              <span data-lang="en"></span>
+            </span>
+          </span>
+          <Icon name="ph:caret-right-thin" width={18} height={18} />
+        </button>
+      </footer>
+    </div>
+    {/* ===================== END SEQUENTIAL TABS DEEP DIVES ===================== */}
+    </div>
+    {/* ===================== END DEEP DIVES OVERLAY ===================== */}
+
+    {/* Sections 12-15 (AI cooked, tasting, next batches, leave a note) migraram
+       pro Passo 9 (Fim) dentro do overlay. */}
+  </main>
+
+  <style>
+    /* ============ HEADER ============ */
+    /* Não-fixed: rola junto com o conteúdo. Só o seqtabs-nav fica sticky.
+       Isso libera o topo da viewport pra ser dominado pela navegação do case. */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--s-6);
+      height: var(--header-h);
+    }
+    .logo-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.1;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .logo-name {
+      font-family: var(--font-brand);
+      font-weight: 600;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .logo-by {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      opacity: 0.55;
+      margin-top: 1px;
+    }
+    .dark-toggle {
+      width: 36px; height: 36px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      padding: 0;
+    }
+    .icon-dark { display: none; }
+    body.dark-mode .icon-light { display: none; }
+    body.dark-mode .icon-dark { display: inline-block; }
+    svg { fill: none; stroke: currentColor; }
+
+    /* ============ MAIN ============ */
+    /* Header não é mais fixed, então o padding-top é só var(--s-7) (sem compensar header) */
+    .case {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: var(--s-7) var(--s-6) var(--s-9);
+    }
+
+    .top-nav { margin-bottom: var(--s-6); }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color var(--dur-fast);
+    }
+    .back-link:hover { color: var(--ink); }
+
+    /* ============ HERO ============ */
+    .hero { margin-bottom: var(--s-8); }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terracota);
+      margin-bottom: var(--s-3);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(28px, 4.5vw, 44px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .hero-em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--ink-soft);
+    }
+
+    /* ============ META CARD ============ */
+    .meta-card {
+      background: var(--surface, var(--bg));
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      padding: var(--s-5) var(--s-6);
+      margin-bottom: var(--s-8);
+    }
+    body.dark-mode .meta-card { background: rgba(255, 255, 255, 0.02); }
+    .meta-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-3);
+      padding: 0;
+      margin: 0;
+    }
+    .meta-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--s-3);
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink);
+    }
+    .meta-icon {
+      flex: none;
+      color: var(--terracota);
+      margin-top: 2px;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: baseline;
+    }
+    .meta-row strong {
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .meta-value { color: var(--ink-soft); }
+
+    /* ============ DEEP DIVES CTA (na view normal) ============ */
+    .deep-dives-cta {
+      text-align: center;
+    }
+    .deep-dives-cta .prose { margin-bottom: var(--s-4); }
+    .deep-dives-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ============ OVERLAY (full-screen takeover) ============ */
+    .cs-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    .cs-overlay[hidden] { display: none; }
+    .cs-overlay-close {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color var(--dur-fast), color var(--dur-fast);
+    }
+    .cs-overlay-close :global(svg) { fill: none; stroke: currentColor; }
+    .cs-overlay-close:hover { border-color: var(--ink-soft); color: var(--terracota); }
+
+    /* ============ SEQUENTIAL TABS (dentro do overlay) ============ */
+    /* O .seqtabs vira o container flex full-height da overlay:
+       [nav (tabs+close)] [panels (scrollable se transbordar)] [footer (prev/next)] */
+    .cs-overlay .seqtabs {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Tab strip — TOP fixo dentro da overlay */
+    .seqtabs-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      flex: none;
+      background: var(--bg);
+      padding: var(--s-3) var(--s-5);
+      border-bottom: 1px solid var(--line);
+    }
+    .seqtabs-nav-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: none;
+      padding-left: var(--s-4);
+      margin-left: var(--s-2);
+      border-left: 1px solid var(--line);
+    }
+    /* Quando overlay tá aberto, esconde site-header e lang-toggle do BaseLayout
+       (pra evitar duplicar elementos — os do overlay assumem). */
+    :global(body.cs-overlay-open .site-header),
+    :global(body.cs-overlay-open .lang-toggle) {
+      display: none !important;
+    }
+    /* Lang toggle dentro do overlay — mesmo padrão do BaseLayout */
+    .cs-lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      height: 32px;
+      padding: 0 4px;
+      box-sizing: border-box;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: border-color var(--dur-fast);
+    }
+    .cs-lang-toggle:hover { border-color: var(--ink-soft); }
+    .cs-lang-toggle .cs-lang-pt,
+    .cs-lang-toggle .cs-lang-en {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-weight: 500;
+      background: transparent;
+      color: var(--ink-soft);
+      transition: color 150ms, background 150ms;
+    }
+    .cs-lang-toggle .cs-lang-pt {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    .cs-lang-toggle.is-en .cs-lang-pt {
+      background: transparent;
+      color: var(--ink-soft);
+    }
+    .cs-lang-toggle.is-en .cs-lang-en {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    /* Dark toggle dentro do overlay */
+    .cs-dark-toggle {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      padding: 0;
+      transition: border-color var(--dur-fast), color var(--dur-fast);
+    }
+    .cs-dark-toggle:hover { border-color: var(--ink-soft); color: var(--terracota); }
+    .cs-dark-toggle :global(svg) { fill: none; stroke: currentColor; }
+    .cs-icon-dark { display: none; }
+    :global(body.dark-mode) .cs-icon-light { display: none; }
+    :global(body.dark-mode) .cs-icon-dark { display: inline-block; }
+
+    /* Close button — volta pra home */
+    .cs-close-btn {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      padding: 0;
+      transition: border-color var(--dur-fast), color var(--dur-fast);
+    }
+    .cs-close-btn:hover { border-color: var(--terracota); color: var(--terracota); }
+    .cs-close-btn :global(svg) { fill: none; stroke: currentColor; }
+    .seqtabs-strip {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+      margin: 0;
+      padding: 0 24px 0 0;  /* padding-right libera espaço pro fade-out */
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+      flex: 1;
+      min-width: 0;
+      /* Fade-mask no edge direito — tabs somem suavemente ao se aproximar
+         dos toggles, sinalizando "rola pra ver mais" sem clip abrupto. */
+      -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 28px), transparent 100%);
+      mask-image: linear-gradient(to right, black 0%, black calc(100% - 28px), transparent 100%);
+    }
+    .seqtabs-strip::-webkit-scrollbar { display: none; }
+
+    /* Dropdown nativo — escondido no desktop, exibido no mobile (@media) */
+    .seqtabs-select-wrap {
+      display: none;
+      position: relative;
+      flex: 1;
+      align-items: center;
+      min-width: 0;
+    }
+    .seqtabs-select {
+      flex: 1;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      padding: 7px 32px 7px 14px;
+      background: var(--terracota);
+      color: var(--bg);
+      border: 1px solid var(--terracota);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .seqtabs-select:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .seqtabs-select-caret {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--bg);
+      display: inline-flex;
+    }
+    .seqtabs-select-caret :global(svg) { fill: none; stroke: currentColor; }
+    .seqtab {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      color: var(--ink-soft);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
+    }
+    .seqtab:hover {
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    .seqtab.is-active {
+      color: var(--bg);
+      background: var(--terracota);
+      border-color: var(--terracota);
+    }
+    .seqtab-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.06);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    body.dark-mode .seqtab-num { background: rgba(255,255,255,0.1); }
+    .seqtab.is-active .seqtab-num {
+      background: rgba(255,255,255,0.22);
+    }
+
+    /* Panel container — preenche o middle, scroll interno se transbordar */
+    .seqtabs-panels {
+      position: relative;
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--s-7) var(--s-6);
+    }
+    .seqtabs-panels > .seqtab-panel {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .seqtab-panel {
+      display: none;
+      animation: seqtab-slide-in 320ms var(--ease-out);
+    }
+    .seqtab-panel.is-active { display: block; }
+    @keyframes seqtab-slide-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Panel header (step indicator + title) */
+    .seqtab-panel-header {
+      margin-bottom: var(--s-5);
+    }
+    .seqtab-panel-step {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracota);
+      margin-bottom: var(--s-2);
+    }
+    .seqtab-panel-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(28px, 4vw, 38px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: 0;
+    }
+    .seqtab-panel-body .prose:first-child { margin-top: 0; }
+
+    /* ============ SCREENSHOTS (passo Admin) ============ */
+    .cs-screenshot {
+      margin: var(--s-3) 0 var(--s-5);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-md);
+      padding: var(--s-3);
+      background: var(--surface, rgba(0, 0, 0, 0.02));
+    }
+    body.dark-mode .cs-screenshot {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .cs-screenshot-frame {
+      position: relative;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cs-screenshot-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      object-fit: contain;
+      border-radius: var(--r-sm);
+      background: var(--bg);
+      position: relative;
+      z-index: 2;
+    }
+    .cs-screenshot-frame img.failed,
+    .cs-screenshot-frame img[data-failed="1"] {
+      display: none;
+    }
+    .cs-screenshot-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--ink-soft);
+      text-align: center;
+      padding: var(--s-4);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .cs-screenshot-fallback :global(svg) {
+      color: var(--ink-mute);
+      fill: none;
+      stroke: currentColor;
+    }
+    .cs-screenshot-fallback-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    .cs-screenshot-fallback code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: rgba(0, 0, 0, 0.045);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--ink);
+    }
+    body.dark-mode .cs-screenshot-fallback code {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .cs-screenshot figcaption {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-top: var(--s-2);
+      text-align: center;
+    }
+
+    /* ============ PROBLEM / SOLUTION CARDS (passo Traduções) ============ */
+    .cs-problem-solution {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-3);
+      margin: var(--s-3) 0 var(--s-6);
+    }
+    .cs-ps-card {
+      padding: var(--s-4) var(--s-4) var(--s-4) var(--s-5);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-3);
+      position: relative;
+    }
+    .cs-ps-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: var(--s-3);
+      bottom: var(--s-3);
+      width: 3px;
+      border-radius: 2px;
+    }
+    .cs-ps-problem::before { background: var(--ink-soft); }
+    .cs-ps-solution::before { background: var(--terracota); }
+    .cs-ps-solution {
+      background: rgba(197, 107, 74, 0.04);
+    }
+    body.dark-mode .cs-ps-solution {
+      background: rgba(213, 136, 96, 0.06);
+    }
+    .cs-ps-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .cs-ps-solution .cs-ps-label { color: var(--terracota); }
+    .cs-ps-card p {
+      font-family: var(--font-sans);
+      font-size: var(--fs-body);
+      line-height: 1.55;
+      color: var(--ink);
+      margin: 0;
+    }
+    @media (max-width: 640px) {
+      .cs-problem-solution { grid-template-columns: 1fr; gap: var(--s-2); }
+    }
+
+    /* ============ RESPONSIVE VARIANTS (passo Ilustração) ============ */
+    .cs-responsive-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-5);
+      margin: var(--s-3) 0 var(--s-5);
+    }
+    .cs-device {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+    }
+    .cs-device-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--s-3);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink);
+    }
+    .cs-device-dim {
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+    .cs-device-canvas {
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      padding: var(--s-4);
+      background: var(--surface, rgba(0, 0, 0, 0.02));
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* SVGs inlined herdam currentColor — definimos cor pra eles aqui. */
+      color: var(--ink-soft);
+    }
+    body.dark-mode .cs-device-canvas {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--ink-soft);
+    }
+    .cs-device-canvas :global(svg) {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 320px;
+      max-width: 100%;
+      fill: none;
+      stroke: currentColor;
+      opacity: 0.9;
+    }
+    .cs-device-mobile-pair {
+      gap: var(--s-3);
+    }
+    .cs-device-mobile-part {
+      flex: 1;
+      min-width: 0;
+      max-width: 48%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cs-device-mobile-part :global(svg) {
+      max-height: 320px;
+    }
+    @media (max-width: 640px) {
+      .cs-device-canvas { padding: var(--s-3); }
+      .cs-device-canvas :global(svg) { max-height: 220px; }
+      .cs-device-mobile-part :global(svg) { max-height: 240px; }
+    }
+
+    /* ============ REFERENCE CARD (passo 1) ============ */
+    .cs-reference {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-4);
+      padding: var(--s-4) var(--s-5);
+      background: var(--surface, transparent);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color var(--dur-fast), background var(--dur-fast);
+      margin: var(--s-3) 0;
+    }
+    .cs-reference:hover {
+      border-color: var(--terracota);
+      background: rgba(197, 107, 74, 0.04);
+    }
+    .cs-reference-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .cs-reference-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terracota);
+    }
+    .cs-reference-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 22px;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+    .cs-reference-author {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+    .cs-reference-arrow {
+      flex: none;
+      color: var(--ink-soft);
+      transition: transform var(--dur-fast), color var(--dur-fast);
+    }
+    .cs-reference :global(svg) { fill: none; stroke: currentColor; }
+    .cs-reference:hover .cs-reference-arrow {
+      color: var(--terracota);
+      transform: translate(2px, -2px);
+    }
+
+    /* ============ DESIGN SYSTEM PANEL — visuais ============ */
+    /* Labels de bloco — section headings dentro do panel */
+    .cs-block-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracota);
+      margin: var(--s-6) 0 var(--s-3);
+    }
+    .cs-block-label:first-child { margin-top: 0; }
+
+    /* Princípios — 4 cards inline */
+    .cs-principles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--s-2);
+      margin-bottom: var(--s-5);
+    }
+    .cs-principle {
+      padding: var(--s-3) var(--s-4);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .cs-principle-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--ink);
+    }
+    .cs-principle-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      line-height: 1.3;
+    }
+
+    /* Paleta — 3 swatches grandes com label */
+    .cs-palette {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s-3);
+      margin: var(--s-3) 0 var(--s-5);
+    }
+    .cs-color {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+    }
+    .cs-color-chip {
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      border-radius: var(--r-md);
+    }
+    /* Chip split — light + dark lado a lado num retângulo */
+    .cs-color-chip-split {
+      display: flex;
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      border-radius: var(--r-md);
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .cs-chip-half { flex: 1; }
+    .cs-color-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .cs-color-name {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink);
+      background: none !important;
+      padding: 0 !important;
+    }
+    .cs-color-hex {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-soft);
+      letter-spacing: 0.02em;
+    }
+    /* Hex pairs (light/dark) — duas linhas com label e valor */
+    .cs-color-hexes {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .cs-color-hexes > span {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-soft);
+    }
+    .cs-hex-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-mute);
+      font-size: 9px;
+    }
+    .cs-hex-val {
+      color: var(--ink-soft);
+    }
+
+    /* Swatch row antigo (mantido se usado em outro lugar) */
+    .cs-swatch-row { display: flex; gap: 8px; margin: var(--s-3) 0 var(--s-5); }
+    .cs-swatch { width: 40px; height: 40px; border-radius: var(--r-md); flex: none; cursor: help; }
+
+    /* Tipografia — 4 samples vivos */
+    .cs-type-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid var(--line);
+      margin: var(--s-3) 0 var(--s-5);
+    }
+    .cs-type-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: var(--s-4);
+      padding: var(--s-3) 0;
+      border-bottom: 1px solid var(--line);
+      align-items: baseline;
+    }
+    .cs-type-meta { display: flex; flex-direction: column; gap: 2px; }
+    .cs-type-name {
+      font-size: 12px;
+      background: none !important;
+      padding: 0 !important;
+      color: var(--ink);
+    }
+    .cs-type-usage {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+    .cs-type-sample {
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Spacing + Radius grid */
+    .cs-tokens-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-5);
+      margin: var(--s-3) 0 var(--s-5);
+    }
+    .cs-mini-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-bottom: var(--s-3);
+    }
+    .cs-spacing-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cs-spacing-row {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+    .cs-spacing-bar {
+      height: 8px;
+      background: var(--terracota);
+      border-radius: 2px;
+      flex: none;
+    }
+    .cs-radius-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--s-3);
+    }
+    .cs-radius-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .cs-radius-box {
+      width: 56px;
+      height: 56px;
+      background: var(--terracota);
+      opacity: 0.85;
+    }
+    .cs-radius-item code {
+      font-size: 11px;
+      color: var(--ink-soft);
+      background: none !important;
+      padding: 0 !important;
+    }
+
+    /* Motion list */
+    .cs-motion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid var(--line);
+      margin: var(--s-3) 0;
+    }
+    .cs-motion-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: var(--s-4);
+      padding: var(--s-2) 0;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink);
+    }
+    .cs-motion-row code {
+      background: none !important;
+      padding: 0 !important;
+    }
+
+    /* Mobile responsive pros visuais */
+    @media (max-width: 640px) {
+      .cs-principles { grid-template-columns: 1fr; }
+      .cs-palette { grid-template-columns: 1fr; }
+      .cs-tokens-grid { grid-template-columns: 1fr; gap: var(--s-5); }
+      .cs-type-row { grid-template-columns: 1fr; gap: var(--s-2); }
+      .cs-motion-row { grid-template-columns: 1fr; gap: 2px; }
+    }
+
+    /* Footer prev/próximo — layout em cards com direção + nome destino.
+       Cores: prev cream/bg + ink, next terracota filled + texto branco
+       (mesma paleta do modo cozinha). */
+    .seqtabs-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: var(--s-3);
+      flex: none;
+      background: var(--bg);
+      padding: var(--s-3) var(--s-5);
+      border-top: 1px solid var(--line);
+    }
+    .seqtabs-navbtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 280px;
+      padding: var(--s-3) var(--s-4);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      color: var(--ink);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast), opacity var(--dur-fast);
+      text-align: left;
+      font-family: inherit;
+    }
+    .seqtabs-navbtn:hover:not(:disabled) {
+      background: var(--surface, rgba(0,0,0,0.03));
+    }
+    .seqtabs-navbtn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .seqtabs-prev { justify-content: flex-start; }
+    .seqtabs-next {
+      justify-content: flex-end;
+      margin-left: auto;
+      background: var(--terracota);
+      color: #fff;
+      border-color: var(--terracota);
+    }
+    .seqtabs-next:hover:not(:disabled) {
+      background: var(--terracota);
+      opacity: 0.9;
+    }
+    .seqtabs-navbtn :global(svg) {
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+    }
+    .seqtabs-navbtn-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .seqtabs-next .seqtabs-navbtn-text { align-items: flex-end; text-align: right; }
+    .seqtabs-navbtn-dir {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .seqtabs-next .seqtabs-navbtn-dir { color: rgba(255,255,255,0.75); }
+    .seqtabs-navbtn-target {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      /* Mobile: troca strip por dropdown nativo. Todas as 9 opções
+         acessíveis via picker do OS, sem scroll horizontal. */
+      .seqtabs-nav {
+        padding: var(--s-2) var(--s-4);
+        gap: var(--s-2);
+      }
+      .seqtabs-strip {
+        display: none;
+      }
+      .seqtabs-select-wrap {
+        display: flex;
+      }
+      .seqtabs-nav-actions {
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
+        gap: 6px;
+      }
+      .cs-lang-toggle { height: 28px; font-size: 11px; }
+      .cs-lang-toggle .cs-lang-pt,
+      .cs-lang-toggle .cs-lang-en { height: 20px; padding: 0 6px; }
+      .cs-dark-toggle { width: 28px; height: 28px; }
+      .cs-close-btn { width: 28px; height: 28px; }
+      .seqtabs-panels {
+        padding: var(--s-5) var(--s-4);
+      }
+      .seqtab-panel-step { font-size: 11px; }
+      .seqtab-panel-title { font-size: clamp(22px, 6vw, 28px); }
+      .hero-title { font-size: clamp(24px, 6vw, 36px) !important; }
+      .meta-card { padding: var(--s-4); }
+      .seqtabs-footer {
+        gap: var(--s-2);
+        padding: var(--s-2) var(--s-4);
+      }
+      .seqtabs-navbtn {
+        padding: var(--s-2) var(--s-3);
+        gap: 8px;
+        max-width: 50%;
+      }
+      .seqtabs-navbtn-target { font-size: 13px; }
+      .seqtabs-navbtn-dir { font-size: 10px; }
+    }
+
+    /* ============ BLOCKS ============ */
+    .block { margin-bottom: var(--s-8); }
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(20px, 2.4vw, 26px);
+      margin-bottom: var(--s-4);
+      color: var(--ink);
+    }
+    .prose {
+      font-family: var(--font-sans);
+      font-size: var(--fs-body);
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: var(--s-3);
+    }
+    .prose:last-child { margin-bottom: 0; }
+    .prose a {
+      color: var(--terracota);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+      transition: opacity var(--dur-fast);
+    }
+    .prose a:hover { opacity: 0.7; }
+    .prose code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: rgba(0, 0, 0, 0.045);
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: -0.01em;
+    }
+    body.dark-mode .prose code {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .dim { color: var(--ink-soft); }
+
+    /* ============ INGREDIENTS ============ */
+    .ing-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+    }
+    .ing-list li {
+      font-family: var(--font-mono);
+      font-size: var(--fs-meta);
+      color: var(--ink);
+      padding-left: var(--s-4);
+      position: relative;
+    }
+    .ing-list li::before {
+      content: '▪';
+      position: absolute;
+      left: 0;
+      color: var(--terracota);
+    }
+
+    /* ============ DAY LIST (method) ============ */
+    .day-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-5);
+    }
+    .day {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: var(--s-5);
+      align-items: start;
+    }
+    .day-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--terracota);
+      padding-top: 4px;
+    }
+    .day-content { min-width: 0; }
+    .day-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: var(--s-2);
+      color: var(--ink);
+    }
+
+    /* ============ BULLETS (tricky bits) ============ */
+    .bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-4);
+    }
+    .bullets > li {
+      padding-left: var(--s-4);
+      position: relative;
+    }
+    .bullets > li::before {
+      content: '◆';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      color: var(--terracota);
+      font-size: 10px;
+    }
+    .bullets strong {
+      display: block;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 17px;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    /* ============ GRID 3 (ai cooked / couldn't) ============ */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s-4);
+    }
+    .grid-item {
+      padding: var(--s-4);
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      background: var(--surface, transparent);
+    }
+    body.dark-mode .grid-item { background: rgba(255, 255, 255, 0.02); }
+    .grid-item h3 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      color: var(--terracota);
+      margin-bottom: var(--s-2);
+    }
+    .grid-item .prose {
+      font-size: var(--fs-small);
+      margin-bottom: 0;
+    }
+
+    /* ============ CTA ============ */
+    .cta-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-3);
+      margin-top: var(--s-4);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--r-pill);
+      font-family: var(--font-mono);
+      font-size: var(--fs-small);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--dur-fast);
+      border: 1px solid;
+    }
+    .btn-primary {
+      background: var(--terracota);
+      color: var(--bg);
+      border-color: var(--terracota);
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    .btn-ghost:hover { border-color: var(--ink-soft); }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 640px) {
+      .case {
+        padding-left: var(--s-4);
+        padding-right: var(--s-4);
+      }
+      .day {
+        grid-template-columns: 1fr;
+        gap: var(--s-2);
+      }
+      .grid-3 { grid-template-columns: 1fr; }
+      .site-header { padding: 0 var(--s-4); }
+    }
+  </style>
+
+  <script>
+    // Dark toggle (recipe.astro tem o seu próprio dentro do overlay)
+    document.getElementById('cs-dark-toggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      try {
+        localStorage.setItem('cozy-dark-mode',
+          document.body.classList.contains('dark-mode') ? 'true' : 'false');
+      } catch (e) {}
+    });
+
+    // Close button — volta pra home com fade transition se disponível
+    document.getElementById('cs-close-btn')?.addEventListener('click', () => {
+      if (window.cozyNavigate) window.cozyNavigate('/');
+      else window.location.href = '/';
+    });
+
+    // Lang toggle dentro do overlay — proxy pro BaseLayout (que mantém o estado real)
+    (function initCsLangToggle() {
+      const csBtn = document.getElementById('cs-lang-toggle');
+      if (!csBtn) return;
+
+      function syncVisual() {
+        const lang = window.__COZY_LANG === 'en' ? 'en' : 'pt';
+        csBtn.classList.toggle('is-en', lang === 'en');
+      }
+
+      csBtn.addEventListener('click', () => {
+        const baseBtn = document.getElementById('lang-toggle');
+        if (baseBtn) baseBtn.click();
+        // Sync imediato (caso o evento custom demore)
+        setTimeout(syncVisual, 0);
+      });
+
+      // Mantém visual sincronizado quando lang muda em qualquer lugar
+      document.addEventListener('cozy-lang-changed', syncVisual);
+
+      // Estado inicial (depois do BaseLayout init)
+      setTimeout(syncVisual, 0);
+    })();
+
+    // Detecta screenshots que ainda não foram adicionadas e esconde o <img>
+    // pra deixar só o placeholder visível.
+    document.querySelectorAll('.cs-screenshot-frame img').forEach(function (img) {
+      function markFailed() { img.classList.add('failed'); }
+      if (img.complete && img.naturalWidth === 0) markFailed();
+      img.addEventListener('error', markFailed);
+    });
+
+    // Overlay sempre aberto — a tela do overlay é o /recipe inteiro.
+    // Não tem botão close; conteúdo "atrás" foi migrado pra dentro dos passos.
+    (function showOverlay() {
+      const overlay = document.getElementById('cs-overlay');
+      if (!overlay) return;
+      overlay.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('cs-overlay-open');
+    })();
+
+    // Sequential tabs — 6 passos (Ingredientes + 4 deep dives + Fim) com prev/próximo no rodapé
+    (function initSeqTabs() {
+      const TAB_IDS = ['inicio', 'design-system', 'ilustracao', 'traducoes', 'admin', 'fim'];
+      const tabs = document.querySelectorAll('.seqtab');
+      const panels = document.querySelectorAll('.seqtab-panel');
+      const prevBtn = document.getElementById('seqtabs-prev');
+      const nextBtn = document.getElementById('seqtabs-next');
+      const prevTargetEl = document.getElementById('seqtabs-prev-target');
+      const nextTargetEl = document.getElementById('seqtabs-next-target');
+      const navEl = document.querySelector('.seqtabs-nav');
+      const selectEl = document.getElementById('seqtabs-select');
+      if (!tabs.length || !panels.length) return;
+
+      // Popula o dropdown mobile com 9 options bilíngues
+      function buildSelectOptions() {
+        if (!selectEl) return;
+        const lang = window.__COZY_LANG === 'en' ? 'en' : 'pt';
+        const currentValue = selectEl.value;
+        selectEl.innerHTML = '';
+        TAB_IDS.forEach(function (id, idx) {
+          const tab = document.querySelector('.seqtab[data-tab="' + id + '"]');
+          const lbl = tab ? tab.querySelector('.seqtab-label') : null;
+          const ptEl = lbl ? lbl.querySelector('[data-lang="pt"]') : null;
+          const enEl = lbl ? lbl.querySelector('[data-lang="en"]') : null;
+          const text = lang === 'en' ? (enEl ? enEl.textContent : '') : (ptEl ? ptEl.textContent : '');
+          const opt = document.createElement('option');
+          opt.value = id;
+          opt.textContent = (idx + 1) + ' · ' + text.trim();
+          selectEl.appendChild(opt);
+        });
+        // Restaura valor (ou primeiro)
+        const active = document.querySelector('.seqtab.is-active');
+        selectEl.value = (active && active.dataset.tab) || currentValue || TAB_IDS[0];
+      }
+
+      buildSelectOptions();
+      document.addEventListener('cozy-lang-changed', buildSelectOptions);
+
+      if (selectEl) {
+        selectEl.addEventListener('change', function (e) {
+          activateTab(e.target.value, true);
+        });
+      }
+
+      function getTabLabels(id) {
+        const tab = document.querySelector('.seqtab[data-tab="' + id + '"]');
+        if (!tab) return { pt: '', en: '' };
+        const lbl = tab.querySelector('.seqtab-label');
+        if (!lbl) return { pt: '', en: '' };
+        const ptEl = lbl.querySelector('[data-lang="pt"]');
+        const enEl = lbl.querySelector('[data-lang="en"]');
+        return {
+          pt: (ptEl ? ptEl.textContent : '').trim(),
+          en: (enEl ? enEl.textContent : '').trim(),
+        };
+      }
+      function setTargetLabel(el, labels) {
+        if (!el) return;
+        const ptEl = el.querySelector('[data-lang="pt"]');
+        const enEl = el.querySelector('[data-lang="en"]');
+        if (ptEl) ptEl.textContent = labels.pt;
+        if (enEl) enEl.textContent = labels.en;
+      }
+      const LABEL_EXIT = { pt: 'voltar pra cozinha', en: 'back to the kitchen' };
+
+      function activateTab(id, scrollToTop) {
+        tabs.forEach(function (t) { t.classList.toggle('is-active', t.dataset.tab === id); });
+        panels.forEach(function (p) { p.classList.toggle('is-active', p.dataset.panel === id); });
+
+        // Sincroniza o dropdown mobile
+        if (selectEl && selectEl.value !== id) selectEl.value = id;
+
+        const activeTab = document.querySelector('.seqtab[data-tab="' + id + '"]');
+        if (activeTab && activeTab.scrollIntoView) {
+          activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        const idx = TAB_IDS.indexOf(id);
+
+        // Atualiza estados e labels prev/próximo. Nos extremos vira "voltar pra cozinha".
+        if (prevBtn) {
+          prevBtn.disabled = false;
+          prevBtn.dataset.exit = idx <= 0 ? 'true' : 'false';
+          setTargetLabel(prevTargetEl, idx <= 0 ? LABEL_EXIT : getTabLabels(TAB_IDS[idx - 1]));
+        }
+        if (nextBtn) {
+          nextBtn.disabled = false;
+          nextBtn.dataset.exit = idx >= TAB_IDS.length - 1 ? 'true' : 'false';
+          setTargetLabel(nextTargetEl, idx >= TAB_IDS.length - 1 ? LABEL_EXIT : getTabLabels(TAB_IDS[idx + 1]));
+        }
+
+        try { history.replaceState(null, '', '#' + id); } catch (e) {}
+
+        // Scrolla o container de panels (não a janela) pro topo
+        if (scrollToTop) {
+          const panelsEl = document.querySelector('.seqtabs-panels');
+          if (panelsEl) panelsEl.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      tabs.forEach(function (t) {
+        t.addEventListener('click', function () { activateTab(t.dataset.tab, true); });
+      });
+
+      function goHome() {
+        // Usa cozyNavigate (fade transition) se disponível, senão fallback direto
+        if (window.cozyNavigate) window.cozyNavigate('/');
+        else window.location.href = '/';
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', function () {
+        const current = document.querySelector('.seqtab.is-active');
+        if (!current) return;
+        const idx = TAB_IDS.indexOf(current.dataset.tab);
+        if (idx <= 0) goHome();
+        else activateTab(TAB_IDS[idx - 1], true);
+      });
+
+      if (nextBtn) nextBtn.addEventListener('click', function () {
+        const current = document.querySelector('.seqtab.is-active');
+        if (!current) return;
+        const idx = TAB_IDS.indexOf(current.dataset.tab);
+        if (idx >= TAB_IDS.length - 1) goHome();
+        else activateTab(TAB_IDS[idx + 1], true);
+      });
+
+      // Keyboard nav (← →) — só responde quando o foco não está num input.
+      // Nos extremos (Step 1 ← / Step 9 →), navega pra home.
+      document.addEventListener('keydown', function (e) {
+        if (document.activeElement && /input|textarea|select/i.test(document.activeElement.tagName)) return;
+        const current = document.querySelector('.seqtab.is-active');
+        if (!current) return;
+        const idx = TAB_IDS.indexOf(current.dataset.tab);
+        if (e.key === 'ArrowRight') {
+          if (idx < TAB_IDS.length - 1) activateTab(TAB_IDS[idx + 1], false);
+          else goHome();
+        } else if (e.key === 'ArrowLeft') {
+          if (idx > 0) activateTab(TAB_IDS[idx - 1], false);
+          else goHome();
+        }
+      });
+
+      // Estado inicial: deep-link via hash, ou default = primeira tab
+      const initialId = window.location.hash.slice(1);
+      if (TAB_IDS.indexOf(initialId) >= 0) {
+        activateTab(initialId, false);
+      } else {
+        activateTab(TAB_IDS[0], false);
+      }
+    })();
+  </script>
+</BaseLayout>
