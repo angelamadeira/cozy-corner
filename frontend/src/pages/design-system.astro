@@ -5,7 +5,7 @@ import { Icon } from 'astro-icon/components';
 const colors = [
   { name: 'bg',         hex: '#FAF6EE', role: 'Background único do site inteiro (creme warm clarinho)' },
   { name: 'surface',    hex: '#F4EFE2', role: 'Surface — elevação sutil sobre bg' },
-  { name: 'accent-blue', hex: '#D7F5FF', role: 'Acento azul — detalhes, hover, sopro' },
+  { name: 'accent-blue', hex: '#D7F5FF', role: 'Highlight de busca (<mark>) — único uso visível no site hoje' },
   { name: 'terracota',  hex: '#C56B4A', role: 'Acento warm — calor contrastante (CTAs, links)' },
   { name: 'cover-dark', hex: '#1A2840', role: 'Cover da intro (só na tela inicial)' },
   { name: 'ink',        hex: '#1A1A1A', role: 'Texto principal' },
@@ -87,7 +87,7 @@ const types = [
     <section class="ds-section">
       <h2 class="ds-section-title">Uso de cor</h2>
       <p class="t-small" style="color: var(--ink-soft); margin-bottom: 24px; max-width: 640px;">
-        <strong>1 fundo</strong> + <strong>2 acentos</strong>. Tudo no creme. Azul claro e terracota entram como detalhes — nada compete com o creme principal.
+        <strong>1 fundo</strong> + <strong>1 acento dominante</strong>. Tudo no creme. Terracota é o único acento usado com frequência (CTAs, links, números, hover). Azul claro fica reservado pro highlight de busca; cover-dark só aparece na intro.
       </p>
       <div class="color-roles">
         <div class="color-role">
@@ -100,8 +100,8 @@ const types = [
         <div class="color-role">
           <div class="role-swatch" style="background: var(--accent-blue); border: 1px solid var(--line);"></div>
           <div>
-            <div class="t-h3">azul · acento sopro</div>
-            <div class="t-small" style="color: var(--ink-soft);">Detalhes sutis. Borders dashed dos hotspots, hover frio, foco em inputs, badges informativos.</div>
+            <div class="t-h3">azul · highlight de busca</div>
+            <div class="t-small" style="color: var(--ink-soft);">Único uso atual: background do <code>&lt;mark&gt;</code> nos resultados de <code>/busca</code>. Reservado pra futuros detalhes sutis (hover frio, foco em inputs, badges) — mas hoje só vive na busca.</div>
           </div>
         </div>
         <div class="color-role">

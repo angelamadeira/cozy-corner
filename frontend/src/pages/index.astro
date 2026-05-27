@@ -55,6 +55,10 @@ const countByCategory = Object.fromEntries(
       <span class="logo-name">Cozy Corner</span>
       <span class="logo-by">— by Gigi</span>
     </div>
+    <a href="/recipe/" class="header-case-link" aria-label="ver como esse site foi feito">
+      <span data-lang="pt">receita deste site</span>
+      <span data-lang="en">recipe for this site</span>
+    </a>
   </header>
 
   <div class="scroll-hint" id="scroll-hint">
@@ -153,6 +157,20 @@ const countByCategory = Object.fromEntries(
     </p>
     <p class="drawer-prose" data-t="sobre.p4">
       Fiquem à vontade, divirtam-se cozinhando e bom apetite =)
+    </p>
+    {/* Easter egg sutil pro case study do próprio site. */}
+    <p class="drawer-prose drawer-egg">
+      <span data-lang="pt">
+        Ah, e se quiser ver como esse cantinho foi feito →
+      </span>
+      <span data-lang="en">
+        Oh, and if you wanna see how this little corner was made →
+      </span>
+      &nbsp;
+      <a href="/recipe/" class="drawer-egg-link">
+        <span data-lang="pt">receita deste site</span>
+        <span data-lang="en">recipe for this site</span>
+      </a>
     </p>
   </aside>
 
@@ -327,6 +345,73 @@ const countByCategory = Object.fromEntries(
       font-size: 12px;
       opacity: 0.55;
       margin-top: 1px;
+    }
+    .header-case-link {
+      /* Desktop largo (≥1024px): à esquerda do lang-toggle (right:16px, ~90px wide),
+         no canto direito do header — agrupa com o toggle como utilities.
+         Em viewports menores, a regra do @media abaixo manda pro bottom. */
+      position: fixed;
+      top: 10px;          /* mesma top do lang-toggle */
+      right: 116px;       /* lang-toggle right (16) + width (~90) + gap (10) */
+      display: inline-flex;
+      align-items: center;
+      height: 36px;       /* mesmo height do lang-toggle */
+      box-sizing: border-box;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      color: var(--bg, #faf6ee);
+      background: var(--terracota, #c8553d);
+      text-decoration: none;
+      padding: 0 14px;
+      border-radius: 999px;
+      transition: opacity 200ms ease-out 500ms;  /* mesma transition do lang-toggle pra entrar junto */
+      z-index: 220;       /* mesmo z-index do lang-toggle */
+    }
+    .header-case-link:hover { opacity: 0.85; transition: opacity var(--dur-fast); }
+    /* Esconde durante intro, drawer aberto e cooking mode (igual ao lang-toggle) */
+    body.intro-active .header-case-link,
+    body.drawer-open .header-case-link,
+    body.cm-open .header-case-link {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 120ms ease-in;
+    }
+    /* Tablet + mobile (<1024px): barra full-width edge-to-edge no bottom,
+       só texto. O botão redondo de swipe-hint (que passa entre as 2 partes
+       da cozinha em mobile) sobe pra ficar acima da barra. */
+    @media (max-width: 1023px) {
+      .header-case-link {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: env(safe-area-inset-bottom, 0px);
+        width: auto;
+        height: auto;
+        padding: var(--s-4) var(--s-5);
+        border-radius: 0;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+        box-sizing: border-box;
+      }
+      /* Pinta a faixa safe-area abaixo do botão com a cor do botão pra
+         não ficar lacuna visual em telas com home-bar do iOS. */
+      body::after {
+        content: '';
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: env(safe-area-inset-bottom, 0px);
+        background: var(--terracota, #c8553d);
+        z-index: 219;
+        pointer-events: none;
+      }
+    }
+    @media print {
+      .header-case-link { display: none; }
     }
 
     /* ============ HERO (morfa pro header) ============ */
@@ -549,12 +634,14 @@ const countByCategory = Object.fromEntries(
       }
       /* Botão de navegação: setinha clicável que alterna entre as duas partes.
          Position absolute (não fixed) pra ficar dentro do wrap, que já usa
-         --vh-real e portanto fica acima da barra de URL do iOS Safari. */
+         --vh-real e portanto fica acima da barra de URL do iOS Safari.
+         Bottom calculado pra ficar acima da barra terracota "receita deste site":
+         padding (var(--s-4)*2=32) + line (~22) + safe-area + gap (16) = ~70+safe. */
       .mobile-swipe-hint {
         position: absolute;
         right: var(--s-3);
         left: auto;
-        bottom: var(--s-5);
+        bottom: calc(var(--s-4) * 2 + 22px + env(safe-area-inset-bottom, 0px) + 16px);
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -818,6 +905,22 @@ const countByCategory = Object.fromEntries(
       color: var(--ink-soft);
       margin-bottom: var(--s-4);
     }
+    /* Easter egg sutil no final do drawer Sobre — fonte um pouco menor,
+       cor mais apagada, separação visual maior do parágrafo anterior. */
+    .drawer-egg {
+      margin-top: var(--s-5);
+      padding-top: var(--s-4);
+      border-top: 1px dashed var(--line);
+      font-size: var(--fs-small);
+      color: var(--ink-mute);
+    }
+    .drawer-egg-link {
+      color: var(--terracota);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      transition: opacity var(--dur-fast);
+    }
+    .drawer-egg-link:hover { opacity: 0.7; }
     /* Foto do "sobre" — preto e branco via CSS, quadrada com cantos suaves */
     .sobre-photo {
       margin: 0 0 var(--s-5);
