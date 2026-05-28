@@ -14,8 +14,7 @@ difficulty: médio
 unitSystem: metric
 media:
   - type: image
-    url: >-
-      https://receitadaboa.com.br/wp-content/uploads/2024/10/iStock-1477739651.jpg
+    url: /uploads/lasanha-de-queijo.png
 ingredients:
   - 1 pacote de massa de lasanha fresca da Massa Leve (500g)
   - 1 cebola picada

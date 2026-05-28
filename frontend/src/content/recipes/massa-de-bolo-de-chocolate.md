@@ -12,8 +12,7 @@ difficulty: fácil
 unitSystem: metric
 media:
   - type: image
-    url: >-
-      https://teamodoce.com.br/wp-content/uploads/2025/10/Massa-de-Chocolate-para-Bolo-de-Aniversario.webp
+    url: /uploads/massa-de-bolo-de-chocolate.png
 ingredients:
   - 5 ovos
   - 400g de açúcar

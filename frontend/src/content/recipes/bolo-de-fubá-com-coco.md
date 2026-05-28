@@ -14,8 +14,7 @@ difficulty: fácil
 unitSystem: metric
 media:
   - type: image
-    url: >-
-      https://receitastiamaria.com/wp-content/uploads/2023/03/bolo-de-fuba-com-coco.webp
+    url: /uploads/bolo-de-fuba-com-coco.png
 ingredients:
   - 3 ovos
   - 110g de óleo
