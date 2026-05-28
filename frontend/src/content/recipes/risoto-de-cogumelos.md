@@ -14,8 +14,7 @@ tags: []
 media:
   - type: image
     src: ''
-    url: >-
-      https://www.estadao.com.br/resizer/v2/IAXF2PJPAJFSXO5E65SZ2XX4MY.jpg?quality=80&auth=64c5439aa1a8788fbe107aad751a2816fc330f0b158660b4bbf6bae307d8a48e&width=720&height=410&focal=1493,987
+    url: /uploads/brownie-perfeito.png
 ingredients:
   - 175g de chocolate meio amargo em pedacinhos
   - 150g de manteiga sem sal

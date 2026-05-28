@@ -12,8 +12,7 @@ difficulty: fácil
 unitSystem: metric
 media:
   - type: image
-    url: >-
-      https://s2-receitas.glbimg.com/y-B5iDswD8se_8lnSiawn-tAJEU=/0x0:1366x768/1000x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_1f540e0b94d8437dbbc39d567a1dee68/internal_photos/bs/2024/o/F/sIukkmQzqkAoX6KnmAXg/bolo-basico-branco.jpg
+    url: /uploads/massa-de-bolo-branco.png
 ingredients:
   - 5 ovos
   - 400g de açúcar
