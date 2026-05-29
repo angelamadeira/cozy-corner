@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cozy-corner",
+  "compatibility_date": "2026-05-14",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "mockup-v1"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
